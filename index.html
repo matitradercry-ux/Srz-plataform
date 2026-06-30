@@ -6,6 +6,8 @@
     <title>Sr. Z - Comando Unificado v2.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
     <style>
         .fade-in { animation: fadeIn 0.25s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
@@ -15,304 +17,391 @@
         ::-webkit-scrollbar-thumb:hover { background: #334155; }
         .calendario-wrapper { position: relative; width: 100%; height: 160px; overflow: hidden; }
         .calendario-wrapper iframe { position: absolute; top: 0; left: 0; width: 200%; height: 100%; transform: scale(0.98); transform-origin: top left; }
+        .chat-msg-user { background: #0f1f35; border-left: 2px solid #0ea5e9; }
+        .chat-msg-ia   { background: #070a12; border-left: 2px solid #1e293b; }
+        .md-h2  { color: #7dd3fc; font-weight: 700; font-size: 1rem; margin: 10px 0 4px; display:block; }
+        .md-h3  { color: #38bdf8; font-weight: 700; font-size: .875rem; margin: 8px 0 3px; display:block; }
+        .md-li  { display: flex; gap: 6px; margin: 2px 0; }
+        .md-dot { color: #06b6d4; flex-shrink: 0; }
+        .md-code{ background:#1e293b; color:#67e8f9; padding:1px 5px; border-radius:4px; font-family:monospace; font-size:.8em; }
+        .md-h1  { color:#e2e8f0; font-weight:800; font-size:1.1rem; margin:12px 0 5px; display:block; }
+        .md-pre { background:#0d1321; border:1px solid #1e293b; border-radius:8px; padding:12px 14px; margin:8px 0; overflow-x:auto; }
+        .md-pre code { color:#67e8f9; font-family:monospace; font-size:.8em; white-space:pre; }
+        .md-hr  { border:none; border-top:1px solid #1e293b; margin:10px 0; }
+        .md-quote { border-left:3px solid #0ea5e9; padding:4px 10px; background:#0f1f35; margin:6px 0; color:#94a3b8; border-radius:0 4px 4px 0; font-size:.85em; }
+        .md-math-block { background:#0d1321; border:1px solid #1e293b; border-radius:6px; padding:8px 12px; margin:6px 0; overflow-x:auto; text-align:center; }
+        .katex { color:#e2e8f0; }
+        .katex-display { overflow-x:auto; overflow-y:hidden; }
+        .md-img-note { background:#1a2035; border:1px dashed #334155; border-radius:6px; padding:6px 10px; margin:4px 0; color:#64748b; font-size:.78em; font-style:italic; }
+        nav.srz-nav { position:fixed; top:0; left:0; right:0; z-index:40; background:rgba(7,10,18,0.92); backdrop-filter:blur(12px); border-bottom:1px solid rgba(30,41,59,0.6); }
     </style>
 </head>
 <body class="bg-[#070a12] text-slate-100 font-sans overflow-x-hidden pb-12">
 
     <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-cyan-500/5 rounded-full blur-[140px] pointer-events-none"></div>
     <div class="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-orange-500/5 rounded-full blur-[140px] pointer-events-none"></div>
-
     <div id="app-container"></div>
 
     <script>
         const LINK_DRIVE_RAIZ = "https://drive.google.com/drive/u/1/folders/1RU6Vg3VMCQaI0j7tWaHcihCiFekUZhMf";
-        
+
+        // Pip value USD por lote estandar por instrumento
+        const INST = {
+            'US30':   { tv:'BLACKBULL:US30',   pip:1,  label:'US30',     unidad:'puntos' },
+            'BTC':    { tv:'BINANCE:BTCUSDT',  pip:1,  label:'BTC',      unidad:'USD' },
+            'GOLD':   { tv:'TVC:GOLD',         pip:10, label:'Oro',      unidad:'pips' },
+            'OIL':    { tv:'TVC:USOIL',        pip:10, label:'Crudo',    unidad:'pips' },
+            'EURUSD': { tv:'FX:EURUSD',        pip:10, label:'EUR/USD',  unidad:'pips' }
+        };
+
         let estado = {
             busqueda: "",
             vistaActual: "home",
             parSeleccionado: "US30",
+            symbolCustom: null,
             calculadoraAbierta: false,
             balanceCuenta: 10000,
             riesgoPorcentaje: 1,
             stopLossPips: 20,
-            iaRespuesta: null,
-            iaCargando: false
+            chatHistorial: [],
+            iaCargando: false,
+            imagenPendiente: null   // {dataUrl, mimeType, base64}
         };
 
-        function render() {
-            const container = document.getElementById('app-container');
-            if (estado.vistaActual === 'trading_hub') {
-                container.innerHTML = renderTradingHub();
-                setTimeout(cargarWidgetsTradingView, 30);
-                return; 
+        // ─── MATH RENDER ────────────────────────────────────────────────────────────
+        function renderMath(math, display) {
+            if (typeof katex !== 'undefined') {
+                try { return katex.renderToString(math.trim(), { displayMode: !!display, throwOnError: false }); }
+                catch(e) {}
             }
-            container.innerHTML = renderHome();
-            vincularEventos();
+            return display
+                ? `<div class="md-math-block">${math}</div>`
+                : `<span class="md-code">${math}</span>`;
+        }
+
+        // ─── MARKDOWN ───────────────────────────────────────────────────────────────
+        function md(text) {
+            // 1. Protect code blocks
+            const blocks = [];
+            text = text.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) => {
+                const i = blocks.length;
+                const safe = code.trim().replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                blocks.push(`<pre class="md-pre"><code>${safe}</code></pre>`);
+                return `\x00BLK${i}\x00`;
+            });
+            // 2. Display math $$...$$
+            text = text.replace(/\$\$([^$]+)\$\$/g, (_, m) => {
+                const i = blocks.length;
+                blocks.push(`<div class="md-math-block">${renderMath(m, true)}</div>`);
+                return `\x00BLK${i}\x00`;
+            });
+            // 3. Images → note (can't embed external images safely)
+            text = text.replace(/!\[([^\]]*)\]\([^)]+\)/g, (_, alt) =>
+                `<div class="md-img-note">🖼 Imagen: ${alt || 'sin descripción'} — buscá en Google Imágenes</div>`
+            );
+
+            const lines = text.split('\n');
+            let out = '';
+            for (let line of lines) {
+                // Restore protected blocks
+                const blkMatch = line.match(/^\x00BLK(\d+)\x00$/);
+                if (blkMatch) { out += blocks[+blkMatch[1]]; continue; }
+
+                const t = line.trimStart();
+                if      (t.startsWith('# '))   out += `<div class="md-h1">${t.slice(2)}</div>`;
+                else if (t.startsWith('## '))  out += `<div class="md-h2">${t.slice(3)}</div>`;
+                else if (t.startsWith('### ')) out += `<div class="md-h3">${t.slice(4)}</div>`;
+                else if (/^[-*]\s/.test(t))    out += `<div class="md-li"><span class="md-dot">›</span><span>${t.slice(2)}</span></div>`;
+                else if (/^\d+\.\s/.test(t))   out += `<div class="md-li"><span class="md-dot">${t.match(/^\d+/)[0]}.</span><span>${t.replace(/^\d+\.\s/,'')}</span></div>`;
+                else if (/^---+$/.test(t))     out += '<hr class="md-hr"/>';
+                else if (t.startsWith('> '))   out += `<div class="md-quote">${t.slice(2)}</div>`;
+                else if (t === '')             out += '<div class="mt-2"></div>';
+                else                           out += `<div>${line}</div>`;
+            }
+
+            // Inline math $...$, bold, italic, code
+            return out
+                .replace(/\$([^$\n<]{1,120})\$/g, (_, m) => renderMath(m, false))
+                .replace(/\*\*(.+?)\*\*/gs, '<strong class="text-slate-100">$1</strong>')
+                .replace(/\*(.+?)\*/g, '<em class="text-slate-300">$1</em>')
+                .replace(/`([^`]+)`/g, '<span class="md-code">$1</span>');
+        }
+
+        // ─── RENDER ─────────────────────────────────────────────────────────────────
+        function render() {
+            const c = document.getElementById('app-container');
+            if (estado.vistaActual === 'trading_hub') {
+                c.innerHTML = renderTradingHub();
+                setTimeout(cargarWidgets, 30);
+            } else {
+                c.innerHTML = renderHome();
+                vincularEventos();
+                setTimeout(cargarTickerHome, 80);
+                setTimeout(cargarMercado, 120);
+            }
         }
 
         function renderHome() {
             const apiKey = localStorage.getItem('gemini_api_key');
 
-            let panelIA = "";
-            if (estado.iaCargando) {
-                panelIA = `
-                    <div class="border-t border-slate-800/60 bg-[#070a12] px-5 py-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
-                            <div class="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" style="animation-delay:0.2s"></div>
-                            <div class="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" style="animation-delay:0.4s"></div>
-                            <span class="text-slate-500 text-xs ml-1">Consultando Gemini...</span>
+            // Chat panel
+            let chatHTML = estado.chatHistorial.map(msg => msg.role === 'user'
+                ? `<div class="chat-msg-user rounded-lg px-4 py-2.5 mb-2">
+                       <div class="text-[10px] text-cyan-500 font-bold mb-1">VOS</div>
+                       ${msg.imageUrl ? `<img src="${msg.imageUrl}" class="max-h-36 rounded-lg mb-2 border border-slate-700 object-contain" alt="imagen"/>` : ''}
+                       <div class="text-slate-200 text-sm">${msg.text}</div>
+                   </div>`
+                : `<div class="chat-msg-ia rounded-lg px-4 py-2.5 mb-2 relative group">
+                       <div class="flex justify-between items-center mb-1">
+                           <span class="text-[10px] text-slate-500 font-bold">SR. Z IA</span>
+                           <button onclick="copiar(this)" data-t="${msg.text.replace(/"/g,'&quot;').replace(/'/g,'&#39;')}"
+                               class="opacity-0 group-hover:opacity-100 text-[10px] text-slate-500 hover:text-cyan-400 px-2 py-0.5 rounded border border-slate-800 hover:border-cyan-500/30 transition">
+                               Copiar
+                           </button>
+                       </div>
+                       <div class="text-slate-200 text-sm leading-relaxed">${md(msg.text)}</div>
+                   </div>`
+            ).join('');
+
+            let panelChat = '';
+            if (estado.chatHistorial.length > 0 || estado.iaCargando) {
+                panelChat = `
+                    <div class="border-t border-slate-800/60 bg-[#070a12] p-3 max-h-96 overflow-y-auto" id="chat-scroll">
+                        <div class="flex justify-end mb-2">
+                            <button onclick="limpiarChat()" class="text-[10px] text-slate-600 hover:text-red-400 transition">Limpiar chat</button>
                         </div>
+                        ${chatHTML}
+                        ${estado.iaCargando ? `<div class="flex items-center gap-2 px-2 py-3">
+                            <div class="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse"></div>
+                            <div class="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse" style="animation-delay:.2s"></div>
+                            <div class="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse" style="animation-delay:.4s"></div>
+                            <span class="text-slate-500 text-xs ml-1">Gemini procesando...</span>
+                        </div>` : ''}
                     </div>`;
-            } else if (estado.iaRespuesta) {
-                panelIA = `
-                    <div class="border-t border-slate-800/60 bg-[#070a12] px-5 py-4 text-left fade-in">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-[10px] text-cyan-400 font-bold uppercase tracking-wider">⚡ Respuesta IA</span>
-                            <button onclick="limpiarRespuesta()" class="text-slate-600 hover:text-slate-400 text-xs transition">✕ Cerrar</button>
-                        </div>
-                        <div class="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap">${estado.iaRespuesta}</div>
-                    </div>`;
-            } else if (estado.busqueda.trim().length > 0 && !apiKey) {
-                panelIA = `
-                    <div class="border-t border-slate-800/60 bg-[#070a12] px-4 py-3">
-                        <div class="flex items-center justify-between gap-3">
-                            <p class="text-xs text-slate-400">Necesitás una API Key de Gemini para usar el asistente IA.</p>
-                            <button onclick="abrirConfigIA()" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold px-3 py-1.5 rounded-lg whitespace-nowrap transition">Configurar →</button>
-                        </div>
+            } else if (estado.busqueda.trim() && !apiKey) {
+                panelChat = `
+                    <div class="border-t border-slate-800/60 bg-[#070a12] px-4 py-3 flex items-center justify-between gap-3">
+                        <p class="text-xs text-slate-400">Configurá una API Key de Gemini para usar el asistente.</p>
+                        <button onclick="abrirKey()" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold px-3 py-1.5 rounded-lg whitespace-nowrap transition">Configurar</button>
                     </div>`;
             }
 
             return `
-                <div id="modal-ia" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <nav class="srz-nav">
+                    <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+                        <div class="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-orange-400 tracking-wider">Sr.Z</div>
+                        <div class="flex items-center gap-1 md:gap-3">
+                            <a href="laboratorio.html" class="text-xs text-slate-400 hover:text-cyan-400 transition px-2 py-1 rounded hover:bg-slate-800/60">⚡ Electrónica</a>
+                            <button onclick="cambiarVista('trading_hub')" class="text-xs text-slate-400 hover:text-orange-400 transition px-2 py-1 rounded hover:bg-slate-800/60">📈 Trading</button>
+                            <a href="${LINK_DRIVE_RAIZ}" target="_blank" class="text-xs text-slate-400 hover:text-emerald-400 transition px-2 py-1 rounded hover:bg-slate-800/60 hidden md:block">📚 Docs</a>
+                            <button onclick="abrirKey()" class="text-xs ${apiKey ? 'text-emerald-400 border-emerald-500/30' : 'text-slate-500 border-slate-800'} border px-2.5 py-1 rounded-lg hover:bg-slate-800/60 transition ml-1">${apiKey ? '● Gemini' : '⚙ API Key'}</button>
+                        </div>
+                    </div>
+                </nav>
+                <div id="modal-key" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                     <div class="bg-[#0d1321] border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl">
-                        <h3 class="text-sm font-bold uppercase text-cyan-400 mb-2">⚙️ API Key de Gemini</h3>
-                        <p class="text-xs text-slate-400 mb-4">Se usa para el asistente IA del home y el laboratorio de electrónica. Gratis con cuenta Google AI Studio.</p>
-                        <input id="ia-key-input" type="password" placeholder="AIzaSy..." class="w-full bg-[#070a12] border border-slate-800 p-2.5 rounded-xl font-mono text-xs focus:outline-none focus:border-cyan-500 mb-4"/>
+                        <h3 class="text-sm font-bold uppercase text-cyan-400 mb-1">API Key de Gemini</h3>
+                        <p class="text-xs text-slate-400 mb-4">Gratis en <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-cyan-400 hover:underline">aistudio.google.com</a>. Compartida con el laboratorio.</p>
+                        <input id="key-input" type="password" placeholder="AIzaSy..." class="w-full bg-[#070a12] border border-slate-800 p-2.5 rounded-xl font-mono text-xs focus:outline-none focus:border-cyan-500 mb-4"/>
                         <div class="flex justify-end gap-2">
-                            <button onclick="cerrarConfigIA()" class="text-xs text-slate-400 px-3 py-2">Cerrar</button>
-                            <button onclick="guardarKeyIA()" class="bg-cyan-500 text-slate-950 text-xs font-bold px-4 py-2 rounded-lg">Guardar</button>
+                            <button onclick="cerrarKey()" class="text-xs text-slate-400 px-3 py-2">Cerrar</button>
+                            <button onclick="guardarKey()" class="bg-cyan-500 text-slate-950 text-xs font-bold px-4 py-2 rounded-lg">Guardar</button>
                         </div>
                     </div>
                 </div>
                 <div class="fade-in">
-                    <header class="relative max-w-6xl mx-auto pt-20 pb-12 px-4 text-center z-10">
+                    <header class="relative max-w-6xl mx-auto pt-28 pb-10 px-4 text-center z-10">
                         <div class="text-6xl font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-orange-400 mb-2 filter drop-shadow-[0_0_20px_rgba(6,182,212,0.4)]">Sr. Z</div>
                         <h1 class="text-xl md:text-2xl font-bold text-slate-400 uppercase tracking-wide">Docente de Electrónica <span class="text-slate-600">|</span> <span class="text-orange-400">Trader</span></h1>
-                        <div class="mt-10 max-w-3xl mx-auto relative px-2">
-                            <div class="relative flex flex-col bg-[#0d1321] border border-slate-800 focus-within:border-cyan-500/50 rounded-xl shadow-2xl overflow-hidden transition-all">
-                                <div class="flex items-center px-4 py-3.5 gap-3">
-                                    <span class="text-xl text-slate-500">🤖</span>
-                                    <input id="buscador-input" type="text" placeholder="Preguntá cualquier cosa: electrónica, trading, física, código..." value="${estado.busqueda}" class="w-full bg-transparent text-slate-100 placeholder-slate-500 focus:outline-none text-base font-medium" />
+                        <div class="mt-8 max-w-3xl mx-auto px-2">
+                            <div class="flex flex-col bg-[#0d1321] border border-slate-800 focus-within:border-cyan-500/50 rounded-xl shadow-2xl overflow-hidden transition-all">
+                                <div class="flex items-center px-4 py-3 gap-3">
+                                    <span class="text-lg ${apiKey ? 'text-cyan-400' : 'text-slate-600'}">🤖</span>
+                                    <input id="buscador-input" type="text" placeholder="Preguntá cualquier cosa: electrónica, trading, física, código..."
+                                        value="${estado.busqueda}" class="w-full bg-transparent text-slate-100 placeholder-slate-500 focus:outline-none text-sm font-medium"/>
+                                    <input type="file" id="img-upload" accept="image/*" class="hidden" onchange="subirImagen(this)"/>
+                                    ${estado.imagenPendiente
+                                        ? `<div class="relative shrink-0">
+                                               <img src="${estado.imagenPendiente.dataUrl}" class="h-8 w-8 rounded object-cover border border-cyan-500/60" alt="img"/>
+                                               <button onclick="limpiarImagen()" class="absolute -top-1 -right-1 bg-slate-900 text-red-400 text-[9px] rounded-full w-3.5 h-3.5 flex items-center justify-center leading-none">✕</button>
+                                           </div>`
+                                        : `<button onclick="document.getElementById('img-upload').click()" title="Adjuntar imagen para análisis"
+                                               class="text-slate-500 hover:text-cyan-400 transition shrink-0 text-base">📎</button>`
+                                    }
                                     <button onclick="consultarIA()" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-sm px-4 py-1.5 rounded-lg transition shrink-0">→</button>
                                 </div>
-                                ${panelIA}
+                                ${panelChat}
                             </div>
                             <div class="flex gap-2 mt-2 flex-wrap justify-center">
-                                <button onclick="setQuery('¿Cómo calculo la resistencia de base para un BC548?')" class="text-[10px] text-slate-500 hover:text-cyan-400 bg-slate-900 px-2 py-1 rounded-md border border-slate-800 hover:border-cyan-500/30 transition">Resistencia de base BC548</button>
-                                <button onclick="setQuery('Explicá el concepto de FVG en SMC trading')" class="text-[10px] text-slate-500 hover:text-orange-400 bg-slate-900 px-2 py-1 rounded-md border border-slate-800 hover:border-orange-500/30 transition">FVG en SMC</button>
-                                <button onclick="setQuery('¿Cómo funciona un filtro RC pasabajos?')" class="text-[10px] text-slate-500 hover:text-cyan-400 bg-slate-900 px-2 py-1 rounded-md border border-slate-800 hover:border-cyan-500/30 transition">Filtro RC pasabajos</button>
-                                <button onclick="abrirConfigIA()" class="text-[10px] text-slate-600 hover:text-slate-400 bg-slate-900 px-2 py-1 rounded-md border border-slate-800 transition">⚙️ API Key</button>
+                                <button onclick="setQ('¿Cómo calculo la resistencia de base para un BC548?')" class="text-[10px] text-slate-500 hover:text-cyan-400 bg-slate-900 px-2 py-1 rounded-md border border-slate-800 hover:border-cyan-500/30 transition">Resistencia base BC548</button>
+                                <button onclick="setQ('Explicá FVG y Order Block en SMC con ejemplos')" class="text-[10px] text-slate-500 hover:text-orange-400 bg-slate-900 px-2 py-1 rounded-md border border-slate-800 hover:border-orange-500/30 transition">FVG + OB en SMC</button>
+                                <button onclick="setQ('¿Cómo funciona un filtro RC pasabajos?')" class="text-[10px] text-slate-500 hover:text-cyan-400 bg-slate-900 px-2 py-1 rounded-md border border-slate-800 hover:border-cyan-500/30 transition">Filtro RC</button>
+                                <button onclick="setQ('¿Qué es el DXY y cómo afecta al US30?')" class="text-[10px] text-slate-500 hover:text-orange-400 bg-slate-900 px-2 py-1 rounded-md border border-slate-800 hover:border-orange-500/30 transition">DXY vs US30</button>
+                                <button onclick="abrirKey()" class="text-[10px] ${apiKey ? 'text-emerald-500 border-emerald-500/30' : 'text-slate-600 border-slate-800'} bg-slate-900 px-2 py-1 rounded-md border transition">
+                                    ${apiKey ? '✓ Gemini conectado' : '⚙️ Configurar API Key'}
+                                </button>
                             </div>
                         </div>
                     </header>
                     <main class="max-w-6xl mx-auto px-4 pb-24 relative z-10">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- CALENDARIO ECONÓMICO — FIJO -->
+                        <div class="mb-3 bg-[#0d1321] border border-slate-800 rounded-xl overflow-hidden shadow-lg">
+                            <div class="bg-slate-950/90 px-4 py-1.5 text-[10px] font-bold text-yellow-400 border-b border-slate-900 uppercase tracking-wider flex items-center gap-2">
+                                <span>📅 Calendario Económico</span>
+                                <span class="text-slate-600 font-normal normal-case">— próximos eventos desde ahora</span>
+                            </div>
+                            <div id="mkt-calendar" class="h-[108px]"></div>
+                        </div>
 
-                            <!-- LABORATORIO -->
-                            <a href="laboratorio.html" class="group relative bg-[#0d1321] border border-slate-800 hover:border-cyan-500/60 rounded-2xl overflow-hidden flex flex-col transition duration-300 shadow-xl hover:shadow-cyan-500/10">
-                                <div class="relative h-36 overflow-hidden bg-gradient-to-br from-[#071a2e] to-[#0d1321] flex items-center justify-center">
-                                    <svg viewBox="0 0 280 140" class="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-300" xmlns="http://www.w3.org/2000/svg">
-                                        <!-- PCB grid -->
-                                        <defs>
-                                            <pattern id="grid-lab" width="14" height="14" patternUnits="userSpaceOnUse"><path d="M 14 0 L 0 0 0 14" fill="none" stroke="#0e3a5e" stroke-width="0.5"/></pattern>
-                                        </defs>
-                                        <rect width="280" height="140" fill="url(#grid-lab)"/>
-                                        <!-- IC chip NE555 -->
-                                        <rect x="100" y="40" width="80" height="60" rx="4" fill="#0a2240" stroke="#0ea5e9" stroke-width="1.5"/>
-                                        <text x="140" y="68" text-anchor="middle" fill="#38bdf8" font-size="9" font-family="monospace" font-weight="bold">NE555</text>
-                                        <text x="140" y="80" text-anchor="middle" fill="#64748b" font-size="6" font-family="monospace">TIMER IC</text>
-                                        <!-- Pins left -->
-                                        <line x1="100" y1="52" x2="78" y2="52" stroke="#06b6d4" stroke-width="1.5"/><circle cx="78" cy="52" r="3" fill="#06b6d4"/>
-                                        <line x1="100" y1="63" x2="78" y2="63" stroke="#06b6d4" stroke-width="1.5"/><circle cx="78" cy="63" r="3" fill="#06b6d4"/>
-                                        <line x1="100" y1="74" x2="78" y2="74" stroke="#06b6d4" stroke-width="1.5"/><circle cx="78" cy="74" r="3" fill="#22d3ee"/>
-                                        <line x1="100" y1="85" x2="78" y2="85" stroke="#06b6d4" stroke-width="1.5"/><circle cx="78" cy="85" r="3" fill="#06b6d4"/>
-                                        <!-- Pins right -->
-                                        <line x1="180" y1="52" x2="202" y2="52" stroke="#06b6d4" stroke-width="1.5"/><circle cx="202" cy="52" r="3" fill="#06b6d4"/>
-                                        <line x1="180" y1="63" x2="202" y2="63" stroke="#06b6d4" stroke-width="1.5"/><circle cx="202" cy="63" r="3" fill="#06b6d4"/>
-                                        <line x1="180" y1="74" x2="202" y2="74" stroke="#06b6d4" stroke-width="1.5"/><circle cx="202" cy="74" r="3" fill="#f97316"/>
-                                        <line x1="180" y1="85" x2="202" y2="85" stroke="#06b6d4" stroke-width="1.5"/><circle cx="202" cy="85" r="3" fill="#06b6d4"/>
-                                        <!-- Traces -->
-                                        <path d="M78 52 L60 52 L60 20 L230 20 L230 52 L202 52" fill="none" stroke="#164e63" stroke-width="1"/>
-                                        <path d="M78 85 L55 85 L55 120 L220 120 L220 85 L202 85" fill="none" stroke="#164e63" stroke-width="1"/>
-                                        <!-- Sine wave output -->
-                                        <path d="M202 74 Q215 60 225 74 Q235 88 245 74" fill="none" stroke="#f97316" stroke-width="2" stroke-dasharray="2,2"/>
-                                        <!-- Badge -->
-                                        <rect x="8" y="8" width="68" height="16" rx="3" fill="#0e7490" fill-opacity="0.6"/>
-                                        <text x="42" y="20" text-anchor="middle" fill="#67e8f9" font-size="7" font-family="monospace" font-weight="bold">LOCAL + GEMINI AI</text>
-                                    </svg>
-                                    <div class="absolute inset-0 bg-gradient-to-t from-[#0d1321] via-transparent to-transparent"></div>
-                                </div>
-                                <div class="p-5 flex flex-col flex-1 justify-between">
-                                    <div>
-                                        <div class="flex items-center gap-2 mb-2"><span class="text-cyan-400 text-base">⚡</span><span class="text-cyan-400 font-bold text-sm tracking-wide uppercase">Laboratorio de Electrónica</span></div>
-                                        <p class="text-slate-400 text-xs leading-relaxed">Identificá y analizá componentes: NE555, LM7805, transistores, diodos y más. BD local instantánea + Gemini para búsqueda extendida.</p>
-                                    </div>
-                                    <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-800/60">
-                                        <div class="flex gap-2"><span class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded border border-cyan-500/20">NE555</span><span class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded border border-cyan-500/20">LM7805</span><span class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded border border-cyan-500/20">BC548</span></div>
-                                        <span class="text-xs text-cyan-500 group-hover:translate-x-1 transition-transform">Abrir →</span>
-                                    </div>
-                                </div>
-                            </a>
+                        <div id="tv-ticker-home" class="mb-4 rounded-xl overflow-hidden border border-slate-800/60 bg-[#0d1321]/60 min-h-[46px]"></div>
 
-                            <!-- TRADING HUB -->
-                            <div onclick="cambiarVista('trading_hub')" class="group relative bg-[#0d1321] border border-slate-800 hover:border-orange-500/60 rounded-2xl overflow-hidden flex flex-col transition duration-300 shadow-xl hover:shadow-orange-500/10 cursor-pointer">
-                                <div class="relative h-36 overflow-hidden bg-gradient-to-br from-[#1a0e07] to-[#0d1321] flex items-center justify-center">
-                                    <svg viewBox="0 0 280 140" class="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-300" xmlns="http://www.w3.org/2000/svg">
-                                        <defs>
-                                            <linearGradient id="candle-green" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#22c55e"/><stop offset="100%" stop-color="#16a34a" stop-opacity="0.3"/></linearGradient>
-                                            <linearGradient id="candle-red" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ef4444"/><stop offset="100%" stop-color="#dc2626" stop-opacity="0.3"/></linearGradient>
-                                        </defs>
-                                        <!-- Grid -->
-                                        <rect width="280" height="140" fill="#0d1321"/>
-                                        <line x1="0" y1="35" x2="280" y2="35" stroke="#1e293b" stroke-width="0.5"/>
-                                        <line x1="0" y1="70" x2="280" y2="70" stroke="#1e293b" stroke-width="0.5"/>
-                                        <line x1="0" y1="105" x2="280" y2="105" stroke="#1e293b" stroke-width="0.5"/>
-                                        <!-- Candles -->
-                                        <line x1="30" y1="60" x2="30" y2="95" stroke="#ef4444" stroke-width="1"/><rect x="24" y="70" width="12" height="20" rx="1" fill="url(#candle-red)"/>
-                                        <line x1="50" y1="50" x2="50" y2="85" stroke="#22c55e" stroke-width="1"/><rect x="44" y="55" width="12" height="22" rx="1" fill="url(#candle-green)"/>
-                                        <line x1="70" y1="55" x2="70" y2="90" stroke="#ef4444" stroke-width="1"/><rect x="64" y="62" width="12" height="20" rx="1" fill="url(#candle-red)"/>
-                                        <line x1="90" y1="45" x2="90" y2="78" stroke="#22c55e" stroke-width="1"/><rect x="84" y="48" width="12" height="22" rx="1" fill="url(#candle-green)"/>
-                                        <line x1="110" y1="40" x2="110" y2="72" stroke="#22c55e" stroke-width="1"/><rect x="104" y="43" width="12" height="22" rx="1" fill="url(#candle-green)"/>
-                                        <line x1="130" y1="48" x2="130" y2="80" stroke="#ef4444" stroke-width="1"/><rect x="124" y="52" width="12" height="20" rx="1" fill="url(#candle-red)"/>
-                                        <line x1="150" y1="35" x2="150" y2="65" stroke="#22c55e" stroke-width="1"/><rect x="144" y="38" width="12" height="20" rx="1" fill="url(#candle-green)"/>
-                                        <line x1="170" y1="28" x2="170" y2="58" stroke="#22c55e" stroke-width="1"/><rect x="164" y="30" width="12" height="20" rx="1" fill="url(#candle-green)"/>
-                                        <line x1="190" y1="32" x2="190" y2="62" stroke="#ef4444" stroke-width="1"/><rect x="184" y="38" width="12" height="16" rx="1" fill="url(#candle-red)"/>
-                                        <line x1="210" y1="20" x2="210" y2="50" stroke="#22c55e" stroke-width="1"/><rect x="204" y="22" width="12" height="20" rx="1" fill="url(#candle-green)"/>
-                                        <line x1="230" y1="15" x2="230" y2="48" stroke="#22c55e" stroke-width="1"/><rect x="224" y="18" width="12" height="22" rx="1" fill="url(#candle-green)"/>
-                                        <!-- EMA line -->
-                                        <path d="M18 90 Q50 82 70 76 Q100 65 130 58 Q160 50 190 42 Q220 30 250 22" fill="none" stroke="#f97316" stroke-width="1.5" opacity="0.8"/>
-                                        <!-- Labels -->
-                                        <text x="252" y="20" fill="#f97316" font-size="7" font-family="monospace">EMA</text>
-                                        <rect x="8" y="8" width="48" height="14" rx="3" fill="#7c2d12" fill-opacity="0.6"/>
-                                        <text x="32" y="19" text-anchor="middle" fill="#fb923c" font-size="7" font-family="monospace" font-weight="bold">US30 · BTC</text>
-                                        <!-- FVG zone -->
-                                        <rect x="144" y="58" width="50" height="12" fill="#f97316" fill-opacity="0.08" stroke="#f97316" stroke-width="0.5" stroke-dasharray="2,2"/>
-                                        <text x="169" y="67" text-anchor="middle" fill="#fb923c" font-size="6" font-family="monospace">FVG</text>
-                                        <div class="absolute inset-0 bg-gradient-to-t from-[#0d1321] to-transparent"></div>
-                                    </svg>
-                                    <div class="absolute inset-0 bg-gradient-to-t from-[#0d1321] via-transparent to-transparent"></div>
+                        <!-- MERCADO — ARRIBA Y GRANDE -->
+                        <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-6">
+                            <!-- Heatmap S&P500 — 3 columnas -->
+                            <div class="lg:col-span-3 bg-[#0d1321] border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+                                <div class="bg-slate-950/80 px-4 py-2 text-[10px] font-bold text-orange-400 border-b border-slate-900 uppercase tracking-wider">🔥 Mapa de Calor — S&amp;P 500 por Sector</div>
+                                <div id="mkt-heatmap" class="h-[420px]"></div>
+                            </div>
+                            <!-- Crypto heatmaps + Noticias — 2 columnas -->
+                            <div class="lg:col-span-2 grid grid-cols-2 gap-4" style="height:452px">
+                                <!-- 2 heatmaps crypto apilados -->
+                                <div class="flex flex-col gap-4">
+                                    <div class="bg-[#0d1321] border border-slate-800 rounded-2xl overflow-hidden shadow-xl flex-1">
+                                        <div class="bg-slate-950/80 px-3 py-1.5 text-[9px] font-bold text-purple-400 border-b border-slate-900 uppercase tracking-wider">₿ Crypto — Market Cap</div>
+                                        <div id="mkt-crypto1" class="h-[196px]"></div>
+                                    </div>
+                                    <div class="bg-[#0d1321] border border-slate-800 rounded-2xl overflow-hidden shadow-xl flex-1">
+                                        <div class="bg-slate-950/80 px-3 py-1.5 text-[9px] font-bold text-violet-400 border-b border-slate-900 uppercase tracking-wider">📊 Crypto — 24h Change</div>
+                                        <div id="mkt-crypto2" class="h-[196px]"></div>
+                                    </div>
                                 </div>
-                                <div class="p-5 flex flex-col flex-1 justify-between">
-                                    <div>
-                                        <div class="flex items-center gap-2 mb-2"><span class="text-orange-400 text-base">📈</span><span class="text-orange-400 font-bold text-sm tracking-wide uppercase">Trading Hub SMC</span></div>
-                                        <p class="text-slate-400 text-xs leading-relaxed">Mesa táctica con velas en vivo, calendario macro de alta relevancia, DXY y correlaciones. Calculadora de lotaje integrada.</p>
-                                    </div>
-                                    <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-800/60">
-                                        <div class="flex gap-2"><span class="text-[10px] bg-orange-500/10 text-orange-400 px-2 py-0.5 rounded border border-orange-500/20">US30</span><span class="text-[10px] bg-orange-500/10 text-orange-400 px-2 py-0.5 rounded border border-orange-500/20">BTC</span><span class="text-[10px] bg-orange-500/10 text-orange-400 px-2 py-0.5 rounded border border-orange-500/20">DXY</span></div>
-                                        <span class="text-xs text-orange-400 group-hover:translate-x-1 transition-transform">Acceder →</span>
-                                    </div>
+                                <!-- Noticias a lo largo de los 2 heatmaps -->
+                                <div class="bg-[#0d1321] border border-slate-800 rounded-2xl overflow-hidden shadow-xl flex flex-col">
+                                    <div class="bg-slate-950/80 px-3 py-1.5 text-[9px] font-bold text-cyan-400 border-b border-slate-900 uppercase tracking-wider shrink-0">📰 Top Stories</div>
+                                    <div id="mkt-news" class="flex-1"></div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- DOCUMENTACIÓN -->
-                            <a href="${LINK_DRIVE_RAIZ}" target="_blank" class="group relative bg-[#0d1321] border border-slate-800 hover:border-emerald-500/60 rounded-2xl overflow-hidden flex flex-col transition duration-300 shadow-xl hover:shadow-emerald-500/10">
-                                <div class="relative h-36 overflow-hidden bg-gradient-to-br from-[#071a12] to-[#0d1321] flex items-center justify-center">
-                                    <svg viewBox="0 0 280 140" class="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-300" xmlns="http://www.w3.org/2000/svg">
-                                        <!-- Stack of documents -->
-                                        <rect x="60" y="90" width="160" height="8" rx="2" fill="#064e3b" stroke="#10b981" stroke-width="0.5"/>
-                                        <rect x="55" y="80" width="160" height="14" rx="2" fill="#065f46" stroke="#10b981" stroke-width="0.5"/>
-                                        <rect x="50" y="30" width="160" height="55" rx="4" fill="#0d1f1a" stroke="#10b981" stroke-width="1.5"/>
-                                        <!-- Doc content lines -->
-                                        <rect x="65" y="42" width="90" height="4" rx="1" fill="#10b981" fill-opacity="0.7"/>
-                                        <rect x="65" y="52" width="120" height="3" rx="1" fill="#34d399" fill-opacity="0.3"/>
-                                        <rect x="65" y="59" width="105" height="3" rx="1" fill="#34d399" fill-opacity="0.3"/>
-                                        <rect x="65" y="66" width="115" height="3" rx="1" fill="#34d399" fill-opacity="0.3"/>
-                                        <rect x="65" y="73" width="70" height="3" rx="1" fill="#34d399" fill-opacity="0.3"/>
-                                        <!-- Folder tab -->
-                                        <rect x="50" y="24" width="50" height="10" rx="2" fill="#065f46" stroke="#10b981" stroke-width="1"/>
-                                        <text x="75" y="32" text-anchor="middle" fill="#34d399" font-size="6" font-family="monospace">CÁTEDRA</text>
-                                        <!-- Drive icon -->
-                                        <g transform="translate(168,38)">
-                                            <polygon points="12,0 24,20 0,20" fill="#fbbc04" fill-opacity="0.15" stroke="#fbbc04" stroke-width="1"/>
-                                            <polygon points="0,20 8,6 20,20" fill="#4285f4" fill-opacity="0.15" stroke="#4285f4" stroke-width="1"/>
-                                            <polygon points="8,6 24,6 20,20" fill="#34a853" fill-opacity="0.15" stroke="#34a853" stroke-width="1"/>
-                                        </g>
-                                        <!-- Badge -->
-                                        <rect x="8" y="8" width="60" height="14" rx="3" fill="#064e3b" fill-opacity="0.8"/>
-                                        <text x="38" y="19" text-anchor="middle" fill="#34d399" font-size="7" font-family="monospace" font-weight="bold">GOOGLE DRIVE</text>
-                                    </svg>
-                                    <div class="absolute inset-0 bg-gradient-to-t from-[#0d1321] via-transparent to-transparent"></div>
-                                </div>
-                                <div class="p-5 flex flex-col flex-1 justify-between">
-                                    <div>
-                                        <div class="flex items-center gap-2 mb-2"><span class="text-emerald-400 text-base">📚</span><span class="text-emerald-400 font-bold text-sm tracking-wide uppercase">Documentación de Cátedra</span></div>
-                                        <p class="text-slate-400 text-xs leading-relaxed">Repositorio institucional en Google Drive. Planificaciones, guías de práctica y materiales para alumnos.</p>
+                        <!-- ACCESOS — COMPACTOS ABAJO -->
+                        <div class="border-t border-slate-800/40 pt-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <a href="laboratorio.html" class="group flex items-center gap-3 bg-[#0d1321] border border-slate-800 hover:border-cyan-500/40 p-3 rounded-xl transition shadow">
+                                    <div class="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center shrink-0 group-hover:bg-cyan-500/20 transition text-xl">⚡</div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-xs font-bold text-cyan-400 uppercase">Laboratorio de Electrónica</div>
+                                        <div class="text-[10px] text-slate-500 mt-0.5">NE555 · LM7805 · BC548 · Transistores · BD Local + Gemini</div>
                                     </div>
-                                    <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-800/60">
-                                        <div class="flex gap-2"><span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20">Planificaciones</span><span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20">Guías</span></div>
-                                        <span class="text-xs text-emerald-400 group-hover:translate-x-1 transition-transform">Abrir Drive ↗</span>
+                                    <span class="text-slate-600 group-hover:text-cyan-400 transition shrink-0 text-sm group-hover:translate-x-0.5">→</span>
+                                </a>
+                                <button onclick="cambiarVista('trading_hub')" class="group flex items-center gap-3 bg-[#0d1321] border border-slate-800 hover:border-orange-500/40 p-3 rounded-xl transition shadow w-full text-left">
+                                    <div class="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0 group-hover:bg-orange-500/20 transition text-xl">📈</div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-xs font-bold text-orange-400 uppercase">Trading Hub SMC</div>
+                                        <div class="text-[10px] text-slate-500 mt-0.5">US30 · BTC · GOLD · Calendario macro · Gestión de riesgo</div>
                                     </div>
-                                </div>
-                            </a>
-
+                                    <span class="text-slate-600 group-hover:text-orange-400 transition shrink-0 text-sm group-hover:translate-x-0.5">→</span>
+                                </button>
+                                <a href="${LINK_DRIVE_RAIZ}" target="_blank" class="group flex items-center gap-3 bg-[#0d1321] border border-slate-800 hover:border-emerald-500/40 p-3 rounded-xl transition shadow">
+                                    <div class="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0 group-hover:bg-emerald-500/20 transition text-xl">📚</div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-xs font-bold text-emerald-400 uppercase">Documentación de Cátedra</div>
+                                        <div class="text-[10px] text-slate-500 mt-0.5">Planificaciones · Guías de práctica · Google Drive</div>
+                                    </div>
+                                    <span class="text-slate-600 group-hover:text-emerald-400 transition shrink-0 text-sm">↗</span>
+                                </a>
+                            </div>
                         </div>
                     </main>
+                    <footer class="border-t border-slate-800/40 py-8 mt-4">
+                        <div class="max-w-6xl mx-auto px-4 flex flex-col items-center gap-3">
+                            <div class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-orange-400">Sr.Z</div>
+                            <p class="text-slate-600 text-xs text-center">Tecnología · Electrónica · Trading</p>
+                            <div class="flex gap-6 mt-1">
+                                <a href="https://github.com/matitradercry-ux" target="_blank" class="text-slate-600 hover:text-slate-300 text-xs transition">GitHub</a>
+                                <a href="laboratorio.html" class="text-slate-600 hover:text-cyan-400 text-xs transition">Laboratorio</a>
+                                <button onclick="cambiarVista('trading_hub')" class="text-slate-600 hover:text-orange-400 text-xs transition">Trading Hub</button>
+                                <a href="${LINK_DRIVE_RAIZ}" target="_blank" class="text-slate-600 hover:text-emerald-400 text-xs transition">Documentación</a>
+                            </div>
+                            <p class="text-slate-800 text-[10px] mt-2">© 2025 Sr.Z · Todos los derechos reservados</p>
+                        </div>
+                    </footer>
                 </div>`;
         }
 
         function renderTradingHub() {
-            const dineroEnRiesgo = estado.balanceCuenta * (estado.riesgoPorcentaje / 100);
-            const lotajeCalculado = (dineroEnRiesgo / (estado.stopLossPips * 10)).toFixed(2);
+            const inst = INST[estado.parSeleccionado];
+            const dinero = estado.balanceCuenta * (estado.riesgoPorcentaje / 100);
+            const lotaje = inst ? (dinero / (estado.stopLossPips * inst.pip)).toFixed(2) : '0.00';
+
+            const parBtns = Object.entries(INST).map(([k,v]) =>
+                `<button onclick="seleccionarPar('${k}')" class="px-2.5 py-0.5 text-xs font-bold rounded-md transition ${estado.parSeleccionado===k ? 'bg-orange-500 text-slate-950' : 'text-slate-400 hover:text-slate-200'}">${v.label}</button>`
+            ).join('');
 
             return `
                 <div class="max-w-[99%] mx-auto p-1 pt-2 fade-in relative">
-                    <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-2">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-2 gap-2 flex-wrap">
                         <div>
                             <button onclick="cambiarVista('home')" class="text-xs text-slate-500 hover:text-orange-400 transition mb-0.5 block">← Panel Central</button>
                             <h1 class="text-base font-black text-slate-200 uppercase tracking-wide">SMC Trading Command</h1>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <div class="flex bg-[#0d1321] p-0.5 rounded-lg border border-slate-800">
-                                <button onclick="seleccionarPar('US30')" class="px-3 py-0.5 text-xs font-bold rounded-md ${estado.parSeleccionado === 'US30' ? 'bg-orange-500 text-slate-950' : 'text-slate-400'}">US30</button>
-                                <button onclick="seleccionarPar('BTC')" class="px-3 py-0.5 text-xs font-bold rounded-md ${estado.parSeleccionado === 'BTC' ? 'bg-orange-500 text-slate-950' : 'text-slate-400'}">BTC</button>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <div class="flex bg-[#0d1321] p-0.5 rounded-lg border border-slate-800 gap-0.5">${parBtns}</div>
+                            <div class="flex items-center gap-1 bg-[#0d1321] border border-slate-800 rounded-lg px-2 py-0.5">
+                                <input id="custom-sym" type="text" placeholder="NASDAQ:AAPL…" value="${estado.symbolCustom || ''}"
+                                    class="bg-transparent text-slate-300 placeholder-slate-700 text-xs font-mono w-28 focus:outline-none focus:text-slate-100"
+                                    onkeydown="if(event.key==='Enter') cambiarSymbol(this.value)"/>
+                                <button onclick="cambiarSymbol(document.getElementById('custom-sym').value)" class="text-slate-500 hover:text-orange-400 text-xs transition">→</button>
                             </div>
-                            <button onclick="toggleCalculadora()" class="bg-orange-500 hover:bg-orange-400 text-slate-950 font-bold text-xs px-3 py-1 rounded-md">🧮 Gestión de Riesgo</button>
+                            <button onclick="toggleCalc()" class="bg-orange-500 hover:bg-orange-400 text-slate-950 font-bold text-xs px-3 py-1 rounded-md">🧮 Gestión de Riesgo</button>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 mb-2">
-                        <div class="bg-[#0d1321] border border-slate-800 rounded-xl overflow-hidden shadow-lg">
-                            <div class="bg-slate-950/80 px-3 py-1 text-[10px] font-bold text-slate-400 border-b border-slate-900 flex justify-between uppercase tracking-wider">
-                                <span>📅 Calendario Macroeconómico de Alta Relevancia</span>
+                        <div class="bg-[#0d1321] border border-slate-800 rounded-xl overflow-hidden shadow-lg flex flex-col">
+                            <div class="bg-slate-950/80 px-3 py-1 text-[10px] font-bold text-slate-400 border-b border-slate-900 uppercase tracking-wider flex items-center gap-2">
+                                📅 Calendario Macroeconómico
+                                <span class="text-slate-700">· Alta impacto</span>
                             </div>
-                            <div class="calendario-wrapper">
-                                <iframe src="https://sslecal2.investing.com?eco_ticker=false&columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=5,22,110,43,17,42,26,10,25,32&calType=day&timeZone=58&lang=5" frameborder="0" allowtransparency="true" style="filter: invert(93%) hue-rotate(180deg) contrast(115%) opacity(0.85);"></iframe>
-                            </div>
+                            <div class="flex-1 min-h-[160px]" id="tv-events"></div>
                         </div>
                         <div class="bg-[#0d1321] border border-slate-800 rounded-xl overflow-hidden flex flex-col shadow-lg">
-                            <div class="bg-slate-950/80 px-3 py-1 text-[10px] font-bold text-cyan-400 border-b border-slate-900 uppercase">📊 Correlación Macro de Activos (En Vivo)</div>
-                            <div class="w-full flex-1 min-h-[130px] bg-slate-950" id="tv-ticker-tape-container"></div>
+                            <div class="bg-slate-950/80 px-3 py-1 text-[10px] font-bold text-cyan-400 border-b border-slate-900 uppercase">📊 Correlación Macro (En Vivo)</div>
+                            <div class="w-full flex-1 min-h-[130px] bg-slate-950" id="tv-ticker"></div>
                         </div>
                     </div>
 
                     <div class="w-full bg-[#0d1321]/60 border border-slate-800 rounded-xl p-1.5 h-[620px] flex flex-col relative mb-2 shadow-2xl">
-                        <div id="tv-chart-container" class="w-full flex-1 rounded-lg overflow-hidden border border-slate-800 bg-slate-950"></div>
-                        
+                        <div id="tv-chart" class="w-full flex-1 rounded-lg overflow-hidden border border-slate-800 bg-slate-950"></div>
+
                         <div id="calc-panel" class="absolute top-2 right-2 bg-[#0d1321] border border-orange-500/40 rounded-xl p-4 w-72 shadow-2xl transition-all ${estado.calculadoraAbierta ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}">
                             <div class="flex justify-between items-center mb-3 border-b border-slate-800 pb-1.5">
-                                <h3 class="text-orange-400 text-xs font-bold uppercase">🧮 Calculadora de Lotaje</h3>
-                                <button onclick="toggleCalculadora()" class="text-slate-500 text-xs">✕</button>
+                                <h3 class="text-orange-400 text-xs font-bold uppercase">🧮 Riesgo — ${inst ? inst.label : ''}</h3>
+                                <button onclick="toggleCalc()" class="text-slate-500 hover:text-slate-300 text-xs">✕</button>
                             </div>
                             <div class="space-y-3 text-xs">
-                                <div><label class="text-slate-400 block mb-0.5">Balance Cuenta (USD)</label><input id="input-balance" type="number" value="${estado.balanceCuenta}" class="w-full bg-[#070a12] border border-slate-800 p-2 rounded-lg font-mono focus:outline-none" /></div>
+                                <div>
+                                    <label class="text-slate-400 block mb-0.5">Balance (USD)</label>
+                                    <input id="inp-bal" type="number" value="${estado.balanceCuenta}" class="w-full bg-[#070a12] border border-slate-800 p-2 rounded-lg font-mono focus:outline-none focus:border-orange-500/50"/>
+                                </div>
                                 <div class="grid grid-cols-2 gap-2">
-                                    <div><label class="text-slate-400 block mb-0.5">Riesgo (%)</label><input id="input-riesgo" type="number" step="0.25" value="${estado.riesgoPorcentaje}" class="w-full bg-[#070a12] border border-slate-800 p-2 rounded-lg font-mono focus:outline-none" /></div>
-                                    <div><label class="text-slate-400 block mb-0.5">Stop Loss (Pips)</label><input id="input-sl" type="number" value="${estado.stopLossPips}" class="w-full bg-[#070a12] border border-slate-800 p-2 rounded-lg font-mono focus:outline-none" /></div>
+                                    <div>
+                                        <label class="text-slate-400 block mb-0.5">Riesgo (%)</label>
+                                        <input id="inp-riesgo" type="number" step="0.25" value="${estado.riesgoPorcentaje}" class="w-full bg-[#070a12] border border-slate-800 p-2 rounded-lg font-mono focus:outline-none focus:border-orange-500/50"/>
+                                    </div>
+                                    <div>
+                                        <label class="text-slate-400 block mb-0.5">SL (${inst ? inst.unidad : 'pips'})</label>
+                                        <input id="inp-sl" type="number" value="${estado.stopLossPips}" class="w-full bg-[#070a12] border border-slate-800 p-2 rounded-lg font-mono focus:outline-none focus:border-orange-500/50"/>
+                                    </div>
                                 </div>
                                 <div class="bg-slate-950 p-3 rounded-lg border border-slate-900 font-mono text-center">
-                                    <div id="calc-neto" class="text-[10px] text-red-400">Riesgo Neto: -${dineroEnRiesgo} USD</div>
-                                    <div class="text-slate-200 font-bold mt-1">Lotaje Sugerido: <span id="calc-lotaje" class="text-emerald-400 text-sm">${lotajeCalculado}</span></div>
+                                    <div class="text-[10px] text-slate-600 mb-1">$${inst ? inst.pip : 10}/pip/lot · ${inst ? inst.unidad : 'pips'}</div>
+                                    <div id="calc-neto" class="text-[10px] text-red-400 mb-2">Riesgo neto: -$${dinero.toFixed(2)} USD</div>
+                                    <div class="text-slate-400 text-[10px]">Lotaje sugerido</div>
+                                    <div id="calc-lot" class="text-emerald-400 text-2xl font-black">${lotaje}</div>
+                                </div>
+                                <div class="text-[10px] text-slate-700 leading-relaxed">
+                                    ${dinero.toFixed(2)} ÷ (${estado.stopLossPips} × $${inst ? inst.pip : 10}) = ${lotaje} lotes
                                 </div>
                             </div>
                         </div>
@@ -320,116 +409,246 @@
                 </div>`;
         }
 
-        function cargarWidgetsTradingView() {
-            const ticker = estado.parSeleccionado === "US30" ? "BLACKBULL:US30" : "BINANCE:BTCUSDT";
-            if(document.getElementById('tv-chart-container')) {
-                new TradingView.widget({ 
-                    "autosize": true, 
-                    "symbol": ticker, 
-                    "interval": "15", 
-                    "timezone": "America/Argentina/Buenos_Aires", 
-                    "theme": "dark", 
-                    "style": "1", 
-                    "locale": "es", 
-                    "container_id": "tv-chart-container" 
+        function inyectarWidget(id, src, cfg) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.innerHTML = '';
+            const s = document.createElement('script');
+            s.type = 'text/javascript';
+            s.src = src;
+            s.async = true;
+            s.innerHTML = JSON.stringify(cfg);
+            el.appendChild(s);
+        }
+
+        function cargarMercado() {
+            inyectarWidget('mkt-calendar',
+                'https://s3.tradingview.com/external-embedding/embed-widget-events.js',
+                { colorTheme:"dark", isTransparent:true, width:"100%", height:"108",
+                  locale:"es", importanceFilter:"0,1", countryFilter:"us,eu,gb,cn,jp,ca,ar" });
+
+            inyectarWidget('mkt-heatmap',
+                'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js',
+                { exchanges:[], dataSource:"SPX500", grouping:"sector", blockSize:"market_cap_basic",
+                  blockColor:"change", locale:"es", symbolUrl:"", colorTheme:"dark",
+                  hasTopBar:false, isDataSetEnabled:false, isZoomEnabled:true,
+                  hasSymbolTooltip:true, isMonoSize:false, width:"100%", height:"420" });
+
+            inyectarWidget('mkt-crypto1',
+                'https://s3.tradingview.com/external-embedding/embed-widget-crypto-coins-heatmap.js',
+                { dataSource:"Crypto", blockSize:"market_cap_basic", blockColor:"change",
+                  locale:"es", colorTheme:"dark", width:"100%", height:"196" });
+
+            inyectarWidget('mkt-crypto2',
+                'https://s3.tradingview.com/external-embedding/embed-widget-crypto-coins-heatmap.js',
+                { dataSource:"Crypto", blockSize:"market_cap_basic", blockColor:"Perf.W",
+                  locale:"es", colorTheme:"dark", width:"100%", height:"196" });
+
+            inyectarWidget('mkt-news',
+                'https://s3.tradingview.com/external-embedding/embed-widget-timeline.js',
+                { feedMode:"all_symbols", colorTheme:"dark", isTransparent:true,
+                  displayMode:"compact", width:"100%", height:"420", locale:"es" });
+        }
+
+        function cargarTickerHome() {
+            const el = document.getElementById('tv-ticker-home');
+            if (!el) return;
+            el.innerHTML = '';
+            const s = document.createElement('script');
+            s.type = 'text/javascript';
+            s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
+            s.async = true;
+            s.innerHTML = JSON.stringify({
+                symbols: [
+                    { proName:"CAPITALCOM:DXY",  title:"DXY" },
+                    { proName:"BLACKBULL:US30",   title:"US30" },
+                    { proName:"BINANCE:BTCUSDT",  title:"BTC" },
+                    { proName:"TVC:GOLD",         title:"Gold" },
+                    { proName:"NASDAQ:QQQ",       title:"NASDAQ" },
+                    { proName:"AMEX:SPY",         title:"S&P 500" },
+                    { proName:"TVC:USOIL",        title:"Crudo" },
+                    { proName:"FX:EURUSD",        title:"EUR/USD" }
+                ],
+                showSymbolLogo: true, colorTheme:"dark", isTransparent:true, displayMode:"adaptive", locale:"es"
+            });
+            el.appendChild(s);
+        }
+
+        function cambiarSymbol(sym) {
+            if (!sym || !sym.trim()) return;
+            estado.symbolCustom = sym.trim().toUpperCase();
+            const chartEl = document.getElementById('tv-chart');
+            if (chartEl) {
+                chartEl.innerHTML = '';
+                new TradingView.widget({
+                    autosize: true, symbol: estado.symbolCustom, interval: "15",
+                    timezone: "America/Argentina/Buenos_Aires",
+                    theme: "dark", style: "1", locale: "es",
+                    container_id: "tv-chart"
                 });
             }
-            if(document.getElementById('tv-ticker-tape-container')) {
-                const container = document.getElementById('tv-ticker-tape-container');
-                container.innerHTML = "";
-                const scriptWidget = document.createElement('script');
-                scriptWidget.type = 'text/javascript';
-                scriptWidget.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
-                scriptWidget.async = true;
-                scriptWidget.innerHTML = JSON.stringify({
-                    "symbols": [
-                        { "proName": "CAPITALCOM:DXY", "title": "DXY" },
-                        { "proName": "NASDAQ:QQQ", "title": "NASDAQ 100" },
-                        { "proName": "AMEX:SPY", "title": "S&P 500" },
-                        { "proName": "TVC:USOIL", "title": "Crudo WTI" },
-                        { "proName": "TVC:GOLD", "title": "Oro" },
-                        { "proName": "BINANCE:BTCUSDT", "title": "BTC" }
-                    ],
-                    "showSymbolLogo": true,
-                    "colorTheme": "dark", 
-                    "isTransparent": true, 
-                    "displayMode": "adaptive", 
-                    "locale": "es" 
+        }
+
+        function cargarWidgets() {
+            const inst  = INST[estado.parSeleccionado];
+            const sym   = estado.symbolCustom || inst.tv;
+            if (document.getElementById('tv-chart')) {
+                new TradingView.widget({
+                    autosize: true, symbol: sym, interval: "15",
+                    timezone: "America/Argentina/Buenos_Aires",
+                    theme: "dark", style: "1", locale: "es",
+                    container_id: "tv-chart"
                 });
-                container.appendChild(scriptWidget);
+            }
+            // Calendario macro TV Events
+            const evEl = document.getElementById('tv-events');
+            if (evEl) {
+                evEl.innerHTML = '';
+                const se = document.createElement('script');
+                se.type = 'text/javascript';
+                se.src = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js';
+                se.async = true;
+                se.innerHTML = JSON.stringify({
+                    colorTheme: "dark", isTransparent: true,
+                    width: "100%", height: "200", locale: "es",
+                    importanceFilter: "0,1",
+                    countryFilter: "us,eu,gb,jp,cn,de,ar"
+                });
+                evEl.appendChild(se);
+            }
+            const tickerEl = document.getElementById('tv-ticker');
+            if (tickerEl) {
+                tickerEl.innerHTML = "";
+                const s = document.createElement('script');
+                s.type = 'text/javascript';
+                s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
+                s.async = true;
+                s.innerHTML = JSON.stringify({
+                    symbols: [
+                        { proName:"CAPITALCOM:DXY",  title:"DXY" },
+                        { proName:"NASDAQ:QQQ",       title:"NASDAQ 100" },
+                        { proName:"AMEX:SPY",         title:"S&P 500" },
+                        { proName:"TVC:GOLD",         title:"Oro" },
+                        { proName:"TVC:USOIL",        title:"Crudo WTI" },
+                        { proName:"FX:EURUSD",        title:"EUR/USD" },
+                        { proName:"BINANCE:BTCUSDT",  title:"BTC" }
+                    ],
+                    showSymbolLogo: true, colorTheme:"dark", isTransparent:true, displayMode:"adaptive", locale:"es"
+                });
+                tickerEl.appendChild(s);
             }
             vincularEventos();
         }
 
         function vincularEventos() {
-            const buscador = document.getElementById('buscador-input');
-            if (buscador) {
-                buscador.addEventListener('input', (e) => { 
-                    estado.busqueda = e.target.value; 
-                    render(); 
-                    const input = document.getElementById('buscador-input'); 
-                    if(input) { input.focus(); input.setSelectionRange(input.value.length, input.value.length); } 
-                });
-                buscador.addEventListener('keydown', (e) => { if(e.key === 'Enter') consultarIA(); });
+            const inp = document.getElementById('buscador-input');
+            if (inp) {
+                inp.addEventListener('input', e => { estado.busqueda = e.target.value; });
+                inp.addEventListener('keydown', e => { if (e.key === 'Enter') consultarIA(); });
             }
-            const iBalance = document.getElementById('input-balance'); if (iBalance) iBalance.addEventListener('input', (e) => { estado.balanceCuenta = parseFloat(e.target.value) || 0; actualizarCalculos(); });
-            const iRiesgo = document.getElementById('input-riesgo'); if (iRiesgo) iRiesgo.addEventListener('input', (e) => { estado.riesgoPorcentaje = parseFloat(e.target.value) || 0; actualizarCalculos(); });
-            const iSL = document.getElementById('input-sl'); if (iSL) iSL.addEventListener('input', (e) => { estado.stopLossPips = parseFloat(e.target.value) || 0; actualizarCalculos(); });
+            const b = document.getElementById('inp-bal');    if(b) b.addEventListener('input', e => { estado.balanceCuenta = parseFloat(e.target.value)||0; recalc(); });
+            const r = document.getElementById('inp-riesgo'); if(r) r.addEventListener('input', e => { estado.riesgoPorcentaje = parseFloat(e.target.value)||0; recalc(); });
+            const sl= document.getElementById('inp-sl');     if(sl) sl.addEventListener('input', e => { estado.stopLossPips = parseFloat(e.target.value)||0; recalc(); });
         }
 
-        function actualizarCalculos() {
-            const dinero = estado.balanceCuenta * (estado.riesgoPorcentaje / 100);
-            const lotaje = (dinero / (estado.stopLossPips * 10)).toFixed(2);
-            const elNeto = document.getElementById('calc-neto');
-            const elLotaje = document.getElementById('calc-lotaje');
-            if(elNeto) elNeto.innerText = `Riesgo Neto: -${dinero} USD`;
-            if(elLotaje) elLotaje.innerText = lotaje;
+        function recalc() {
+            const inst = INST[estado.parSeleccionado];
+            const d = estado.balanceCuenta * (estado.riesgoPorcentaje / 100);
+            const l = inst ? (d / (estado.stopLossPips * inst.pip)).toFixed(2) : '0.00';
+            const n = document.getElementById('calc-neto'); if(n) n.innerText = `Riesgo neto: -$${d.toFixed(2)} USD`;
+            const lo= document.getElementById('calc-lot');  if(lo) lo.innerText = l;
         }
 
-        function toggleCalculadora() { estado.calculadoraAbierta = !estado.calculadoraAbierta; const panel = document.getElementById('calc-panel'); if(panel) panel.classList.toggle('opacity-0'); panel.classList.toggle('scale-95'); panel.classList.toggle('pointer-events-none'); }
-        function seleccionarPar(par) { estado.parSeleccionado = par; render(); }
-        function cambiarVista(nuevaVista) { estado.vistaActual = nuevaVista; estado.busqueda = ""; estado.iaRespuesta = null; render(); }
-
-        function setQuery(texto) {
-            estado.busqueda = texto;
-            render();
-            setTimeout(() => { const input = document.getElementById('buscador-input'); if(input) { input.focus(); input.setSelectionRange(input.value.length, input.value.length); } }, 50);
+        function toggleCalc() {
+            estado.calculadoraAbierta = !estado.calculadoraAbierta;
+            const p = document.getElementById('calc-panel');
+            if(p) { p.classList.toggle('opacity-0'); p.classList.toggle('scale-95'); p.classList.toggle('pointer-events-none'); }
         }
 
-        function limpiarRespuesta() { estado.iaRespuesta = null; render(); }
+        function seleccionarPar(par) { estado.parSeleccionado = par; estado.symbolCustom = null; render(); }
+        function cambiarVista(v)     { estado.vistaActual = v; estado.chatHistorial = []; estado.busqueda = ""; render(); }
+        function limpiarChat()       { estado.chatHistorial = []; render(); vincularEventos(); }
+        function setQ(t)             { estado.busqueda = t; const i = document.getElementById('buscador-input'); if(i) i.value = t; }
 
-        function abrirConfigIA() {
-            const modal = document.getElementById('modal-ia');
-            if(modal) { modal.classList.remove('hidden'); document.getElementById('ia-key-input').value = localStorage.getItem('gemini_api_key') || ''; }
+        function copiar(btn) {
+            const t = btn.getAttribute('data-t').replace(/&quot;/g,'"').replace(/&#39;/g,"'");
+            navigator.clipboard.writeText(t).then(() => {
+                const orig = btn.innerHTML;
+                btn.innerHTML = '✓ Copiado';
+                setTimeout(() => { btn.innerHTML = orig; }, 1500);
+            });
         }
-        function cerrarConfigIA() { document.getElementById('modal-ia')?.classList.add('hidden'); }
-        function guardarKeyIA() { localStorage.setItem('gemini_api_key', document.getElementById('ia-key-input').value.trim()); cerrarConfigIA(); }
+
+        function abrirKey() {
+            document.getElementById('modal-key')?.classList.remove('hidden');
+            const ki = document.getElementById('key-input');
+            if(ki) ki.value = localStorage.getItem('gemini_api_key') || '';
+        }
+        function cerrarKey() { document.getElementById('modal-key')?.classList.add('hidden'); }
+        function guardarKey() { localStorage.setItem('gemini_api_key', document.getElementById('key-input').value.trim()); cerrarKey(); render(); vincularEventos(); }
+
+        function subirImagen(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                const dataUrl = e.target.result;
+                const base64 = dataUrl.split(',')[1];
+                estado.imagenPendiente = { dataUrl, base64, mimeType: file.type };
+                render(); vincularEventos();
+                setTimeout(() => { document.getElementById('buscador-input')?.focus(); }, 50);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function limpiarImagen() { estado.imagenPendiente = null; render(); vincularEventos(); }
 
         async function consultarIA() {
-            const query = estado.busqueda.trim();
-            if (!query) return;
+            const inp = document.getElementById('buscador-input');
+            const query = (inp ? inp.value : estado.busqueda).trim();
+            const img   = estado.imagenPendiente;
+            if (!query && !img) return;
             const apiKey = localStorage.getItem('gemini_api_key');
-            if (!apiKey) { render(); return; }
+            if (!apiKey) { estado.busqueda = query; render(); vincularEventos(); return; }
 
-            estado.iaCargando = true;
-            estado.iaRespuesta = null;
-            render();
+            const msgUser = { role:'user', text: query || '¿Qué ves en esta imagen?', imageUrl: img?.dataUrl || null };
+            estado.chatHistorial.push(msgUser);
+            estado.iaCargando  = true;
+            estado.busqueda    = '';
+            estado.imagenPendiente = null;
+            render(); vincularEventos();
+            setTimeout(() => { const cs = document.getElementById('chat-scroll'); if(cs) cs.scrollTop = cs.scrollHeight; }, 60);
 
             try {
-                const prompt = `Sos el asistente personal de Sr. Z, docente de electrónica y trader activo en US30 y BTC. Respondé en español, de forma directa y técnica, sin rodeos. Usá formato claro con saltos de línea cuando corresponda. Pregunta: "${query}"`;
+                const SYS = `Sos el asistente personal de Sr. Z: docente de electrónica (NE555, transistores, amplificadores, fuentes) y trader activo en US30 y BTC con metodología SMC. Respondé en español, directo y técnico. Usá markdown: **negrita**, ## títulos, - listas, \`código inline\`. Si analizás una imagen de un componente o circuito, identificá el componente, sus pines y función.`;
+                const contents = [
+                    { role:'user',  parts:[{text: SYS}] },
+                    { role:'model', parts:[{text: 'Entendido, listo.'}] }
+                ];
+                for (let i = 0; i < estado.chatHistorial.length - 1; i++) {
+                    const m = estado.chatHistorial[i];
+                    contents.push({ role: m.role==='user' ? 'user' : 'model', parts:[{text: m.text}] });
+                }
+                // Último mensaje: puede incluir imagen
+                const lastParts = [];
+                if (img) lastParts.push({ inlineData: { mimeType: img.mimeType, data: img.base64 } });
+                lastParts.push({ text: msgUser.text });
+                contents.push({ role:'user', parts: lastParts });
+
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    method:'POST', headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({ contents })
                 });
                 const data = await res.json();
-                estado.iaRespuesta = data.candidates[0].content.parts[0].text.trim();
+                if (data.error) throw new Error(data.error.message);
+                estado.chatHistorial.push({ role:'ia', text: data.candidates[0].content.parts[0].text.trim() });
             } catch(e) {
-                estado.iaRespuesta = "❌ Error al conectar con Gemini. Verificá tu API Key en ⚙️.";
+                estado.chatHistorial.push({ role:'ia', text:`❌ Error: ${e.message || 'Verificá tu API Key en ⚙️.'}` });
             }
+
             estado.iaCargando = false;
-            render();
-            vincularEventos();
+            render(); vincularEventos();
+            setTimeout(() => { const cs = document.getElementById('chat-scroll'); if(cs) cs.scrollTop = cs.scrollHeight; }, 60);
         }
 
         render();
