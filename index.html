@@ -29,12 +29,14 @@
         
         let estado = {
             busqueda: "",
-            vistaActual: "home", 
+            vistaActual: "home",
             parSeleccionado: "US30",
             calculadoraAbierta: false,
             balanceCuenta: 10000,
             riesgoPorcentaje: 1,
-            stopLossPips: 20
+            stopLossPips: 20,
+            iaRespuesta: null,
+            iaCargando: false
         };
 
         function render() {
@@ -49,34 +51,68 @@
         }
 
         function renderHome() {
-            let resultadosHTML = "";
-            if (estado.busqueda.trim().length > 0) {
-                resultadosHTML = `
-                    <div class="border-t border-slate-800/80 bg-[#090e1a] p-2 text-left">
-                        <div class="flex justify-between items-center bg-cyan-950/20 border border-cyan-500/20 p-2 rounded-lg">
-                            <div class="flex items-center gap-3"><span class="text-cyan-400 text-lg">🤖</span>
-                                <div>
-                                    <p class="text-sm font-semibold text-cyan-200">Consultar Automatizado: "${estado.busqueda}"</p>
-                                    <p class="text-xs text-slate-400">Redirigiendo al Laboratorio de Electrónica Avanzado...</p>
-                                </div>
-                            </div>
-                            <button onclick="irAlLaboratorio()" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold px-3 py-1.5 rounded-md transition">Consultar →</button>
+            const apiKey = localStorage.getItem('gemini_api_key');
+
+            let panelIA = "";
+            if (estado.iaCargando) {
+                panelIA = `
+                    <div class="border-t border-slate-800/60 bg-[#070a12] px-5 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+                            <div class="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" style="animation-delay:0.2s"></div>
+                            <div class="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" style="animation-delay:0.4s"></div>
+                            <span class="text-slate-500 text-xs ml-1">Consultando Gemini...</span>
+                        </div>
+                    </div>`;
+            } else if (estado.iaRespuesta) {
+                panelIA = `
+                    <div class="border-t border-slate-800/60 bg-[#070a12] px-5 py-4 text-left fade-in">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[10px] text-cyan-400 font-bold uppercase tracking-wider">⚡ Respuesta IA</span>
+                            <button onclick="limpiarRespuesta()" class="text-slate-600 hover:text-slate-400 text-xs transition">✕ Cerrar</button>
+                        </div>
+                        <div class="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap">${estado.iaRespuesta}</div>
+                    </div>`;
+            } else if (estado.busqueda.trim().length > 0 && !apiKey) {
+                panelIA = `
+                    <div class="border-t border-slate-800/60 bg-[#070a12] px-4 py-3">
+                        <div class="flex items-center justify-between gap-3">
+                            <p class="text-xs text-slate-400">Necesitás una API Key de Gemini para usar el asistente IA.</p>
+                            <button onclick="abrirConfigIA()" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold px-3 py-1.5 rounded-lg whitespace-nowrap transition">Configurar →</button>
                         </div>
                     </div>`;
             }
 
             return `
+                <div id="modal-ia" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div class="bg-[#0d1321] border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl">
+                        <h3 class="text-sm font-bold uppercase text-cyan-400 mb-2">⚙️ API Key de Gemini</h3>
+                        <p class="text-xs text-slate-400 mb-4">Se usa para el asistente IA del home y el laboratorio de electrónica. Gratis con cuenta Google AI Studio.</p>
+                        <input id="ia-key-input" type="password" placeholder="AIzaSy..." class="w-full bg-[#070a12] border border-slate-800 p-2.5 rounded-xl font-mono text-xs focus:outline-none focus:border-cyan-500 mb-4"/>
+                        <div class="flex justify-end gap-2">
+                            <button onclick="cerrarConfigIA()" class="text-xs text-slate-400 px-3 py-2">Cerrar</button>
+                            <button onclick="guardarKeyIA()" class="bg-cyan-500 text-slate-950 text-xs font-bold px-4 py-2 rounded-lg">Guardar</button>
+                        </div>
+                    </div>
+                </div>
                 <div class="fade-in">
                     <header class="relative max-w-6xl mx-auto pt-20 pb-12 px-4 text-center z-10">
                         <div class="text-6xl font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-orange-400 mb-2 filter drop-shadow-[0_0_20px_rgba(6,182,212,0.4)]">Sr. Z</div>
                         <h1 class="text-xl md:text-2xl font-bold text-slate-400 uppercase tracking-wide">Docente de Electrónica <span class="text-slate-600">|</span> <span class="text-orange-400">Trader</span></h1>
                         <div class="mt-10 max-w-3xl mx-auto relative px-2">
-                            <div class="relative flex flex-col bg-[#0d1321] border border-slate-800 focus-within:border-cyan-500/50 rounded-xl shadow-2xl overflow-hidden">
-                                <div class="flex items-center px-4 py-3.5">
-                                    <span class="text-xl mr-3 text-slate-500">🔍</span>
-                                    <input id="buscador-input" type="text" placeholder="Ingresá componentes para analizar en el laboratorio..." value="${estado.busqueda}" class="w-full bg-transparent text-slate-100 placeholder-slate-500 focus:outline-none text-base font-medium" />
+                            <div class="relative flex flex-col bg-[#0d1321] border border-slate-800 focus-within:border-cyan-500/50 rounded-xl shadow-2xl overflow-hidden transition-all">
+                                <div class="flex items-center px-4 py-3.5 gap-3">
+                                    <span class="text-xl text-slate-500">🤖</span>
+                                    <input id="buscador-input" type="text" placeholder="Preguntá cualquier cosa: electrónica, trading, física, código..." value="${estado.busqueda}" class="w-full bg-transparent text-slate-100 placeholder-slate-500 focus:outline-none text-base font-medium" />
+                                    <button onclick="consultarIA()" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-sm px-4 py-1.5 rounded-lg transition shrink-0">→</button>
                                 </div>
-                                ${resultadosHTML}
+                                ${panelIA}
+                            </div>
+                            <div class="flex gap-2 mt-2 flex-wrap justify-center">
+                                <button onclick="setQuery('¿Cómo calculo la resistencia de base para un BC548?')" class="text-[10px] text-slate-500 hover:text-cyan-400 bg-slate-900 px-2 py-1 rounded-md border border-slate-800 hover:border-cyan-500/30 transition">Resistencia de base BC548</button>
+                                <button onclick="setQuery('Explicá el concepto de FVG en SMC trading')" class="text-[10px] text-slate-500 hover:text-orange-400 bg-slate-900 px-2 py-1 rounded-md border border-slate-800 hover:border-orange-500/30 transition">FVG en SMC</button>
+                                <button onclick="setQuery('¿Cómo funciona un filtro RC pasabajos?')" class="text-[10px] text-slate-500 hover:text-cyan-400 bg-slate-900 px-2 py-1 rounded-md border border-slate-800 hover:border-cyan-500/30 transition">Filtro RC pasabajos</button>
+                                <button onclick="abrirConfigIA()" class="text-[10px] text-slate-600 hover:text-slate-400 bg-slate-900 px-2 py-1 rounded-md border border-slate-800 transition">⚙️ API Key</button>
                             </div>
                         </div>
                     </header>
@@ -334,7 +370,7 @@
                     const input = document.getElementById('buscador-input'); 
                     if(input) { input.focus(); input.setSelectionRange(input.value.length, input.value.length); } 
                 });
-                buscador.addEventListener('keydown', (e) => { if(e.key === 'Enter') irAlLaboratorio(); });
+                buscador.addEventListener('keydown', (e) => { if(e.key === 'Enter') consultarIA(); });
             }
             const iBalance = document.getElementById('input-balance'); if (iBalance) iBalance.addEventListener('input', (e) => { estado.balanceCuenta = parseFloat(e.target.value) || 0; actualizarCalculos(); });
             const iRiesgo = document.getElementById('input-riesgo'); if (iRiesgo) iRiesgo.addEventListener('input', (e) => { estado.riesgoPorcentaje = parseFloat(e.target.value) || 0; actualizarCalculos(); });
@@ -352,8 +388,49 @@
 
         function toggleCalculadora() { estado.calculadoraAbierta = !estado.calculadoraAbierta; const panel = document.getElementById('calc-panel'); if(panel) panel.classList.toggle('opacity-0'); panel.classList.toggle('scale-95'); panel.classList.toggle('pointer-events-none'); }
         function seleccionarPar(par) { estado.parSeleccionado = par; render(); }
-        function cambiarVista(nuevaVista) { estado.vistaActual = nuevaVista; estado.busqueda = ""; render(); }
-        function irAlLaboratorio() { localStorage.setItem('query_busqueda_inicial', estado.busqueda); window.location.href = "laboratorio.html"; }
+        function cambiarVista(nuevaVista) { estado.vistaActual = nuevaVista; estado.busqueda = ""; estado.iaRespuesta = null; render(); }
+
+        function setQuery(texto) {
+            estado.busqueda = texto;
+            render();
+            setTimeout(() => { const input = document.getElementById('buscador-input'); if(input) { input.focus(); input.setSelectionRange(input.value.length, input.value.length); } }, 50);
+        }
+
+        function limpiarRespuesta() { estado.iaRespuesta = null; render(); }
+
+        function abrirConfigIA() {
+            const modal = document.getElementById('modal-ia');
+            if(modal) { modal.classList.remove('hidden'); document.getElementById('ia-key-input').value = localStorage.getItem('gemini_api_key') || ''; }
+        }
+        function cerrarConfigIA() { document.getElementById('modal-ia')?.classList.add('hidden'); }
+        function guardarKeyIA() { localStorage.setItem('gemini_api_key', document.getElementById('ia-key-input').value.trim()); cerrarConfigIA(); }
+
+        async function consultarIA() {
+            const query = estado.busqueda.trim();
+            if (!query) return;
+            const apiKey = localStorage.getItem('gemini_api_key');
+            if (!apiKey) { render(); return; }
+
+            estado.iaCargando = true;
+            estado.iaRespuesta = null;
+            render();
+
+            try {
+                const prompt = `Sos el asistente personal de Sr. Z, docente de electrónica y trader activo en US30 y BTC. Respondé en español, de forma directa y técnica, sin rodeos. Usá formato claro con saltos de línea cuando corresponda. Pregunta: "${query}"`;
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                });
+                const data = await res.json();
+                estado.iaRespuesta = data.candidates[0].content.parts[0].text.trim();
+            } catch(e) {
+                estado.iaRespuesta = "❌ Error al conectar con Gemini. Verificá tu API Key en ⚙️.";
+            }
+            estado.iaCargando = false;
+            render();
+            vincularEventos();
+        }
 
         render();
     </script>
