@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sr. Z - Comando Unificado v2.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <style>
+        .fade-in { animation: fadeIn 0.25s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #070a12; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+        .calendario-wrapper { position: relative; width: 100%; height: 160px; overflow: hidden; }
+        .calendario-wrapper iframe { position: absolute; top: 0; left: 0; width: 200%; height: 100%; transform: scale(0.98); transform-origin: top left; }
+    </style>
+</head>
+<body class="bg-[#070a12] text-slate-100 font-sans overflow-x-hidden pb-12">
+
+    <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-cyan-500/5 rounded-full blur-[140px] pointer-events-none"></div>
+    <div class="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-orange-500/5 rounded-full blur-[140px] pointer-events-none"></div>
+
+    <div id="app-container"></div>
+
+    <script>
+        const LINK_DRIVE_RAIZ = "https://drive.google.com/drive/u/1/folders/1RU6Vg3VMCQaI0j7tWaHcihCiFekUZhMf";
+        
+        let estado = {
+            busqueda: "",
+            vistaActual: "home", 
+            parSeleccionado: "US30",
+            calculadoraAbierta: false,
+            balanceCuenta: 10000,
+            riesgoPorcentaje: 1,
+            stopLossPips: 20
+        };
+
+        function render() {
+            const container = document.getElementById('app-container');
+            if (estado.vistaActual === 'trading_hub') {
+                container.innerHTML = renderTradingHub();
+                setTimeout(cargarWidgetsTradingView, 30);
+                return; 
+            }
+            container.innerHTML = renderHome();
+            vincularEventos();
+        }
+
+        function renderHome() {
+            let resultadosHTML = "";
+            if (estado.busqueda.trim().length > 0) {
+                resultadosHTML = `
+                    <div class="border-t border-slate-800/80 bg-[#090e1a] p-2 text-left">
+                        <div class="flex justify-between items-center bg-cyan-950/20 border border-cyan-500/20 p-2 rounded-lg">
+                            <div class="flex items-center gap-3"><span class="text-cyan-400 text-lg">🤖</span>
+                                <div>
+                                    <p class="text-sm font-semibold text-cyan-200">Consultar Automatizado: "${estado.busqueda}"</p>
+                                    <p class="text-xs text-slate-400">Redirigiendo al Laboratorio de Electrónica Avanzado...</p>
+                                </div>
+                            </div>
+                            <button onclick="irAlLaboratorio()" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold px-3 py-1.5 rounded-md transition">Consultar →</button>
+                        </div>
+                    </div>`;
+            }
+
+            return `
+                <div class="fade-in">
+                    <header class="relative max-w-6xl mx-auto pt-20 pb-12 px-4 text-center z-10">
+                        <div class="text-6xl font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-orange-400 mb-2 filter drop-shadow-[0_0_20px_rgba(6,182,212,0.4)]">Sr. Z</div>
+                        <h1 class="text-xl md:text-2xl font-bold text-slate-400 uppercase tracking-wide">Docente de Electrónica <span class="text-slate-600">|</span> <span class="text-orange-400">Trader</span></h1>
+                        <div class="mt-10 max-w-3xl mx-auto relative px-2">
+                            <div class="relative flex flex-col bg-[#0d1321] border border-slate-800 focus-within:border-cyan-500/50 rounded-xl shadow-2xl overflow-hidden">
+                                <div class="flex items-center px-4 py-3.5">
+                                    <span class="text-xl mr-3 text-slate-500">🔍</span>
+                                    <input id="buscador-input" type="text" placeholder="Ingresá componentes para analizar en el laboratorio..." value="${estado.busqueda}" class="w-full bg-transparent text-slate-100 placeholder-slate-500 focus:outline-none text-base font-medium" />
+                                </div>
+                                ${resultadosHTML}
+                            </div>
+                        </div>
+                    </header>
+                    <main class="max-w-6xl mx-auto px-4 pb-24 relative z-10">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                            <!-- LABORATORIO -->
+                            <a href="laboratorio.html" class="group relative bg-[#0d1321] border border-slate-800 hover:border-cyan-500/60 rounded-2xl overflow-hidden flex flex-col transition duration-300 shadow-xl hover:shadow-cyan-500/10">
+                                <div class="relative h-36 overflow-hidden bg-gradient-to-br from-[#071a2e] to-[#0d1321] flex items-center justify-center">
+                                    <svg viewBox="0 0 280 140" class="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-300" xmlns="http://www.w3.org/2000/svg">
+                                        <!-- PCB grid -->
+                                        <defs>
+                                            <pattern id="grid-lab" width="14" height="14" patternUnits="userSpaceOnUse"><path d="M 14 0 L 0 0 0 14" fill="none" stroke="#0e3a5e" stroke-width="0.5"/></pattern>
+                                        </defs>
+                                        <rect width="280" height="140" fill="url(#grid-lab)"/>
+                                        <!-- IC chip NE555 -->
+                                        <rect x="100" y="40" width="80" height="60" rx="4" fill="#0a2240" stroke="#0ea5e9" stroke-width="1.5"/>
+                                        <text x="140" y="68" text-anchor="middle" fill="#38bdf8" font-size="9" font-family="monospace" font-weight="bold">NE555</text>
+                                        <text x="140" y="80" text-anchor="middle" fill="#64748b" font-size="6" font-family="monospace">TIMER IC</text>
+                                        <!-- Pins left -->
+                                        <line x1="100" y1="52" x2="78" y2="52" stroke="#06b6d4" stroke-width="1.5"/><circle cx="78" cy="52" r="3" fill="#06b6d4"/>
+                                        <line x1="100" y1="63" x2="78" y2="63" stroke="#06b6d4" stroke-width="1.5"/><circle cx="78" cy="63" r="3" fill="#06b6d4"/>
+                                        <line x1="100" y1="74" x2="78" y2="74" stroke="#06b6d4" stroke-width="1.5"/><circle cx="78" cy="74" r="3" fill="#22d3ee"/>
+                                        <line x1="100" y1="85" x2="78" y2="85" stroke="#06b6d4" stroke-width="1.5"/><circle cx="78" cy="85" r="3" fill="#06b6d4"/>
+                                        <!-- Pins right -->
+                                        <line x1="180" y1="52" x2="202" y2="52" stroke="#06b6d4" stroke-width="1.5"/><circle cx="202" cy="52" r="3" fill="#06b6d4"/>
+                                        <line x1="180" y1="63" x2="202" y2="63" stroke="#06b6d4" stroke-width="1.5"/><circle cx="202" cy="63" r="3" fill="#06b6d4"/>
+                                        <line x1="180" y1="74" x2="202" y2="74" stroke="#06b6d4" stroke-width="1.5"/><circle cx="202" cy="74" r="3" fill="#f97316"/>
+                                        <line x1="180" y1="85" x2="202" y2="85" stroke="#06b6d4" stroke-width="1.5"/><circle cx="202" cy="85" r="3" fill="#06b6d4"/>
+                                        <!-- Traces -->
+                                        <path d="M78 52 L60 52 L60 20 L230 20 L230 52 L202 52" fill="none" stroke="#164e63" stroke-width="1"/>
+                                        <path d="M78 85 L55 85 L55 120 L220 120 L220 85 L202 85" fill="none" stroke="#164e63" stroke-width="1"/>
+                                        <!-- Sine wave output -->
+                                        <path d="M202 74 Q215 60 225 74 Q235 88 245 74" fill="none" stroke="#f97316" stroke-width="2" stroke-dasharray="2,2"/>
+                                        <!-- Badge -->
+                                        <rect x="8" y="8" width="68" height="16" rx="3" fill="#0e7490" fill-opacity="0.6"/>
+                                        <text x="42" y="20" text-anchor="middle" fill="#67e8f9" font-size="7" font-family="monospace" font-weight="bold">LOCAL + GEMINI AI</text>
+                                    </svg>
+                                    <div class="absolute inset-0 bg-gradient-to-t from-[#0d1321] via-transparent to-transparent"></div>
+                                </div>
+                                <div class="p-5 flex flex-col flex-1 justify-between">
+                                    <div>
+                                        <div class="flex items-center gap-2 mb-2"><span class="text-cyan-400 text-base">⚡</span><span class="text-cyan-400 font-bold text-sm tracking-wide uppercase">Laboratorio de Electrónica</span></div>
+                                        <p class="text-slate-400 text-xs leading-relaxed">Identificá y analizá componentes: NE555, LM7805, transistores, diodos y más. BD local instantánea + Gemini para búsqueda extendida.</p>
+                                    </div>
+                                    <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-800/60">
+                                        <div class="flex gap-2"><span class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded border border-cyan-500/20">NE555</span><span class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded border border-cyan-500/20">LM7805</span><span class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded border border-cyan-500/20">BC548</span></div>
+                                        <span class="text-xs text-cyan-500 group-hover:translate-x-1 transition-transform">Abrir →</span>
+                                    </div>
+                                </div>
+                            </a>
+
+                            <!-- TRADING HUB -->
+                            <div onclick="cambiarVista('trading_hub')" class="group relative bg-[#0d1321] border border-slate-800 hover:border-orange-500/60 rounded-2xl overflow-hidden flex flex-col transition duration-300 shadow-xl hover:shadow-orange-500/10 cursor-pointer">
+                                <div class="relative h-36 overflow-hidden bg-gradient-to-br from-[#1a0e07] to-[#0d1321] flex items-center justify-center">
+                                    <svg viewBox="0 0 280 140" class="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-300" xmlns="http://www.w3.org/2000/svg">
+                                        <defs>
+                                            <linearGradient id="candle-green" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#22c55e"/><stop offset="100%" stop-color="#16a34a" stop-opacity="0.3"/></linearGradient>
+                                            <linearGradient id="candle-red" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ef4444"/><stop offset="100%" stop-color="#dc2626" stop-opacity="0.3"/></linearGradient>
+                                        </defs>
+                                        <!-- Grid -->
+                                        <rect width="280" height="140" fill="#0d1321"/>
+                                        <line x1="0" y1="35" x2="280" y2="35" stroke="#1e293b" stroke-width="0.5"/>
+                                        <line x1="0" y1="70" x2="280" y2="70" stroke="#1e293b" stroke-width="0.5"/>
+                                        <line x1="0" y1="105" x2="280" y2="105" stroke="#1e293b" stroke-width="0.5"/>
+                                        <!-- Candles -->
+                                        <line x1="30" y1="60" x2="30" y2="95" stroke="#ef4444" stroke-width="1"/><rect x="24" y="70" width="12" height="20" rx="1" fill="url(#candle-red)"/>
+                                        <line x1="50" y1="50" x2="50" y2="85" stroke="#22c55e" stroke-width="1"/><rect x="44" y="55" width="12" height="22" rx="1" fill="url(#candle-green)"/>
+                                        <line x1="70" y1="55" x2="70" y2="90" stroke="#ef4444" stroke-width="1"/><rect x="64" y="62" width="12" height="20" rx="1" fill="url(#candle-red)"/>
+                                        <line x1="90" y1="45" x2="90" y2="78" stroke="#22c55e" stroke-width="1"/><rect x="84" y="48" width="12" height="22" rx="1" fill="url(#candle-green)"/>
+                                        <line x1="110" y1="40" x2="110" y2="72" stroke="#22c55e" stroke-width="1"/><rect x="104" y="43" width="12" height="22" rx="1" fill="url(#candle-green)"/>
+                                        <line x1="130" y1="48" x2="130" y2="80" stroke="#ef4444" stroke-width="1"/><rect x="124" y="52" width="12" height="20" rx="1" fill="url(#candle-red)"/>
+                                        <line x1="150" y1="35" x2="150" y2="65" stroke="#22c55e" stroke-width="1"/><rect x="144" y="38" width="12" height="20" rx="1" fill="url(#candle-green)"/>
+                                        <line x1="170" y1="28" x2="170" y2="58" stroke="#22c55e" stroke-width="1"/><rect x="164" y="30" width="12" height="20" rx="1" fill="url(#candle-green)"/>
+                                        <line x1="190" y1="32" x2="190" y2="62" stroke="#ef4444" stroke-width="1"/><rect x="184" y="38" width="12" height="16" rx="1" fill="url(#candle-red)"/>
+                                        <line x1="210" y1="20" x2="210" y2="50" stroke="#22c55e" stroke-width="1"/><rect x="204" y="22" width="12" height="20" rx="1" fill="url(#candle-green)"/>
+                                        <line x1="230" y1="15" x2="230" y2="48" stroke="#22c55e" stroke-width="1"/><rect x="224" y="18" width="12" height="22" rx="1" fill="url(#candle-green)"/>
+                                        <!-- EMA line -->
+                                        <path d="M18 90 Q50 82 70 76 Q100 65 130 58 Q160 50 190 42 Q220 30 250 22" fill="none" stroke="#f97316" stroke-width="1.5" opacity="0.8"/>
+                                        <!-- Labels -->
+                                        <text x="252" y="20" fill="#f97316" font-size="7" font-family="monospace">EMA</text>
+                                        <rect x="8" y="8" width="48" height="14" rx="3" fill="#7c2d12" fill-opacity="0.6"/>
+                                        <text x="32" y="19" text-anchor="middle" fill="#fb923c" font-size="7" font-family="monospace" font-weight="bold">US30 · BTC</text>
+                                        <!-- FVG zone -->
+                                        <rect x="144" y="58" width="50" height="12" fill="#f97316" fill-opacity="0.08" stroke="#f97316" stroke-width="0.5" stroke-dasharray="2,2"/>
+                                        <text x="169" y="67" text-anchor="middle" fill="#fb923c" font-size="6" font-family="monospace">FVG</text>
+                                        <div class="absolute inset-0 bg-gradient-to-t from-[#0d1321] to-transparent"></div>
+                                    </svg>
+                                    <div class="absolute inset-0 bg-gradient-to-t from-[#0d1321] via-transparent to-transparent"></div>
+                                </div>
+                                <div class="p-5 flex flex-col flex-1 justify-between">
+                                    <div>
+                                        <div class="flex items-center gap-2 mb-2"><span class="text-orange-400 text-base">📈</span><span class="text-orange-400 font-bold text-sm tracking-wide uppercase">Trading Hub SMC</span></div>
+                                        <p class="text-slate-400 text-xs leading-relaxed">Mesa táctica con velas en vivo, calendario macro de alta relevancia, DXY y correlaciones. Calculadora de lotaje integrada.</p>
+                                    </div>
+                                    <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-800/60">
+                                        <div class="flex gap-2"><span class="text-[10px] bg-orange-500/10 text-orange-400 px-2 py-0.5 rounded border border-orange-500/20">US30</span><span class="text-[10px] bg-orange-500/10 text-orange-400 px-2 py-0.5 rounded border border-orange-500/20">BTC</span><span class="text-[10px] bg-orange-500/10 text-orange-400 px-2 py-0.5 rounded border border-orange-500/20">DXY</span></div>
+                                        <span class="text-xs text-orange-400 group-hover:translate-x-1 transition-transform">Acceder →</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- DOCUMENTACIÓN -->
+                            <a href="${LINK_DRIVE_RAIZ}" target="_blank" class="group relative bg-[#0d1321] border border-slate-800 hover:border-emerald-500/60 rounded-2xl overflow-hidden flex flex-col transition duration-300 shadow-xl hover:shadow-emerald-500/10">
+                                <div class="relative h-36 overflow-hidden bg-gradient-to-br from-[#071a12] to-[#0d1321] flex items-center justify-center">
+                                    <svg viewBox="0 0 280 140" class="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-300" xmlns="http://www.w3.org/2000/svg">
+                                        <!-- Stack of documents -->
+                                        <rect x="60" y="90" width="160" height="8" rx="2" fill="#064e3b" stroke="#10b981" stroke-width="0.5"/>
+                                        <rect x="55" y="80" width="160" height="14" rx="2" fill="#065f46" stroke="#10b981" stroke-width="0.5"/>
+                                        <rect x="50" y="30" width="160" height="55" rx="4" fill="#0d1f1a" stroke="#10b981" stroke-width="1.5"/>
+                                        <!-- Doc content lines -->
+                                        <rect x="65" y="42" width="90" height="4" rx="1" fill="#10b981" fill-opacity="0.7"/>
+                                        <rect x="65" y="52" width="120" height="3" rx="1" fill="#34d399" fill-opacity="0.3"/>
+                                        <rect x="65" y="59" width="105" height="3" rx="1" fill="#34d399" fill-opacity="0.3"/>
+                                        <rect x="65" y="66" width="115" height="3" rx="1" fill="#34d399" fill-opacity="0.3"/>
+                                        <rect x="65" y="73" width="70" height="3" rx="1" fill="#34d399" fill-opacity="0.3"/>
+                                        <!-- Folder tab -->
+                                        <rect x="50" y="24" width="50" height="10" rx="2" fill="#065f46" stroke="#10b981" stroke-width="1"/>
+                                        <text x="75" y="32" text-anchor="middle" fill="#34d399" font-size="6" font-family="monospace">CÁTEDRA</text>
+                                        <!-- Drive icon -->
+                                        <g transform="translate(168,38)">
+                                            <polygon points="12,0 24,20 0,20" fill="#fbbc04" fill-opacity="0.15" stroke="#fbbc04" stroke-width="1"/>
+                                            <polygon points="0,20 8,6 20,20" fill="#4285f4" fill-opacity="0.15" stroke="#4285f4" stroke-width="1"/>
+                                            <polygon points="8,6 24,6 20,20" fill="#34a853" fill-opacity="0.15" stroke="#34a853" stroke-width="1"/>
+                                        </g>
+                                        <!-- Badge -->
+                                        <rect x="8" y="8" width="60" height="14" rx="3" fill="#064e3b" fill-opacity="0.8"/>
+                                        <text x="38" y="19" text-anchor="middle" fill="#34d399" font-size="7" font-family="monospace" font-weight="bold">GOOGLE DRIVE</text>
+                                    </svg>
+                                    <div class="absolute inset-0 bg-gradient-to-t from-[#0d1321] via-transparent to-transparent"></div>
+                                </div>
+                                <div class="p-5 flex flex-col flex-1 justify-between">
+                                    <div>
+                                        <div class="flex items-center gap-2 mb-2"><span class="text-emerald-400 text-base">📚</span><span class="text-emerald-400 font-bold text-sm tracking-wide uppercase">Documentación de Cátedra</span></div>
+                                        <p class="text-slate-400 text-xs leading-relaxed">Repositorio institucional en Google Drive. Planificaciones, guías de práctica y materiales para alumnos.</p>
+                                    </div>
+                                    <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-800/60">
+                                        <div class="flex gap-2"><span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20">Planificaciones</span><span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20">Guías</span></div>
+                                        <span class="text-xs text-emerald-400 group-hover:translate-x-1 transition-transform">Abrir Drive ↗</span>
+                                    </div>
+                                </div>
+                            </a>
+
+                        </div>
+                    </main>
+                </div>`;
+        }
+
+        function renderTradingHub() {
+            const dineroEnRiesgo = estado.balanceCuenta * (estado.riesgoPorcentaje / 100);
+            const lotajeCalculado = (dineroEnRiesgo / (estado.stopLossPips * 10)).toFixed(2);
+
+            return `
+                <div class="max-w-[99%] mx-auto p-1 pt-2 fade-in relative">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-2">
+                        <div>
+                            <button onclick="cambiarVista('home')" class="text-xs text-slate-500 hover:text-orange-400 transition mb-0.5 block">← Panel Central</button>
+                            <h1 class="text-base font-black text-slate-200 uppercase tracking-wide">SMC Trading Command</h1>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="flex bg-[#0d1321] p-0.5 rounded-lg border border-slate-800">
+                                <button onclick="seleccionarPar('US30')" class="px-3 py-0.5 text-xs font-bold rounded-md ${estado.parSeleccionado === 'US30' ? 'bg-orange-500 text-slate-950' : 'text-slate-400'}">US30</button>
+                                <button onclick="seleccionarPar('BTC')" class="px-3 py-0.5 text-xs font-bold rounded-md ${estado.parSeleccionado === 'BTC' ? 'bg-orange-500 text-slate-950' : 'text-slate-400'}">BTC</button>
+                            </div>
+                            <button onclick="toggleCalculadora()" class="bg-orange-500 hover:bg-orange-400 text-slate-950 font-bold text-xs px-3 py-1 rounded-md">🧮 Gestión de Riesgo</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 mb-2">
+                        <div class="bg-[#0d1321] border border-slate-800 rounded-xl overflow-hidden shadow-lg">
+                            <div class="bg-slate-950/80 px-3 py-1 text-[10px] font-bold text-slate-400 border-b border-slate-900 flex justify-between uppercase tracking-wider">
+                                <span>📅 Calendario Macroeconómico de Alta Relevancia</span>
+                            </div>
+                            <div class="calendario-wrapper">
+                                <iframe src="https://sslecal2.investing.com?eco_ticker=false&columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=5,22,110,43,17,42,26,10,25,32&calType=day&timeZone=58&lang=5" frameborder="0" allowtransparency="true" style="filter: invert(93%) hue-rotate(180deg) contrast(115%) opacity(0.85);"></iframe>
+                            </div>
+                        </div>
+                        <div class="bg-[#0d1321] border border-slate-800 rounded-xl overflow-hidden flex flex-col shadow-lg">
+                            <div class="bg-slate-950/80 px-3 py-1 text-[10px] font-bold text-cyan-400 border-b border-slate-900 uppercase">📊 Correlación Macro de Activos (En Vivo)</div>
+                            <div class="w-full flex-1 min-h-[130px] bg-slate-950" id="tv-ticker-tape-container"></div>
+                        </div>
+                    </div>
+
+                    <div class="w-full bg-[#0d1321]/60 border border-slate-800 rounded-xl p-1.5 h-[620px] flex flex-col relative mb-2 shadow-2xl">
+                        <div id="tv-chart-container" class="w-full flex-1 rounded-lg overflow-hidden border border-slate-800 bg-slate-950"></div>
+                        
+                        <div id="calc-panel" class="absolute top-2 right-2 bg-[#0d1321] border border-orange-500/40 rounded-xl p-4 w-72 shadow-2xl transition-all ${estado.calculadoraAbierta ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}">
+                            <div class="flex justify-between items-center mb-3 border-b border-slate-800 pb-1.5">
+                                <h3 class="text-orange-400 text-xs font-bold uppercase">🧮 Calculadora de Lotaje</h3>
+                                <button onclick="toggleCalculadora()" class="text-slate-500 text-xs">✕</button>
+                            </div>
+                            <div class="space-y-3 text-xs">
+                                <div><label class="text-slate-400 block mb-0.5">Balance Cuenta (USD)</label><input id="input-balance" type="number" value="${estado.balanceCuenta}" class="w-full bg-[#070a12] border border-slate-800 p-2 rounded-lg font-mono focus:outline-none" /></div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div><label class="text-slate-400 block mb-0.5">Riesgo (%)</label><input id="input-riesgo" type="number" step="0.25" value="${estado.riesgoPorcentaje}" class="w-full bg-[#070a12] border border-slate-800 p-2 rounded-lg font-mono focus:outline-none" /></div>
+                                    <div><label class="text-slate-400 block mb-0.5">Stop Loss (Pips)</label><input id="input-sl" type="number" value="${estado.stopLossPips}" class="w-full bg-[#070a12] border border-slate-800 p-2 rounded-lg font-mono focus:outline-none" /></div>
+                                </div>
+                                <div class="bg-slate-950 p-3 rounded-lg border border-slate-900 font-mono text-center">
+                                    <div id="calc-neto" class="text-[10px] text-red-400">Riesgo Neto: -${dineroEnRiesgo} USD</div>
+                                    <div class="text-slate-200 font-bold mt-1">Lotaje Sugerido: <span id="calc-lotaje" class="text-emerald-400 text-sm">${lotajeCalculado}</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        function cargarWidgetsTradingView() {
+            const ticker = estado.parSeleccionado === "US30" ? "BLACKBULL:US30" : "BINANCE:BTCUSDT";
+            if(document.getElementById('tv-chart-container')) {
+                new TradingView.widget({ 
+                    "autosize": true, 
+                    "symbol": ticker, 
+                    "interval": "15", 
+                    "timezone": "America/Argentina/Buenos_Aires", 
+                    "theme": "dark", 
+                    "style": "1", 
+                    "locale": "es", 
+                    "container_id": "tv-chart-container" 
+                });
+            }
+            if(document.getElementById('tv-ticker-tape-container')) {
+                const container = document.getElementById('tv-ticker-tape-container');
+                container.innerHTML = "";
+                const scriptWidget = document.createElement('script');
+                scriptWidget.type = 'text/javascript';
+                scriptWidget.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
+                scriptWidget.async = true;
+                scriptWidget.innerHTML = JSON.stringify({
+                    "symbols": [
+                        { "proName": "CAPITALCOM:DXY", "title": "DXY" },
+                        { "proName": "NASDAQ:QQQ", "title": "NASDAQ 100" },
+                        { "proName": "AMEX:SPY", "title": "S&P 500" },
+                        { "proName": "TVC:USOIL", "title": "Crudo WTI" },
+                        { "proName": "TVC:GOLD", "title": "Oro" },
+                        { "proName": "BINANCE:BTCUSDT", "title": "BTC" }
+                    ],
+                    "showSymbolLogo": true,
+                    "colorTheme": "dark", 
+                    "isTransparent": true, 
+                    "displayMode": "adaptive", 
+                    "locale": "es" 
+                });
+                container.appendChild(scriptWidget);
+            }
+            vincularEventos();
+        }
+
+        function vincularEventos() {
+            const buscador = document.getElementById('buscador-input');
+            if (buscador) {
+                buscador.addEventListener('input', (e) => { 
+                    estado.busqueda = e.target.value; 
+                    render(); 
+                    const input = document.getElementById('buscador-input'); 
+                    if(input) { input.focus(); input.setSelectionRange(input.value.length, input.value.length); } 
+                });
+                buscador.addEventListener('keydown', (e) => { if(e.key === 'Enter') irAlLaboratorio(); });
+            }
+            const iBalance = document.getElementById('input-balance'); if (iBalance) iBalance.addEventListener('input', (e) => { estado.balanceCuenta = parseFloat(e.target.value) || 0; actualizarCalculos(); });
+            const iRiesgo = document.getElementById('input-riesgo'); if (iRiesgo) iRiesgo.addEventListener('input', (e) => { estado.riesgoPorcentaje = parseFloat(e.target.value) || 0; actualizarCalculos(); });
+            const iSL = document.getElementById('input-sl'); if (iSL) iSL.addEventListener('input', (e) => { estado.stopLossPips = parseFloat(e.target.value) || 0; actualizarCalculos(); });
+        }
+
+        function actualizarCalculos() {
+            const dinero = estado.balanceCuenta * (estado.riesgoPorcentaje / 100);
+            const lotaje = (dinero / (estado.stopLossPips * 10)).toFixed(2);
+            const elNeto = document.getElementById('calc-neto');
+            const elLotaje = document.getElementById('calc-lotaje');
+            if(elNeto) elNeto.innerText = `Riesgo Neto: -${dinero} USD`;
+            if(elLotaje) elLotaje.innerText = lotaje;
+        }
+
+        function toggleCalculadora() { estado.calculadoraAbierta = !estado.calculadoraAbierta; const panel = document.getElementById('calc-panel'); if(panel) panel.classList.toggle('opacity-0'); panel.classList.toggle('scale-95'); panel.classList.toggle('pointer-events-none'); }
+        function seleccionarPar(par) { estado.parSeleccionado = par; render(); }
+        function cambiarVista(nuevaVista) { estado.vistaActual = nuevaVista; estado.busqueda = ""; render(); }
+        function irAlLaboratorio() { localStorage.setItem('query_busqueda_inicial', estado.busqueda); window.location.href = "laboratorio.html"; }
+
+        render();
+    </script>
+</body>
+</html>

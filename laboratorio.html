@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio Automatizado - Sr. Z</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#070a12] text-slate-100 font-sans p-4 md:p-8 overflow-x-hidden">
+
+    <div id="modal-config" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-[#0d1321] border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl">
+            <h3 class="text-sm font-bold uppercase text-cyan-400 mb-2">⚙️ Conexión Extendida Nube (Gemini)</h3>
+            <p class="text-xs text-slate-400 mb-4">Ingresá tu clave de Gemini para análisis de componentes no indexados en la base de datos local.</p>
+            <input id="api-key-input" type="password" placeholder="AIzaSy..." class="w-full bg-[#070a12] border border-slate-800 p-2.5 rounded-xl font-mono text-xs focus:outline-none focus:border-cyan-500 mb-4" />
+            <div class="flex justify-end gap-2">
+                <button onclick="toggleModal()" class="text-xs text-slate-400 px-3 py-2">Cerrar</button>
+                <button onclick="guardarKey()" class="bg-cyan-500 text-slate-950 text-xs font-bold px-4 py-2 rounded-lg">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto">
+        <div class="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
+            <div>
+                <a href="index2.html" class="text-xs text-slate-500 hover:text-cyan-400 transition">← Volver al Panel Central</a>
+                <h1 class="text-xl font-black uppercase text-slate-200 tracking-wide mt-1">⚡ Laboratorio Automatizado</h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <span id="badge-modo" class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/20">⚡ BD Local Activa</span>
+                <button onclick="toggleModal()" class="bg-[#0d1321] border border-slate-800 hover:border-cyan-500/40 p-2 rounded-xl text-xs transition">⚙️ Gemini API</button>
+            </div>
+        </div>
+
+        <!-- SIMULADORES PROPIOS -->
+        <div class="mb-6">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-cyan-400">⚡ Simuladores Propios — Electrónica</span>
+                <div class="flex-1 h-px bg-slate-800"></div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-4">
+                <a href="https://matitradercry-ux.github.io/simuladordecircuitos/" target="_blank" class="group bg-[#0d1321] border border-slate-800 hover:border-cyan-500/50 p-3 rounded-xl flex justify-between items-center transition">
+                    <div><p class="text-xs font-bold text-slate-200 group-hover:text-cyan-300 transition">🔌 Lab de Circuitos</p><p class="text-[11px] text-slate-500">Serie / Paralelo / Mixto · Ley de Ohm en tiempo real</p></div>
+                    <span class="text-xs text-cyan-500 shrink-0 ml-2">↗</span>
+                </a>
+                <a href="https://matitradercry-ux.github.io/CircuitosIA/" target="_blank" class="group bg-[#0d1321] border border-slate-800 hover:border-purple-500/50 p-3 rounded-xl flex justify-between items-center transition">
+                    <div><p class="text-xs font-bold text-slate-200 group-hover:text-purple-300 transition">🤖 Circuitos IA</p><p class="text-[11px] text-slate-500">Escáner de esquemas con visión artificial + análisis nodal</p></div>
+                    <span class="text-xs text-purple-500 shrink-0 ml-2">↗</span>
+                </a>
+                <a href="https://matitradercry-ux.github.io/OSCILOSCOPIO/" target="_blank" class="group bg-[#0d1321] border border-slate-800 hover:border-cyan-500/50 p-3 rounded-xl flex justify-between items-center transition">
+                    <div><p class="text-xs font-bold text-slate-200 group-hover:text-cyan-300 transition">📡 Osciloscopio Virtual</p><p class="text-[11px] text-slate-500">UNI-T UTG932E + Owon SDS1002 · Señales en tiempo real</p></div>
+                    <span class="text-xs text-cyan-500 shrink-0 ml-2">↗</span>
+                </a>
+                <a href="https://matitradercry-ux.github.io/calculador-de-resistores/" target="_blank" class="group bg-[#0d1321] border border-slate-800 hover:border-cyan-500/50 p-3 rounded-xl flex justify-between items-center transition">
+                    <div><p class="text-xs font-bold text-slate-200 group-hover:text-cyan-300 transition">Ω Calculador de Resistores</p><p class="text-[11px] text-slate-500">Asociación serie/paralelo + decodificador 4 bandas</p></div>
+                    <span class="text-xs text-cyan-500 shrink-0 ml-2">↗</span>
+                </a>
+                <a href="https://matitradercry-ux.github.io/codigo-de-colores/" target="_blank" class="group bg-[#0d1321] border border-slate-800 hover:border-cyan-500/50 p-3 rounded-xl flex justify-between items-center transition">
+                    <div><p class="text-xs font-bold text-slate-200 group-hover:text-cyan-300 transition">🎨 Código de Colores</p><p class="text-[11px] text-slate-500">Resistencias 4 y 5 bandas · Valor nominal y tolerancia</p></div>
+                    <span class="text-xs text-cyan-500 shrink-0 ml-2">↗</span>
+                </a>
+                <a href="https://matitradercry-ux.github.io/taller-de-electronica/" target="_blank" class="group bg-[#0d1321] border border-slate-800 hover:border-emerald-500/50 p-3 rounded-xl flex justify-between items-center transition">
+                    <div><p class="text-xs font-bold text-slate-200 group-hover:text-emerald-300 transition">🔧 Taller de Electrónica</p><p class="text-[11px] text-slate-500">Guía interactiva de componentes y uso del multímetro</p></div>
+                    <span class="text-xs text-emerald-500 shrink-0 ml-2">↗</span>
+                </a>
+            </div>
+
+            <div class="flex items-center gap-2 mb-3">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-orange-400">⚙️ Simuladores Propios — Física y Mecánica</span>
+                <div class="flex-1 h-px bg-slate-800"></div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 mb-4">
+                <a href="https://matitradercry-ux.github.io/palancas/" target="_blank" class="group bg-[#0d1321] border border-slate-800 hover:border-orange-500/50 p-3 rounded-xl flex justify-between items-center transition">
+                    <div><p class="text-xs font-bold text-slate-200 group-hover:text-orange-300 transition">⚖️ Palancas</p><p class="text-[11px] text-slate-500">Tipos I, II y III · Ecuación P·d = R·r</p></div>
+                    <span class="text-xs text-orange-500 shrink-0 ml-2">↗</span>
+                </a>
+                <a href="https://matitradercry-ux.github.io/simulador-de-mecanismos/" target="_blank" class="group bg-[#0d1321] border border-slate-800 hover:border-orange-500/50 p-3 rounded-xl flex justify-between items-center transition">
+                    <div><p class="text-xs font-bold text-slate-200 group-hover:text-orange-300 transition">⚙️ Transmisiones</p><p class="text-[11px] text-slate-500">Poleas · Cadenas · Fricción · Relación de transmisión</p></div>
+                    <span class="text-xs text-orange-500 shrink-0 ml-2">↗</span>
+                </a>
+                <a href="https://matitradercry-ux.github.io/simuladortuneldeviento/" target="_blank" class="group bg-[#0d1321] border border-slate-800 hover:border-orange-500/50 p-3 rounded-xl flex justify-between items-center transition">
+                    <div><p class="text-xs font-bold text-slate-200 group-hover:text-orange-300 transition">🌬️ Túnel de Viento</p><p class="text-[11px] text-slate-500">Perfil alar · Sustentación y resistencia · Pérdida aerodinámica</p></div>
+                    <span class="text-xs text-orange-500 shrink-0 ml-2">↗</span>
+                </a>
+                <a href="https://matitradercry-ux.github.io/calculos-combinados/" target="_blank" class="group bg-[#0d1321] border border-slate-800 hover:border-orange-500/50 p-3 rounded-xl flex justify-between items-center transition">
+                    <div><p class="text-xs font-bold text-slate-200 group-hover:text-orange-300 transition">🔢 Cálculos Combinados</p><p class="text-[11px] text-slate-500">Operaciones con decimales · Resolución guiada para el aula</p></div>
+                    <span class="text-xs text-orange-500 shrink-0 ml-2">↗</span>
+                </a>
+            </div>
+
+            <div class="flex items-center gap-2 mb-3">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">🌐 Simuladores Externos</span>
+                <div class="flex-1 h-px bg-slate-800"></div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+            <a href="https://wokwi.com" target="_blank" class="bg-[#0d1321] border border-slate-800 hover:border-slate-600 p-3 rounded-xl flex justify-between items-center transition">
+                <div><p class="text-xs font-bold text-slate-300">🤖 Wokwi</p><p class="text-[11px] text-slate-500">Simulador de Microcontroladores</p></div><span class="text-xs text-slate-500">Abrir ↗</span>
+            </a>
+            <a href="https://www.tinkercad.com" target="_blank" class="bg-[#0d1321] border border-slate-800 hover:border-slate-600 p-3 rounded-xl flex justify-between items-center transition">
+                <div><p class="text-xs font-bold text-slate-300">🧱 Tinkercad Circuits</p><p class="text-[11px] text-slate-500">Laboratorio Inicial Cátedra</p></div><span class="text-xs text-slate-500">Abrir ↗</span>
+            </a>
+            <a href="https://www.falstad.com/circuit/circuitjs.html" target="_blank" class="bg-[#0d1321] border border-slate-800 hover:border-slate-600 p-3 rounded-xl flex justify-between items-center transition">
+                <div><p class="text-xs font-bold text-slate-300">📈 Falstad Circuit</p><p class="text-[11px] text-slate-500">Simulador Interactivo Analógico</p></div><span class="text-xs text-slate-500">Abrir ↗</span>
+            </a>
+        </div>
+
+        <div class="bg-[#0d1321] border border-slate-800 p-3 rounded-xl mb-6 flex gap-2 shadow-2xl">
+            <input id="input-busqueda" type="text" placeholder="Ingresá el componente (ej. NE555, LM7805, 1N4007, BC548, LM317, 2N2222)..." class="w-full bg-[#070a12] border border-slate-800 rounded-lg p-2 text-sm focus:outline-none focus:border-cyan-500" />
+            <button onclick="buscarComponente()" id="btn-buscar" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs px-6 rounded-lg transition flex items-center gap-1 whitespace-nowrap">Analizar</button>
+        </div>
+
+        <!-- Quick access chips -->
+        <div class="flex flex-wrap gap-2 mb-6">
+            <span class="text-[10px] text-slate-500 self-center">Acceso rápido:</span>
+            <button onclick="buscarRapido('NE555')" class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded border border-cyan-500/20 hover:bg-cyan-500/20 transition">NE555</button>
+            <button onclick="buscarRapido('LM7805')" class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded border border-cyan-500/20 hover:bg-cyan-500/20 transition">LM7805</button>
+            <button onclick="buscarRapido('BC548')" class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded border border-cyan-500/20 hover:bg-cyan-500/20 transition">BC548</button>
+            <button onclick="buscarRapido('1N4007')" class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded border border-cyan-500/20 hover:bg-cyan-500/20 transition">1N4007</button>
+            <button onclick="buscarRapido('LM317')" class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded border border-cyan-500/20 hover:bg-cyan-500/20 transition">LM317</button>
+            <button onclick="buscarRapido('2N2222')" class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded border border-cyan-500/20 hover:bg-cyan-500/20 transition">2N2222</button>
+            <button onclick="buscarRapido('TIP31')" class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded border border-cyan-500/20 hover:bg-cyan-500/20 transition">TIP31</button>
+            <button onclick="buscarRapido('LM741')" class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded border border-cyan-500/20 hover:bg-cyan-500/20 transition">LM741</button>
+            <button onclick="buscarRapido('4N35')" class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded border border-cyan-500/20 hover:bg-cyan-500/20 transition">4N35</button>
+            <button onclick="buscarRapido('IRF540')" class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded border border-cyan-500/20 hover:bg-cyan-500/20 transition">IRF540</button>
+        </div>
+
+        <div id="resultado-container"></div>
+    </div>
+
+    <script>
+        // ─── SVG PINOUTS ────────────────────────────────────────────────────────────
+        const PINOUTS_SVG = {
+            "ne555": `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+                <rect x="70" y="10" width="100" height="160" rx="4" fill="#071828" stroke="#0ea5e9" stroke-width="2"/>
+                <text x="120" y="92" text-anchor="middle" fill="#38bdf8" font-size="13" font-family="monospace" font-weight="bold">NE555</text>
+                <text x="120" y="108" text-anchor="middle" fill="#334155" font-size="8" font-family="monospace">TIMER · DIP-8</text>
+                <circle cx="80" cy="20" r="4" fill="#070a12" stroke="#38bdf8" stroke-width="1.2"/>
+                <line x1="10" y1="38" x2="70" y2="38" stroke="#ef4444" stroke-width="2"/><circle cx="10" cy="38" r="4" fill="#ef4444"/>
+                <text x="12" y="30" fill="#ef4444" font-size="8" font-family="monospace">GND</text>
+                <line x1="10" y1="70" x2="70" y2="70" stroke="#f97316" stroke-width="2"/><circle cx="10" cy="70" r="4" fill="#f97316"/>
+                <text x="12" y="62" fill="#f97316" font-size="8" font-family="monospace">TRG</text>
+                <line x1="10" y1="102" x2="70" y2="102" stroke="#22c55e" stroke-width="2"/><circle cx="10" cy="102" r="4" fill="#22c55e"/>
+                <text x="12" y="94" fill="#22c55e" font-size="8" font-family="monospace">OUT</text>
+                <line x1="10" y1="134" x2="70" y2="134" stroke="#a78bfa" stroke-width="2"/><circle cx="10" cy="134" r="4" fill="#a78bfa"/>
+                <text x="12" y="126" fill="#a78bfa" font-size="8" font-family="monospace">RST</text>
+                <line x1="170" y1="38" x2="230" y2="38" stroke="#06b6d4" stroke-width="2"/><circle cx="230" cy="38" r="4" fill="#06b6d4"/>
+                <text x="172" y="30" fill="#06b6d4" font-size="8" font-family="monospace">VCC</text>
+                <line x1="170" y1="70" x2="230" y2="70" stroke="#8b5cf6" stroke-width="2"/><circle cx="230" cy="70" r="4" fill="#8b5cf6"/>
+                <text x="172" y="62" fill="#8b5cf6" font-size="8" font-family="monospace">CTRL</text>
+                <line x1="170" y1="102" x2="230" y2="102" stroke="#f59e0b" stroke-width="2"/><circle cx="230" cy="102" r="4" fill="#f59e0b"/>
+                <text x="172" y="94" fill="#f59e0b" font-size="8" font-family="monospace">THR</text>
+                <line x1="170" y1="134" x2="230" y2="134" stroke="#64748b" stroke-width="2"/><circle cx="230" cy="134" r="4" fill="#64748b"/>
+                <text x="172" y="126" fill="#64748b" font-size="8" font-family="monospace">DIS</text>
+            </svg>`,
+
+            "lm7805": `<svg viewBox="0 0 240 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+                <rect x="70" y="20" width="100" height="90" rx="4" fill="#071828" stroke="#0ea5e9" stroke-width="2"/>
+                <rect x="90" y="110" width="60" height="22" rx="2" fill="#1e293b" stroke="#334155" stroke-width="1.2"/>
+                <circle cx="120" cy="119" r="4" fill="#0f172a" stroke="#475569" stroke-width="1"/>
+                <text x="120" y="60" text-anchor="middle" fill="#38bdf8" font-size="12" font-family="monospace" font-weight="bold">LM7805</text>
+                <text x="120" y="76" text-anchor="middle" fill="#334155" font-size="8" font-family="monospace">REG +5V · TO-220</text>
+                <line x1="10" y1="65" x2="70" y2="65" stroke="#f97316" stroke-width="2.5"/><circle cx="10" cy="65" r="5" fill="#f97316"/>
+                <text x="14" y="56" fill="#fb923c" font-size="9" font-family="monospace" font-weight="bold">IN</text>
+                <text x="14" y="78" fill="#94a3b8" font-size="7" font-family="monospace">7-25V</text>
+                <line x1="170" y1="65" x2="230" y2="65" stroke="#22c55e" stroke-width="2.5"/><circle cx="230" cy="65" r="5" fill="#22c55e"/>
+                <text x="174" y="56" fill="#4ade80" font-size="9" font-family="monospace" font-weight="bold">OUT</text>
+                <text x="174" y="78" fill="#94a3b8" font-size="7" font-family="monospace">5V fijo</text>
+                <line x1="120" y1="132" x2="120" y2="155" stroke="#64748b" stroke-width="2.5"/><circle cx="120" cy="155" r="5" fill="#64748b"/>
+                <text x="128" y="159" fill="#94a3b8" font-size="8" font-family="monospace">GND</text>
+            </svg>`,
+
+            "1n4007": `<svg viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+                <line x1="10" y1="50" x2="85" y2="50" stroke="#94a3b8" stroke-width="2.5"/>
+                <polygon points="85,30 85,70 115,50" fill="#b0b8c0" stroke="#94a3b8" stroke-width="1.5"/>
+                <line x1="115" y1="30" x2="115" y2="70" stroke="#94a3b8" stroke-width="3"/>
+                <line x1="115" y1="50" x2="230" y2="50" stroke="#94a3b8" stroke-width="2.5"/>
+                <rect x="68" y="35" width="90" height="30" rx="14" fill="#1c2030" stroke="#334155" stroke-width="1.2"/>
+                <line x1="168" y1="35" x2="168" y2="65" stroke="#475569" stroke-width="3"/>
+                <text x="100" y="54" text-anchor="middle" fill="#475569" font-size="8" font-family="monospace">1N4007</text>
+                <circle cx="10" cy="50" r="5" fill="#f97316"/>
+                <text x="16" y="38" fill="#fb923c" font-size="8" font-family="monospace">ÁNODO (+)</text>
+                <circle cx="230" cy="50" r="5" fill="#ef4444"/>
+                <text x="140" y="38" fill="#f87171" font-size="8" font-family="monospace">CÁTODO (−)</text>
+                <text x="175" y="82" fill="#64748b" font-size="7" font-family="monospace">banda plateada</text>
+            </svg>`,
+
+            "bc548": `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+                <ellipse cx="120" cy="100" rx="52" ry="62" fill="#1c2030" stroke="#475569" stroke-width="1.5"/>
+                <rect x="94" y="155" width="52" height="12" rx="2" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+                <text x="120" y="96" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="monospace" font-weight="bold">BC548</text>
+                <text x="120" y="111" text-anchor="middle" fill="#334155" font-size="7" font-family="monospace">NPN · TO-92</text>
+                <line x1="120" y1="38" x2="120" y2="5" stroke="#22c55e" stroke-width="2.5"/><circle cx="120" cy="5" r="5" fill="#22c55e"/>
+                <text x="128" y="9" fill="#4ade80" font-size="9" font-family="monospace" font-weight="bold">C</text>
+                <text x="128" y="22" fill="#64748b" font-size="7" font-family="monospace">COLECTOR</text>
+                <line x1="68" y1="100" x2="10" y2="100" stroke="#f97316" stroke-width="2.5"/><circle cx="10" cy="100" r="5" fill="#f97316"/>
+                <text x="16" y="90" fill="#fb923c" font-size="9" font-family="monospace" font-weight="bold">B</text>
+                <text x="16" y="103" fill="#64748b" font-size="7" font-family="monospace">BASE</text>
+                <line x1="120" y1="167" x2="120" y2="195" stroke="#64748b" stroke-width="2.5"/><circle cx="120" cy="195" r="5" fill="#64748b"/>
+                <text x="128" y="190" fill="#94a3b8" font-size="9" font-family="monospace" font-weight="bold">E</text>
+                <text x="140" y="190" fill="#64748b" font-size="7" font-family="monospace">EMISOR</text>
+                <text x="120" y="138" text-anchor="middle" fill="#1e3a5f" font-size="28" font-family="monospace" font-weight="bold" opacity="0.4">NPN</text>
+                <line x1="105" y1="75" x2="135" y2="100" stroke="#38bdf8" stroke-width="1" opacity="0.3"/>
+                <line x1="105" y1="125" x2="135" y2="100" stroke="#38bdf8" stroke-width="1" opacity="0.3"/>
+            </svg>`,
+
+            "lm317": `<svg viewBox="0 0 240 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+                <rect x="70" y="20" width="100" height="90" rx="4" fill="#071828" stroke="#8b5cf6" stroke-width="2"/>
+                <rect x="90" y="110" width="60" height="22" rx="2" fill="#1e293b" stroke="#334155" stroke-width="1.2"/>
+                <circle cx="120" cy="119" r="4" fill="#0f172a" stroke="#475569" stroke-width="1"/>
+                <text x="120" y="60" text-anchor="middle" fill="#a78bfa" font-size="12" font-family="monospace" font-weight="bold">LM317</text>
+                <text x="120" y="76" text-anchor="middle" fill="#334155" font-size="8" font-family="monospace">REG ADJ · TO-220</text>
+                <text x="120" y="90" text-anchor="middle" fill="#4c1d95" font-size="7" font-family="monospace">Vout = 1.25×(1+R2/R1)</text>
+                <line x1="10" y1="65" x2="70" y2="65" stroke="#f97316" stroke-width="2.5"/><circle cx="10" cy="65" r="5" fill="#f97316"/>
+                <text x="14" y="56" fill="#fb923c" font-size="9" font-family="monospace" font-weight="bold">IN</text>
+                <line x1="170" y1="65" x2="230" y2="65" stroke="#22c55e" stroke-width="2.5"/><circle cx="230" cy="65" r="5" fill="#22c55e"/>
+                <text x="174" y="56" fill="#4ade80" font-size="9" font-family="monospace" font-weight="bold">OUT</text>
+                <line x1="120" y1="132" x2="120" y2="155" stroke="#8b5cf6" stroke-width="2.5"/><circle cx="120" cy="155" r="5" fill="#8b5cf6"/>
+                <text x="128" y="159" fill="#a78bfa" font-size="8" font-family="monospace">ADJ</text>
+            </svg>`,
+
+            "2n2222": `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+                <circle cx="120" cy="100" r="58" fill="#1c1c20" stroke="#94a3b8" stroke-width="2"/>
+                <circle cx="120" cy="100" r="45" fill="#111114" stroke="#475569" stroke-width="1"/>
+                <text x="120" y="96" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="monospace" font-weight="bold">2N2222</text>
+                <text x="120" y="111" text-anchor="middle" fill="#334155" font-size="7" font-family="monospace">NPN · TO-18</text>
+                <line x1="120" y1="42" x2="120" y2="5" stroke="#22c55e" stroke-width="2.5"/><circle cx="120" cy="5" r="5" fill="#22c55e"/>
+                <text x="128" y="18" fill="#4ade80" font-size="8" font-family="monospace">COLECTOR</text>
+                <line x1="65" y1="100" x2="10" y2="100" stroke="#f97316" stroke-width="2.5"/><circle cx="10" cy="100" r="5" fill="#f97316"/>
+                <text x="16" y="93" fill="#fb923c" font-size="8" font-family="monospace">BASE</text>
+                <line x1="120" y1="158" x2="120" y2="195" stroke="#64748b" stroke-width="2.5"/><circle cx="120" cy="195" r="5" fill="#64748b"/>
+                <text x="128" y="192" fill="#94a3b8" font-size="8" font-family="monospace">EMISOR</text>
+                <rect x="108" y="155" width="4" height="6" rx="1" fill="#f59e0b"/>
+                <text x="116" y="160" fill="#f59e0b" font-size="6" font-family="monospace">tab=E</text>
+            </svg>`,
+
+            "lm741": `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+                <rect x="60" y="15" width="120" height="160" rx="4" fill="#071828" stroke="#f59e0b" stroke-width="2"/>
+                <circle cx="72" cy="25" r="4" fill="#070a12" stroke="#f59e0b" stroke-width="1.2"/>
+                <text x="120" y="95" text-anchor="middle" fill="#fbbf24" font-size="11" font-family="monospace" font-weight="bold">LM741</text>
+                <text x="120" y="110" text-anchor="middle" fill="#334155" font-size="8" font-family="monospace">OP-AMP · DIP-8</text>
+                <text x="120" y="125" text-anchor="middle" fill="#1c1400" font-size="22" font-family="serif" font-weight="bold" opacity="0.5">∞</text>
+                <line x1="10" y1="42" x2="60" y2="42" stroke="#475569" stroke-width="1.5"/><circle cx="10" cy="42" r="3" fill="#475569"/>
+                <text x="14" y="36" fill="#64748b" font-size="7" font-family="monospace">1·OFF-N</text>
+                <line x1="10" y1="70" x2="60" y2="70" stroke="#ef4444" stroke-width="2"/><circle cx="10" cy="70" r="4" fill="#ef4444"/>
+                <text x="14" y="63" fill="#f87171" font-size="8" font-family="monospace">2·IN−</text>
+                <line x1="10" y1="98" x2="60" y2="98" stroke="#22c55e" stroke-width="2"/><circle cx="10" cy="98" r="4" fill="#22c55e"/>
+                <text x="14" y="91" fill="#4ade80" font-size="8" font-family="monospace">3·IN+</text>
+                <line x1="10" y1="126" x2="60" y2="126" stroke="#ef4444" stroke-width="2"/><circle cx="10" cy="126" r="4" fill="#ef4444"/>
+                <text x="14" y="119" fill="#f87171" font-size="8" font-family="monospace">4·VCC−</text>
+                <line x1="10" y1="154" x2="60" y2="154" stroke="#475569" stroke-width="1.5"/><circle cx="10" cy="154" r="3" fill="#475569"/>
+                <text x="14" y="148" fill="#64748b" font-size="7" font-family="monospace">5·OFF-P</text>
+                <line x1="180" y1="42" x2="230" y2="42" stroke="#f97316" stroke-width="2"/><circle cx="230" cy="42" r="4" fill="#f97316"/>
+                <text x="184" y="36" fill="#fb923c" font-size="8" font-family="monospace">6·OUT</text>
+                <line x1="180" y1="70" x2="230" y2="70" stroke="#06b6d4" stroke-width="2"/><circle cx="230" cy="70" r="4" fill="#06b6d4"/>
+                <text x="184" y="63" fill="#67e8f9" font-size="8" font-family="monospace">7·VCC+</text>
+                <line x1="180" y1="98" x2="230" y2="98" stroke="#475569" stroke-width="1.5"/><circle cx="230" cy="98" r="3" fill="#475569"/>
+                <text x="184" y="91" fill="#64748b" font-size="7" font-family="monospace">8·N/C</text>
+            </svg>`,
+
+            "default": `<svg viewBox="0 0 240 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+                <rect x="50" y="20" width="140" height="120" rx="6" fill="#0a1628" stroke="#1e3a5f" stroke-width="1.5" stroke-dasharray="5,3"/>
+                <text x="120" y="78" text-anchor="middle" fill="#1e3a5f" font-size="11" font-family="monospace">IC / MÓDULO</text>
+                <text x="120" y="96" text-anchor="middle" fill="#0f2030" font-size="8" font-family="monospace">Diagrama SVG no disponible</text>
+                <text x="120" y="112" text-anchor="middle" fill="#0d1f30" font-size="7" font-family="monospace">Ver pines en la lista →</text>
+            </svg>`
+        };
+
+        // ─── BASE DE DATOS LOCAL ─────────────────────────────────────────────────────
+        const BD_LOCAL = {
+            "ne555": {
+                termino: "NE555", categoria: "Temporizador / Integrado Oscilador",
+                descripcion: "Circuito integrado de precisión altamente estable para generación de retardos de tiempo u oscilación. Puede operar en modo monoestable (un pulso) o astable (onda cuadrada continua). El transistor interno en el pin 7 permite cargar/descargar capacitores externos.",
+                vccMax: "4.5V a 16V Vcc · Salida máx. 200mA", encapsulado: "DIP-8 / SOIC-8",
+                imagen: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/NE555_Bloc_Diagram.svg/300px-NE555_Bloc_Diagram.svg.png",
+                aspectosClave: [
+                    "Modo Astable: f = 1.44 / ((R1 + 2×R2) × C). Genera onda cuadrada sin intervención externa.",
+                    "Modo Monoestable: t = 1.1 × R × C. El pulso de disparo en pin 2 debe ser < Vcc/3.",
+                    "Pin 5 (CTRL) desconectado: colocar capacitor cerámico 10nF a GND para filtrar ruido.",
+                    "Pin 4 (RESET) activo en bajo: si no se usa, conectar directo a Vcc.",
+                    "La salida puede sourcear y sinkear corriente — revisar corriente máx. del pin 3 (200mA)."
+                ],
+                pines: ["Pin 1 — GND (Tierra de referencia)", "Pin 2 — TRIGGER (Disparo: activo < Vcc/3)", "Pin 3 — OUTPUT (Salida digital)", "Pin 4 — RESET (Reinicio, activo bajo)", "Pin 5 — CONTROL VOLTAGE (2/3 Vcc interno)", "Pin 6 — THRESHOLD (Umbral: activo > 2/3 Vcc)", "Pin 7 — DISCHARGE (Descarga del capacitor RC)", "Pin 8 — VCC (+Voltaje de alimentación)"],
+                pinoutKey: "ne555"
+            },
+            "lm7805": {
+                termino: "LM7805", categoria: "Regulador de Voltaje Lineal Positivo",
+                descripcion: "Regulador monolítico de tres terminales con salida fija de 5V. Incluye protección térmica interna, protección contra cortocircuito y limitación de corriente. Disipa el exceso de voltaje como calor — disipador obligatorio para corrientes > 300mA.",
+                vccMax: "7V a 25V entrada → 5V fijos · 1.5A máx.", encapsulado: "TO-220 / TO-3",
+                imagen: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/7805-TO220.jpg/200px-7805-TO220.jpg",
+                aspectosClave: [
+                    "Voltaje mínimo de entrada: Vin ≥ Vout + 2V (dropout voltage). Bajo esa diferencia, la regulación falla.",
+                    "Capacitor en entrada 0.33µF y en salida 0.1µF cerámicos: evitan oscilaciones parásitas.",
+                    "Cálculo de disipación: P = (Vin - 5V) × I. Con Vin=12V y 500mA → disipa 3.5W. Disipador requerido.",
+                    "Familia L78XX: L7812 (12V), L7809 (9V), L7815 (15V) — misma conexión de pines.",
+                    "Si la salida supera la entrada momentáneamente (ej. carga inductiva), colocar diodo 1N4007 entre OUT e IN."
+                ],
+                pines: ["Pin 1 — INPUT (Entrada, 7V a 25V)", "Pin 2 — GND (Común/Tierra)", "Pin 3 — OUTPUT (Salida fija 5V)"],
+                pinoutKey: "lm7805"
+            },
+            "1n4007": {
+                termino: "1N4007", categoria: "Diodo Rectificador de Silicio",
+                descripcion: "Diodo rectificador estándar de baja frecuencia. Clave en etapas de fuentes de alimentación. Soporte de picos de corriente de hasta 30A. La banda plateada indica el cátodo (terminal negativo).",
+                vccMax: "1000V VRRM · 1.0A If(av) · 30A IFSM", encapsulado: "DO-41 Axial",
+                imagen: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Diode_pinout_en_fr.svg/250px-Diode_pinout_en_fr.svg.png",
+                aspectosClave: [
+                    "Caída de tensión directa típica: 0.7V a 1A (silicio). A corrientes bajas, puede ser 0.5–0.6V.",
+                    "Banda plateada/gris en el cuerpo = CÁTODO (terminal negativo, corriente sale).",
+                    "En puente rectificador: 4 diodos. Vripple = I / (f × C). Factor de ondulación calculable.",
+                    "No apto para alta frecuencia (> 1kHz). Para switching usar 1N4148 (señal) o Schottky (potencia).",
+                    "Corriente inversa de fuga a 25°C: < 5µA. Aumenta con temperatura."
+                ],
+                pines: ["Terminal sin banda — ÁNODO (+, corriente entra)", "Terminal con banda plateada — CÁTODO (-, corriente sale)"],
+                pinoutKey: "1n4007"
+            },
+            "bc548": {
+                termino: "BC548", categoria: "Transistor Bipolar NPN",
+                descripcion: "Transistor de propósito general para amplificación y conmutación de baja potencia. Ampliamente usado en protoboard para primeras prácticas de electrónica analógica y digital. La ganancia hFE varía según el sufijo: BC548A (110-220), BC548B (200-450), BC548C (420-800).",
+                vccMax: "Vceo 30V · Ic 100mA · Ptot 500mW · ft 150MHz", encapsulado: "TO-92 Plástico",
+                imagen: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Transistor_BJT_Structure_NPN.svg/200px-Transistor_BJT_Structure_NPN.svg.png",
+                aspectosClave: [
+                    "Pinout TO-92 con la cara plana hacia vos: C (izquierda), B (centro), E (derecha). VERIFICAR con datasheet.",
+                    "Resistencia de base: Rb = (Vcc - Vbe) / Ib. Con Vbe = 0.7V y hFE mínimo del sufijo elegido.",
+                    "En saturación: Vce(sat) ≈ 0.2V. En corte: Ic ≈ 0A. Para conmutar: llevar a saturación profunda.",
+                    "Nunca conectar B–E sin resistencia limitadora desde una fuente de tensión: corriente ilimitada destruye el transistor.",
+                    "Reemplazos: BC547 (30V), BC549 (bajo ruido), 2N2222 (más corriente, TO-18 metal)."
+                ],
+                pines: ["Pin 1 — COLECTOR (C)", "Pin 2 — BASE (B)", "Pin 3 — EMISOR (E)"],
+                pinoutKey: "bc548"
+            },
+            "lm317": {
+                termino: "LM317", categoria: "Regulador de Voltaje Lineal Ajustable",
+                descripcion: "Regulador de tres terminales ajustable de 1.25V a 37V. A diferencia del 7805, la salida se configura con dos resistencias externas. Incluye protección térmica y limitación de corriente. Referencia interna de 1.25V entre OUT y ADJ.",
+                vccMax: "3V a 40V diferencia Vin-Vout · 1.5A máx.", encapsulado: "TO-220 / TO-3",
+                imagen: "",
+                aspectosClave: [
+                    "Fórmula: Vout = 1.25V × (1 + R2/R1). Típico: R1=240Ω fijo, R2=potenciómetro.",
+                    "Corriente de ajuste (Iadj): 50–100µA. R1 debe dimensionarse para que Iadj sea despreciable.",
+                    "Capacitor en ADJ: 10µF mejora rechazo de ondulación 10dB. Requiere diodo de protección.",
+                    "Dropout: Vin debe superar Vout en al menos 3V para regulación correcta.",
+                    "Variante LM337: versión para voltajes negativos, misma lógica de cálculo."
+                ],
+                pines: ["Pin 1 — ADJUST (Referencia ajustable)", "Pin 2 — INPUT (Entrada)", "Pin 3 — OUTPUT (Salida variable)"],
+                pinoutKey: "lm317"
+            },
+            "2n2222": {
+                termino: "2N2222", categoria: "Transistor Bipolar NPN de Propósito General",
+                descripcion: "Transistor NPN de mayor capacidad de corriente que el BC548. Muy usado en electrónica de potencia baja y conmutación. Disponible en encapsulado metálico TO-18 y plástico TO-92 (2N2222A). La ft de 300MHz lo hace útil también en RF de baja frecuencia.",
+                vccMax: "Vceo 40V · Ic 600mA · Ptot 625mW · ft 300MHz", encapsulado: "TO-18 Metal / TO-92",
+                imagen: "",
+                aspectosClave: [
+                    "Pinout TO-18 (metal): visto desde abajo, tab identifica el EMISOR.",
+                    "Pinout TO-92 (2N2222A): EBC de izquierda a derecha con cara plana hacia vos.",
+                    "hFE mínimo: 100 a Ic=150mA. Cae significativamente a corrientes altas.",
+                    "En saturación: Vce(sat) < 0.3V a Ic=150mA.",
+                    "Reemplazos equivalentes: BC337 (TO-92, más económico), PN2222A."
+                ],
+                pines: ["Pin 1 — EMISOR (E)", "Pin 2 — BASE (B)", "Pin 3 — COLECTOR (C)"],
+                pinoutKey: "default"
+            },
+            "tip31": {
+                termino: "TIP31", categoria: "Transistor de Potencia NPN",
+                descripcion: "Transistor NPN de potencia media, complementario al TIP32 (PNP). Usado en etapas de salida de audio, control de motores DC y fuentes de alimentación lineales. Requiere disipador para aplicaciones > 500mA continuos.",
+                vccMax: "Vceo 40V · Ic 3A continua · Ptot 40W (con disipador)", encapsulado: "TO-220",
+                imagen: "",
+                aspectosClave: [
+                    "Con disipador correctamente montado puede disipar hasta 40W a 25°C.",
+                    "Resistencia térmica juntura-carcasa: 3.125°C/W. Calcular disipador para no superar Tj=150°C.",
+                    "hFE = 10-50 a alta corriente. Requiere mayor corriente de base que transistores de señal.",
+                    "TIP31 (40V) / TIP31A (60V) / TIP31B (80V) / TIP31C (100V): misma conexión de pines.",
+                    "Par complementario TIP32/TIP32C para diseños push-pull."
+                ],
+                pines: ["Pin 1 — BASE (B)", "Pin 2 — COLECTOR (C, tab metálico)", "Pin 3 — EMISOR (E)"],
+                pinoutKey: "default"
+            },
+            "lm741": {
+                termino: "LM741", categoria: "Amplificador Operacional",
+                descripcion: "Amplificador operacional de propósito general con compensación interna. Referencia histórica en el estudio de AO: comparadores, amplificadores inversores/no inversores, integradores, sumadores. Limitaciones modernas (slew rate, GBW) lo hacen didáctico pero no apto para señales rápidas.",
+                vccMax: "±18V dual (36V total) · Salida ±13V típico", encapsulado: "DIP-8 / TO-99",
+                imagen: "",
+                aspectosClave: [
+                    "GBW (Gain-Bandwidth Product): 1MHz. A ganancia 10, ancho de banda efectivo = 100kHz.",
+                    "Slew Rate: 0.5V/µs. Limita la amplitud máxima a altas frecuencias (distorsión de pendiente).",
+                    "Offset de entrada típico: 1–6mV. En aplicaciones de precisión, usar LM324 o OP07.",
+                    "Requiere alimentación dual ±Vcc para que la salida pueda ir a 0V en modo inversor.",
+                    "Pin 1 y 5: compensación de offset externo con potenciómetro de 10kΩ."
+                ],
+                pines: ["Pin 1 — OFFSET NULL 1", "Pin 2 — IN– (Entrada Inversora)", "Pin 3 — IN+ (Entrada No Inversora)", "Pin 4 — VCC– (Alimentación Negativa)", "Pin 5 — OFFSET NULL 2", "Pin 6 — OUTPUT (Salida)", "Pin 7 — VCC+ (Alimentación Positiva)", "Pin 8 — N/C (No conectado)"],
+                pinoutKey: "default"
+            },
+            "4n35": {
+                termino: "4N35", categoria: "Optoacoplador / Optoaislador",
+                descripcion: "Optoaislador con LED infrarrojo y fototransistor NPN. Proporciona aislamiento galvánico entre circuitos de control (baja tensión/digital) y circuitos de potencia o AC. Imprescindible en diseños con microcontroladores que controlan cargas de red.",
+                vccMax: "Viso 5300Vrms · CTR 100% mín · If 10mA típico", encapsulado: "DIP-6",
+                imagen: "",
+                aspectosClave: [
+                    "CTR (Current Transfer Ratio): Ic/If × 100%. Mínimo 100% — nunca confundir con ganancia de corriente.",
+                    "Resistencia en serie del LED emisor: R = (Vcc - 1.2V) / If_deseado.",
+                    "Pin 6 (BASE del fototransistor): puede dejarse sin conectar o usarse para ajustar CTR.",
+                    "Para cargas AC: combinar con TRIAC y MOC3021 para disparo aislado.",
+                    "Tiempo de respuesta: ton/toff ≈ 2µs — apto para frecuencias de conmutación hasta ~100kHz."
+                ],
+                pines: ["Pin 1 — ÁNODO LED (+)", "Pin 2 — CÁTODO LED (-)", "Pin 3 — N/C", "Pin 4 — EMISOR TRANSISTOR", "Pin 5 — COLECTOR TRANSISTOR", "Pin 6 — BASE TRANSISTOR (opcional)"],
+                pinoutKey: "default"
+            },
+            "irf540": {
+                termino: "IRF540", categoria: "MOSFET Canal N de Potencia",
+                descripcion: "MOSFET de canal N para conmutación de potencia. Ideal para control PWM de motores DC, LEDs de alta potencia y fuentes conmutadas. Se activa con Vgs > 4V, conduce completamente a Vgs = 10V. La puerta tiene impedancia casi infinita — no consume corriente en DC.",
+                vccMax: "Vds 100V · Id 28A · Rds(on) 44mΩ · Ptot 150W", encapsulado: "TO-220",
+                imagen: "",
+                aspectosClave: [
+                    "Rds(on) = 44mΩ a Vgs=10V. Pérdidas en conducción: P = Id² × Rds(on).",
+                    "Vgs(th) = 2–4V (umbral). Para conmutación completa con 5V lógica: verificar Vgs=5V en curvas.",
+                    "Diodo intrínseco (body diode): permite conducción inversa pero con pérdidas. En H-bridge usar diodo externo rápido.",
+                    "La puerta es capacitiva (1.5nF). En alta frecuencia de switching, la corriente de driver = C × dV/dt.",
+                    "Disipador obligatorio para P > 5W. Resistencia térmica juntura-carcasa: 0.83°C/W."
+                ],
+                pines: ["Pin 1 — GATE (G, Puerta de control)", "Pin 2 — DRAIN (D, Tab metálico, colector de corriente)", "Pin 3 — SOURCE (S, retorno de corriente)"],
+                pinoutKey: "default"
+            },
+            "lm324": {
+                termino: "LM324", categoria: "Amplificador Operacional Cuádruple",
+                descripcion: "Cuatro amplificadores operacionales en un solo encapsulado DIP-14. Opera con alimentación simple o dual, con salida que puede llegar hasta 0V (rail-to-rail en baja). Más moderno y versátil que el LM741 para la mayoría de aplicaciones de señal.",
+                vccMax: "3V a 32V (simple) / ±1.5V a ±16V (dual)", encapsulado: "DIP-14 / SOIC-14",
+                imagen: "",
+                aspectosClave: [
+                    "Puede operar con alimentación simple desde 3V — no requiere dual como el LM741.",
+                    "GBW: 1MHz por amplificador. Adecuado para audio hasta ~10kHz con ganancia razonable.",
+                    "4 AO independientes: eficiente para proyectos con múltiples etapas de amplificación o filtrado.",
+                    "Salida llega a ~1.5V sobre el negativo de alimentación — útil con alimentación simple.",
+                    "Común en circuitos de nivel/umbral, comparadores con histéresis (Schmitt trigger) y filtros activos."
+                ],
+                pines: ["Pin 1 — OUT1", "Pin 2 — IN1–", "Pin 3 — IN1+", "Pin 4 — VCC+", "Pin 5 — IN2+", "Pin 6 — IN2–", "Pin 7 — OUT2", "Pin 8 — OUT3", "Pin 9 — IN3–", "Pin 10 — IN3+", "Pin 11 — GND", "Pin 12 — IN4+", "Pin 13 — IN4–", "Pin 14 — OUT4"],
+                pinoutKey: "default"
+            },
+            "l293d": {
+                termino: "L293D", categoria: "Driver de Motor DC / H-Bridge",
+                descripcion: "Driver puente H cuádruple con diodos de protección internos. Controla hasta 2 motores DC bidireccionales o 1 motor paso a paso bipolar. Las entradas EN (Enable) permiten control PWM de velocidad. Muy usado en proyectos con Arduino.",
+                vccMax: "Vs 4.5V a 36V (motores) · Vss 5V (lógica) · 600mA/canal", encapsulado: "DIP-16",
+                imagen: "",
+                aspectosClave: [
+                    "Dos fuentes de alimentación separadas: Vss (lógica 5V) y Vs (motores, hasta 36V).",
+                    "Diodos de flyback internos: protegen contra picos de la carga inductiva del motor.",
+                    "Control PWM en pin EN1/EN2: frecuencia hasta 5kHz para velocidad variable.",
+                    "Caída de tensión interna: ~1.4V por transistor. La tensión efectiva en el motor = Vs - 2.8V.",
+                    "Para motores que requieren más corriente, usar L298N (2A/canal) o TB6612FNG."
+                ],
+                pines: ["Pin 1 — EN1 (Enable canal 1)", "Pin 2 — IN1", "Pin 3 — OUT1", "Pin 4/5 — GND", "Pin 6 — OUT2", "Pin 7 — IN2", "Pin 8 — Vs (Voltaje motores)", "Pin 9 — EN2 (Enable canal 2)", "Pin 10 — IN3", "Pin 11 — OUT3", "Pin 12/13 — GND", "Pin 14 — OUT4", "Pin 15 — IN4", "Pin 16 — Vss (Lógica 5V)"],
+                pinoutKey: "default"
+            }
+        };
+
+        let datosComponente = null;
+
+        function getPinoutSVG(key, pines) {
+            if (key !== "default" && PINOUTS_SVG[key]) return PINOUTS_SVG[key];
+            // Generador dinámico basado en los pines reales del componente
+            if (!pines || pines.length === 0) return PINOUTS_SVG["default"];
+            const total = pines.length;
+            const mitad = Math.ceil(total / 2);
+            const izq = pines.slice(0, mitad);
+            const der = pines.slice(mitad);
+            const alturaMin = Math.max(160, mitad * 32 + 40);
+            const colores = ["#06b6d4","#f97316","#22c55e","#a78bfa","#f59e0b","#ef4444","#64748b","#38bdf8","#4ade80","#fb923c","#c084fc","#fbbf24"];
+            const getColor = i => colores[i % colores.length];
+            const nombreCorto = p => {
+                const match = p.match(/[-—]\s*(.+)/);
+                if (!match) return p.replace(/pin\s*\d+/i,'').trim().substring(0,12);
+                return match[1].replace(/\(.*\)/,'').trim().substring(0,12);
+            };
+            let svgLines = `<svg viewBox="0 0 240 ${alturaMin}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+                <rect x="70" y="20" width="100" height="${alturaMin-40}" rx="4" fill="#071828" stroke="#334155" stroke-width="1.5"/>
+                <text x="120" y="${alturaMin/2-8}" text-anchor="middle" fill="#1e3a5f" font-size="9" font-family="monospace">IC</text>`;
+            izq.forEach((p, i) => {
+                const y = 38 + i * 32;
+                const c = getColor(i);
+                svgLines += `<line x1="10" y1="${y}" x2="70" y2="${y}" stroke="${c}" stroke-width="2"/>
+                <circle cx="10" cy="${y}" r="4" fill="${c}"/>
+                <text x="14" y="${y-5}" fill="${c}" font-size="7" font-family="monospace">${i+1}·${nombreCorto(p)}</text>`;
+            });
+            der.forEach((p, i) => {
+                const y = 38 + i * 32;
+                const c = getColor(mitad + i);
+                svgLines += `<line x1="170" y1="${y}" x2="230" y2="${y}" stroke="${c}" stroke-width="2"/>
+                <circle cx="230" cy="${y}" r="4" fill="${c}"/>
+                <text x="172" y="${y-5}" fill="${c}" font-size="7" font-family="monospace">${mitad+i+1}·${nombreCorto(p)}</text>`;
+            });
+            svgLines += `</svg>`;
+            return svgLines;
+        }
+
+        function imprimirPantalla() {
+            const container = document.getElementById('resultado-container');
+            const comp = datosComponente;
+            const svgPinout = getPinoutSVG(comp.pinoutKey || "default", comp.pines);
+
+            container.innerHTML = `
+                <div class="fade-in">
+                    <div class="border-b border-slate-800 pb-3 mb-5 flex items-start justify-between gap-4">
+                        <div>
+                            <span class="bg-cyan-500/10 text-cyan-400 text-[10px] px-2.5 py-0.5 rounded border border-cyan-500/20 font-bold uppercase">${comp.categoria}</span>
+                            <h2 class="text-2xl font-black text-slate-100 mt-1.5">${comp.termino}</h2>
+                        </div>
+                        <span class="text-[10px] font-mono bg-slate-900 text-slate-500 px-2 py-1 rounded border border-slate-800 whitespace-nowrap">${comp.encapsulado}</span>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        <div class="lg:col-span-2 space-y-4">
+                            <div class="bg-[#0d1321] border border-slate-800 rounded-xl p-4">
+                                <h3 class="text-xs font-bold uppercase text-slate-500 mb-2 tracking-wider">📋 Descripción</h3>
+                                <p class="text-slate-300 text-sm leading-relaxed">${comp.descripcion}</p>
+                            </div>
+                            <div class="bg-[#0d1321] border border-slate-800 rounded-xl p-4">
+                                <h3 class="text-xs font-bold uppercase text-orange-400 mb-2 tracking-wider">⚡ Umbrales Críticos</h3>
+                                <p class="text-slate-200 font-mono text-sm">${comp.vccMax}</p>
+                            </div>
+                            <div class="bg-[#0d1321] border border-slate-800 rounded-xl p-4">
+                                <h3 class="text-xs font-bold uppercase text-cyan-400 mb-3 tracking-wider">💡 Notas Técnicas de Cátedra</h3>
+                                <ul class="space-y-2">
+                                    ${comp.aspectosClave.map(x => `<li class="flex gap-2 text-sm text-slate-300"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>${x}</span></li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="bg-[#0d1321] border border-slate-800 rounded-xl p-4">
+                                <h3 class="text-xs font-bold uppercase text-slate-500 mb-3 tracking-wider">📌 Diagrama de Pines</h3>
+                                <div class="bg-[#070a12] rounded-lg p-3 mb-3" style="min-height:120px">
+                                    ${svgPinout}
+                                </div>
+                                <div class="flex gap-2 mb-3">
+                                    <a href="https://www.google.com/search?q=${encodeURIComponent(comp.termino + ' pinout terminals datasheet')}&tbm=isch" target="_blank" class="flex-1 flex items-center justify-center gap-1.5 bg-[#0d1321] border border-slate-700 hover:border-cyan-500/50 text-slate-300 hover:text-cyan-300 text-[10px] font-bold px-2 py-2 rounded-lg transition">
+                                        🖼️ Ver Pinout Real
+                                    </a>
+                                    <a href="https://www.alldatasheet.com/search/?q=${encodeURIComponent(comp.termino)}" target="_blank" class="flex-1 flex items-center justify-center gap-1.5 bg-[#0d1321] border border-slate-700 hover:border-orange-500/50 text-slate-300 hover:text-orange-300 text-[10px] font-bold px-2 py-2 rounded-lg transition">
+                                        📄 Datasheet
+                                    </a>
+                                </div>
+                                <div class="space-y-1.5 font-mono text-xs">
+                                    ${comp.pines.map((p,i) => `<div class="bg-[#070a12] px-3 py-2 border border-slate-800/80 rounded-lg text-slate-300 flex items-center gap-2"><span class="text-slate-600 shrink-0">${i+1}.</span>${p}</div>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        function mostrarNoEncontrado(query) {
+            const apiKey = localStorage.getItem('gemini_api_key');
+            document.getElementById('resultado-container').innerHTML = `
+                <div class="bg-[#0d1321] border border-slate-700 rounded-xl p-8 text-center fade-in">
+                    <div class="text-4xl mb-3">🔍</div>
+                    <h3 class="text-slate-200 font-bold text-lg mb-1">"${query.toUpperCase()}" no indexado localmente</h3>
+                    <p class="text-slate-400 text-sm mb-5">Este componente no está en la base de datos local. Tenés dos opciones:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-lg mx-auto">
+                        <div class="bg-[#070a12] border border-cyan-500/20 rounded-xl p-4 text-left">
+                            <div class="text-cyan-400 font-bold text-xs mb-1">⚡ Opción 1 — Configurar Gemini</div>
+                            <p class="text-slate-400 text-xs mb-3">Conectá tu API Key de Gemini para análisis extendido de cualquier componente.</p>
+                            <button onclick="toggleModal()" class="bg-cyan-500 text-slate-950 font-bold text-xs px-4 py-2 rounded-lg w-full">Configurar API Key →</button>
+                        </div>
+                        <div class="bg-[#070a12] border border-slate-700 rounded-xl p-4 text-left">
+                            <div class="text-slate-300 font-bold text-xs mb-1">📚 Opción 2 — Datasheet oficial</div>
+                            <p class="text-slate-400 text-xs mb-3">Buscá el datasheet completo en el repositorio oficial del fabricante.</p>
+                            <a href="https://www.alldatasheet.com/search/?q=${encodeURIComponent(query)}" target="_blank" class="block bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs px-4 py-2 rounded-lg w-full text-center transition">Buscar Datasheet ↗</a>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        async function buscarComponente() {
+            const query = document.getElementById('input-busqueda').value.trim();
+            if(!query) return;
+
+            const btn = document.getElementById('btn-buscar');
+            btn.innerText = "⏳";
+            btn.disabled = true;
+
+            const keyLimpia = query.toLowerCase().replace(/[\s\-_]/g, '');
+            const apiKey = localStorage.getItem('gemini_api_key');
+
+            // 1. BD Local
+            if (BD_LOCAL[keyLimpia]) {
+                datosComponente = BD_LOCAL[keyLimpia];
+                imprimirPantalla();
+                btn.innerText = "Analizar";
+                btn.disabled = false;
+                return;
+            }
+
+            // 2. Gemini si hay API Key
+            if(apiKey) {
+                try {
+                    document.getElementById('resultado-container').innerHTML = `<div class="text-center py-12 text-slate-500 text-sm">Consultando Gemini AI...</div>`;
+                    const prompt = `Eres un Ingeniero Electrónico experto. Analiza el componente electrónico: "${query}". Responde EXCLUSIVAMENTE con un objeto JSON plano (sin markdown, sin \`\`\`, sin texto extra) con esta estructura exacta: {"termino":"${query.toUpperCase()}","categoria":"...","descripcion":"...","vccMax":"...","encapsulado":"...","imagen":"","aspectosClave":["detalle técnico 1","detalle técnico 2","detalle técnico 3","detalle técnico 4"],"pines":["Pin 1 — nombre (función)","Pin 2 — nombre (función)"],"pinoutKey":"default"}`;
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    });
+                    const data = await res.json();
+                    let txt = data.candidates[0].content.parts[0].text.replace(/```json/g, "").replace(/```/g, "").trim();
+                    datosComponente = JSON.parse(txt);
+                    imprimirPantalla();
+                    document.getElementById('badge-modo').textContent = '☁️ Gemini AI';
+                    document.getElementById('badge-modo').className = 'text-[10px] font-mono text-purple-400 bg-purple-500/10 px-2 py-1 rounded-md border border-purple-500/20';
+                } catch (e) {
+                    mostrarNoEncontrado(query);
+                }
+            } else {
+                // 3. No encontrado — mensaje claro
+                mostrarNoEncontrado(query);
+            }
+
+            btn.innerText = "Analizar";
+            btn.disabled = false;
+        }
+
+        function buscarRapido(termino) {
+            document.getElementById('input-busqueda').value = termino;
+            buscarComponente();
+        }
+
+        function toggleModal() {
+            document.getElementById('modal-config').classList.toggle('hidden');
+            document.getElementById('api-key-input').value = localStorage.getItem('gemini_api_key') || '';
+        }
+        function guardarKey() {
+            localStorage.setItem('gemini_api_key', document.getElementById('api-key-input').value.trim());
+            toggleModal();
+            document.getElementById('badge-modo').textContent = '☁️ Gemini Conectado';
+            document.getElementById('badge-modo').className = 'text-[10px] font-mono text-purple-400 bg-purple-500/10 px-2 py-1 rounded-md border border-purple-500/20';
+        }
+
+        window.onload = () => {
+            const q = localStorage.getItem('query_busqueda_inicial');
+            if(q) {
+                document.getElementById('input-busqueda').value = q;
+                localStorage.removeItem('query_busqueda_inicial');
+                setTimeout(buscarComponente, 100);
+            }
+            document.getElementById('input-busqueda').addEventListener('keydown', (e) => { if(e.key === 'Enter') buscarComponente(); });
+            // Mostrar NE555 por defecto
+            buscarRapido('NE555');
+        };
+    </script>
+    <style>
+        .fade-in { animation: fadeIn 0.2s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #070a12; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    </style>
+</body>
+</html>
