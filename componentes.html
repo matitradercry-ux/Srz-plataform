@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sr. Z — Componentes Electrónicos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: radial-gradient(ellipse at 50% 20%, #1a2744 0%, #0a0f1e 55%, #060a14 100%); min-height:100vh; }
+        .fade-in { animation: fadeIn 0.2s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #070a12; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    </style>
+</head>
+<body class="text-slate-100 font-sans">
+
+<!-- Modal API Key -->
+<div id="modal-config" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-[#0d1321] border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl">
+        <h3 class="text-sm font-bold uppercase text-cyan-400 mb-2">⚙️ Conexión Gemini API</h3>
+        <p class="text-xs text-slate-400 mb-4">API Key para análisis de componentes no indexados localmente.</p>
+        <input id="api-key-input" type="password" placeholder="AIzaSy..." class="w-full bg-[#070a12] border border-slate-800 p-2.5 rounded-xl font-mono text-xs focus:outline-none focus:border-cyan-500 mb-4" />
+        <div class="flex justify-end gap-2">
+            <button onclick="toggleModal()" class="text-xs text-slate-400 px-3 py-2">Cerrar</button>
+            <button onclick="guardarKey()" class="bg-cyan-500 text-slate-950 text-xs font-bold px-4 py-2 rounded-lg">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Header -->
+<div class="border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-sm sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-5 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <a href="index.html" class="text-xs text-slate-500 hover:text-cyan-400 transition">← Inicio</a>
+            <span class="text-slate-700">|</span>
+            <a href="laboratorio.html" class="text-xs text-slate-500 hover:text-cyan-400 transition">Laboratorio</a>
+            <span class="text-slate-700">|</span>
+            <span class="text-base font-black uppercase tracking-wide text-slate-200">🔌 Componentes</span>
+        </div>
+        <div class="flex items-center gap-3">
+            <span id="badge-modo" class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/20">⚡ BD Local Activa</span>
+            <button onclick="toggleModal()" class="bg-[#0d1321] border border-slate-800 hover:border-cyan-500/40 p-2 rounded-xl text-xs transition">⚙️ Gemini API</button>
+        </div>
+    </div>
+</div>
+
+<div class="max-w-5xl mx-auto px-5 py-8">
+
+    <div class="mb-8">
+        <h1 class="text-2xl font-black text-slate-100 mb-1">🔌 Analizador de Componentes</h1>
+        <p class="text-sm text-slate-500">Buscá cualquier componente electrónico — pinout, descripción, umbrales críticos y notas de cátedra.</p>
+    </div>
+
+    <!-- Search -->
+    <div class="bg-[#0d1321] border border-slate-800 p-3 rounded-xl mb-4 flex gap-2 shadow-2xl">
+        <input id="input-busqueda" type="text" placeholder="NE555, LM7805, BC548, IRF540, Arduino Uno, ESP32..." class="w-full bg-[#070a12] border border-slate-800 rounded-lg p-2.5 text-sm focus:outline-none focus:border-cyan-500" />
+        <button onclick="buscarComponente()" id="btn-buscar" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-sm px-6 rounded-lg transition flex items-center gap-1 whitespace-nowrap">Analizar</button>
+    </div>
+
+    <!-- Quick chips -->
+    <div class="flex flex-wrap gap-2 mb-8">
+        <span class="text-[10px] text-slate-500 self-center">Acceso rápido:</span>
+        <button onclick="buscarRapido('NE555')" class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded border border-cyan-500/20 hover:bg-cyan-500/20 transition">NE555</button>
+        <button onclick="buscarRapido('LM7805')" class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded border border-cyan-500/20 hover:bg-cyan-500/20 transition">LM7805</button>
+        <button onclick="buscarRapido('BC548')" class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded border border-cyan-500/20 hover:bg-cyan-500/20 transition">BC548</button>
+        <button onclick="buscarRapido('1N4007')" class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded border border-cyan-500/20 hover:bg-cyan-500/20 transition">1N4007</button>
+        <button onclick="buscarRapido('LM317')" class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded border border-cyan-500/20 hover:bg-cyan-500/20 transition">LM317</button>
+        <button onclick="buscarRapido('2N2222')" class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded border border-cyan-500/20 hover:bg-cyan-500/20 transition">2N2222</button>
+        <button onclick="buscarRapido('TIP31')" class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded border border-cyan-500/20 hover:bg-cyan-500/20 transition">TIP31</button>
+        <button onclick="buscarRapido('LM741')" class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded border border-cyan-500/20 hover:bg-cyan-500/20 transition">LM741</button>
+        <button onclick="buscarRapido('4N35')" class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded border border-cyan-500/20 hover:bg-cyan-500/20 transition">4N35</button>
+        <button onclick="buscarRapido('IRF540')" class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded border border-cyan-500/20 hover:bg-cyan-500/20 transition">IRF540</button>
+        <button onclick="buscarRapido('LED')" class="text-[10px] bg-yellow-500/10 text-yellow-400 px-2 py-1 rounded border border-yellow-500/20 hover:bg-yellow-500/20 transition">LED</button>
+        <button onclick="buscarRapido('Zener')" class="text-[10px] bg-purple-500/10 text-purple-400 px-2 py-1 rounded border border-purple-500/20 hover:bg-purple-500/20 transition">Zener</button>
+        <button onclick="buscarRapido('Capacitor')" class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded border border-blue-500/20 hover:bg-blue-500/20 transition">Capacitor</button>
+        <button onclick="buscarRapido('74HC04')" class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded border border-emerald-500/20 hover:bg-emerald-500/20 transition">74HC04</button>
+        <button onclick="buscarRapido('LM324')" class="text-[10px] bg-cyan-500/10 text-cyan-400 px-2 py-1 rounded border border-cyan-500/20 hover:bg-cyan-500/20 transition">LM324</button>
+        <button onclick="buscarRapido('L293D')" class="text-[10px] bg-orange-500/10 text-orange-400 px-2 py-1 rounded border border-orange-500/20 hover:bg-orange-500/20 transition">L293D</button>
+        <button onclick="buscarRapido('Arduino Uno')" class="text-[10px] bg-green-500/10 text-green-400 px-2 py-1 rounded border border-green-500/20 hover:bg-green-500/20 transition">Arduino Uno</button>
+        <button onclick="buscarRapido('ESP32')" class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded border border-blue-500/20 hover:bg-blue-500/20 transition">ESP32</button>
+    </div>
+
+    <div id="resultado-container"></div>
+
+</div>
+
+<script>
+// ─── SVG PINOUTS ─────────────────────────────────────────────────────────────
+const PINOUTS_SVG = {
+    "ne555": `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+        <rect x="70" y="10" width="100" height="160" rx="4" fill="#071828" stroke="#0ea5e9" stroke-width="2"/>
+        <text x="120" y="92" text-anchor="middle" fill="#38bdf8" font-size="13" font-family="monospace" font-weight="bold">NE555</text>
+        <text x="120" y="108" text-anchor="middle" fill="#334155" font-size="8" font-family="monospace">TIMER · DIP-8</text>
+        <circle cx="80" cy="20" r="4" fill="#070a12" stroke="#38bdf8" stroke-width="1.2"/>
+        <line x1="10" y1="38" x2="70" y2="38" stroke="#ef4444" stroke-width="2"/><circle cx="10" cy="38" r="4" fill="#ef4444"/>
+        <text x="12" y="30" fill="#ef4444" font-size="8" font-family="monospace">GND</text>
+        <line x1="10" y1="70" x2="70" y2="70" stroke="#f97316" stroke-width="2"/><circle cx="10" cy="70" r="4" fill="#f97316"/>
+        <text x="12" y="62" fill="#f97316" font-size="8" font-family="monospace">TRG</text>
+        <line x1="10" y1="102" x2="70" y2="102" stroke="#22c55e" stroke-width="2"/><circle cx="10" cy="102" r="4" fill="#22c55e"/>
+        <text x="12" y="94" fill="#22c55e" font-size="8" font-family="monospace">OUT</text>
+        <line x1="10" y1="134" x2="70" y2="134" stroke="#a78bfa" stroke-width="2"/><circle cx="10" cy="134" r="4" fill="#a78bfa"/>
+        <text x="12" y="126" fill="#a78bfa" font-size="8" font-family="monospace">RST</text>
+        <line x1="170" y1="38" x2="230" y2="38" stroke="#06b6d4" stroke-width="2"/><circle cx="230" cy="38" r="4" fill="#06b6d4"/>
+        <text x="172" y="30" fill="#06b6d4" font-size="8" font-family="monospace">VCC</text>
+        <line x1="170" y1="70" x2="230" y2="70" stroke="#8b5cf6" stroke-width="2"/><circle cx="230" cy="70" r="4" fill="#8b5cf6"/>
+        <text x="172" y="62" fill="#8b5cf6" font-size="8" font-family="monospace">CTRL</text>
+        <line x1="170" y1="102" x2="230" y2="102" stroke="#f59e0b" stroke-width="2"/><circle cx="230" cy="102" r="4" fill="#f59e0b"/>
+        <text x="172" y="94" fill="#f59e0b" font-size="8" font-family="monospace">THR</text>
+        <line x1="170" y1="134" x2="230" y2="134" stroke="#64748b" stroke-width="2"/><circle cx="230" cy="134" r="4" fill="#64748b"/>
+        <text x="172" y="126" fill="#64748b" font-size="8" font-family="monospace">DIS</text>
+    </svg>`,
+    "lm7805": `<svg viewBox="0 0 240 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+        <rect x="70" y="20" width="100" height="90" rx="4" fill="#071828" stroke="#0ea5e9" stroke-width="2"/>
+        <rect x="90" y="110" width="60" height="22" rx="2" fill="#1e293b" stroke="#334155" stroke-width="1.2"/>
+        <circle cx="120" cy="119" r="4" fill="#0f172a" stroke="#475569" stroke-width="1"/>
+        <text x="120" y="60" text-anchor="middle" fill="#38bdf8" font-size="12" font-family="monospace" font-weight="bold">LM7805</text>
+        <text x="120" y="76" text-anchor="middle" fill="#334155" font-size="8" font-family="monospace">REG +5V · TO-220</text>
+        <line x1="10" y1="65" x2="70" y2="65" stroke="#f97316" stroke-width="2.5"/><circle cx="10" cy="65" r="5" fill="#f97316"/>
+        <text x="14" y="56" fill="#fb923c" font-size="9" font-family="monospace" font-weight="bold">IN</text>
+        <text x="14" y="78" fill="#94a3b8" font-size="7" font-family="monospace">7-25V</text>
+        <line x1="170" y1="65" x2="230" y2="65" stroke="#22c55e" stroke-width="2.5"/><circle cx="230" cy="65" r="5" fill="#22c55e"/>
+        <text x="174" y="56" fill="#4ade80" font-size="9" font-family="monospace" font-weight="bold">OUT</text>
+        <text x="174" y="78" fill="#94a3b8" font-size="7" font-family="monospace">5V fijo</text>
+        <line x1="120" y1="132" x2="120" y2="155" stroke="#64748b" stroke-width="2.5"/><circle cx="120" cy="155" r="5" fill="#64748b"/>
+        <text x="128" y="159" fill="#94a3b8" font-size="8" font-family="monospace">GND</text>
+    </svg>`,
+    "1n4007": `<svg viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+        <line x1="10" y1="50" x2="85" y2="50" stroke="#94a3b8" stroke-width="2.5"/>
+        <polygon points="85,30 85,70 115,50" fill="#b0b8c0" stroke="#94a3b8" stroke-width="1.5"/>
+        <line x1="115" y1="30" x2="115" y2="70" stroke="#94a3b8" stroke-width="3"/>
+        <line x1="115" y1="50" x2="230" y2="50" stroke="#94a3b8" stroke-width="2.5"/>
+        <rect x="68" y="35" width="90" height="30" rx="14" fill="#1c2030" stroke="#334155" stroke-width="1.2"/>
+        <line x1="168" y1="35" x2="168" y2="65" stroke="#475569" stroke-width="3"/>
+        <text x="100" y="54" text-anchor="middle" fill="#475569" font-size="8" font-family="monospace">1N4007</text>
+        <circle cx="10" cy="50" r="5" fill="#f97316"/><text x="16" y="38" fill="#fb923c" font-size="8" font-family="monospace">ÁNODO (+)</text>
+        <circle cx="230" cy="50" r="5" fill="#ef4444"/><text x="140" y="38" fill="#f87171" font-size="8" font-family="monospace">CÁTODO (−)</text>
+        <text x="175" y="82" fill="#64748b" font-size="7" font-family="monospace">banda plateada</text>
+    </svg>`,
+    "bc548": `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+        <ellipse cx="120" cy="100" rx="52" ry="62" fill="#1c2030" stroke="#475569" stroke-width="1.5"/>
+        <rect x="94" y="155" width="52" height="12" rx="2" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+        <text x="120" y="96" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="monospace" font-weight="bold">BC548</text>
+        <text x="120" y="111" text-anchor="middle" fill="#334155" font-size="7" font-family="monospace">NPN · TO-92</text>
+        <line x1="120" y1="38" x2="120" y2="5" stroke="#22c55e" stroke-width="2.5"/><circle cx="120" cy="5" r="5" fill="#22c55e"/>
+        <text x="128" y="9" fill="#4ade80" font-size="9" font-family="monospace" font-weight="bold">C</text>
+        <line x1="68" y1="100" x2="10" y2="100" stroke="#f97316" stroke-width="2.5"/><circle cx="10" cy="100" r="5" fill="#f97316"/>
+        <text x="16" y="90" fill="#fb923c" font-size="9" font-family="monospace" font-weight="bold">B</text>
+        <line x1="120" y1="167" x2="120" y2="195" stroke="#64748b" stroke-width="2.5"/><circle cx="120" cy="195" r="5" fill="#64748b"/>
+        <text x="128" y="190" fill="#94a3b8" font-size="9" font-family="monospace" font-weight="bold">E</text>
+    </svg>`,
+    "lm317": `<svg viewBox="0 0 240 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+        <rect x="70" y="20" width="100" height="90" rx="4" fill="#071828" stroke="#8b5cf6" stroke-width="2"/>
+        <rect x="90" y="110" width="60" height="22" rx="2" fill="#1e293b" stroke="#334155" stroke-width="1.2"/>
+        <circle cx="120" cy="119" r="4" fill="#0f172a" stroke="#475569" stroke-width="1"/>
+        <text x="120" y="60" text-anchor="middle" fill="#a78bfa" font-size="12" font-family="monospace" font-weight="bold">LM317</text>
+        <text x="120" y="76" text-anchor="middle" fill="#334155" font-size="8" font-family="monospace">REG ADJ · TO-220</text>
+        <text x="120" y="90" text-anchor="middle" fill="#4c1d95" font-size="7" font-family="monospace">Vout = 1.25×(1+R2/R1)</text>
+        <line x1="10" y1="65" x2="70" y2="65" stroke="#f97316" stroke-width="2.5"/><circle cx="10" cy="65" r="5" fill="#f97316"/>
+        <text x="14" y="56" fill="#fb923c" font-size="9" font-family="monospace" font-weight="bold">IN</text>
+        <line x1="170" y1="65" x2="230" y2="65" stroke="#22c55e" stroke-width="2.5"/><circle cx="230" cy="65" r="5" fill="#22c55e"/>
+        <text x="174" y="56" fill="#4ade80" font-size="9" font-family="monospace" font-weight="bold">OUT</text>
+        <line x1="120" y1="132" x2="120" y2="155" stroke="#8b5cf6" stroke-width="2.5"/><circle cx="120" cy="155" r="5" fill="#8b5cf6"/>
+        <text x="128" y="159" fill="#a78bfa" font-size="8" font-family="monospace">ADJ</text>
+    </svg>`,
+    "2n2222": `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+        <circle cx="120" cy="100" r="58" fill="#1c1c20" stroke="#94a3b8" stroke-width="2"/>
+        <circle cx="120" cy="100" r="45" fill="#111114" stroke="#475569" stroke-width="1"/>
+        <text x="120" y="96" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="monospace" font-weight="bold">2N2222</text>
+        <text x="120" y="111" text-anchor="middle" fill="#334155" font-size="7" font-family="monospace">NPN · TO-18</text>
+        <line x1="120" y1="42" x2="120" y2="5" stroke="#22c55e" stroke-width="2.5"/><circle cx="120" cy="5" r="5" fill="#22c55e"/>
+        <text x="128" y="18" fill="#4ade80" font-size="8" font-family="monospace">COLECTOR</text>
+        <line x1="65" y1="100" x2="10" y2="100" stroke="#f97316" stroke-width="2.5"/><circle cx="10" cy="100" r="5" fill="#f97316"/>
+        <text x="16" y="93" fill="#fb923c" font-size="8" font-family="monospace">BASE</text>
+        <line x1="120" y1="158" x2="120" y2="195" stroke="#64748b" stroke-width="2.5"/><circle cx="120" cy="195" r="5" fill="#64748b"/>
+        <text x="128" y="192" fill="#94a3b8" font-size="8" font-family="monospace">EMISOR</text>
+        <rect x="108" y="155" width="4" height="6" rx="1" fill="#f59e0b"/>
+        <text x="116" y="160" fill="#f59e0b" font-size="6" font-family="monospace">tab=E</text>
+    </svg>`,
+    "lm741": `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+        <rect x="60" y="15" width="120" height="160" rx="4" fill="#071828" stroke="#f59e0b" stroke-width="2"/>
+        <circle cx="72" cy="25" r="4" fill="#070a12" stroke="#f59e0b" stroke-width="1.2"/>
+        <text x="120" y="95" text-anchor="middle" fill="#fbbf24" font-size="11" font-family="monospace" font-weight="bold">LM741</text>
+        <text x="120" y="110" text-anchor="middle" fill="#334155" font-size="8" font-family="monospace">OP-AMP · DIP-8</text>
+        <line x1="10" y1="70" x2="60" y2="70" stroke="#ef4444" stroke-width="2"/><circle cx="10" cy="70" r="4" fill="#ef4444"/>
+        <text x="14" y="63" fill="#f87171" font-size="8" font-family="monospace">2·IN−</text>
+        <line x1="10" y1="98" x2="60" y2="98" stroke="#22c55e" stroke-width="2"/><circle cx="10" cy="98" r="4" fill="#22c55e"/>
+        <text x="14" y="91" fill="#4ade80" font-size="8" font-family="monospace">3·IN+</text>
+        <line x1="10" y1="126" x2="60" y2="126" stroke="#ef4444" stroke-width="2"/><circle cx="10" cy="126" r="4" fill="#ef4444"/>
+        <text x="14" y="119" fill="#f87171" font-size="8" font-family="monospace">4·VCC−</text>
+        <line x1="180" y1="42" x2="230" y2="42" stroke="#f97316" stroke-width="2"/><circle cx="230" cy="42" r="4" fill="#f97316"/>
+        <text x="184" y="36" fill="#fb923c" font-size="8" font-family="monospace">6·OUT</text>
+        <line x1="180" y1="70" x2="230" y2="70" stroke="#06b6d4" stroke-width="2"/><circle cx="230" cy="70" r="4" fill="#06b6d4"/>
+        <text x="184" y="63" fill="#67e8f9" font-size="8" font-family="monospace">7·VCC+</text>
+    </svg>`,
+    "tip31": `<svg viewBox="0 0 240 190" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+        <rect x="65" y="32" width="110" height="78" rx="4" fill="#1a0505" stroke="#ef4444" stroke-width="2"/>
+        <text x="120" y="68" text-anchor="middle" fill="#fca5a5" font-size="13" font-family="monospace" font-weight="bold">TIP31</text>
+        <text x="120" y="83" text-anchor="middle" fill="#475569" font-size="7.5" font-family="monospace">NPN POTENCIA · TO-220</text>
+        <line x1="93" y1="110" x2="93" y2="148" stroke="#f97316" stroke-width="3"/>
+        <line x1="120" y1="110" x2="120" y2="148" stroke="#22c55e" stroke-width="3"/>
+        <line x1="147" y1="110" x2="147" y2="148" stroke="#64748b" stroke-width="3"/>
+        <circle cx="93" cy="158" r="10" fill="#1a0505" stroke="#f97316" stroke-width="2"/>
+        <text x="93" y="162" text-anchor="middle" fill="#fb923c" font-size="9" font-family="monospace" font-weight="bold">B</text>
+        <circle cx="120" cy="158" r="10" fill="#1a0505" stroke="#22c55e" stroke-width="2"/>
+        <text x="120" y="162" text-anchor="middle" fill="#4ade80" font-size="9" font-family="monospace" font-weight="bold">C</text>
+        <circle cx="147" cy="158" r="10" fill="#1a0505" stroke="#64748b" stroke-width="2"/>
+        <text x="147" y="162" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="monospace" font-weight="bold">E</text>
+    </svg>`,
+    "irf540": `<svg viewBox="0 0 240 190" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+        <rect x="65" y="32" width="110" height="78" rx="4" fill="#030f1a" stroke="#06b6d4" stroke-width="2"/>
+        <text x="120" y="66" text-anchor="middle" fill="#67e8f9" font-size="12" font-family="monospace" font-weight="bold">IRF540</text>
+        <text x="120" y="81" text-anchor="middle" fill="#475569" font-size="7.5" font-family="monospace">N-MOSFET · TO-220</text>
+        <text x="120" y="96" text-anchor="middle" fill="#0e3a5e" font-size="7" font-family="monospace">Vds 100V · Id 28A · Rds 44mΩ</text>
+        <line x1="93" y1="110" x2="93" y2="148" stroke="#f59e0b" stroke-width="3"/>
+        <line x1="120" y1="110" x2="120" y2="148" stroke="#06b6d4" stroke-width="3"/>
+        <line x1="147" y1="110" x2="147" y2="148" stroke="#64748b" stroke-width="3"/>
+        <circle cx="93" cy="158" r="10" fill="#030f1a" stroke="#f59e0b" stroke-width="2"/>
+        <text x="93" y="162" text-anchor="middle" fill="#fbbf24" font-size="9" font-family="monospace" font-weight="bold">G</text>
+        <circle cx="120" cy="158" r="10" fill="#030f1a" stroke="#06b6d4" stroke-width="2"/>
+        <text x="120" y="162" text-anchor="middle" fill="#67e8f9" font-size="9" font-family="monospace" font-weight="bold">D</text>
+        <circle cx="147" cy="158" r="10" fill="#030f1a" stroke="#64748b" stroke-width="2"/>
+        <text x="147" y="162" text-anchor="middle" fill="#94a3b8" font-size="9" font-family="monospace" font-weight="bold">S</text>
+    </svg>`,
+    "4n35": `<svg viewBox="0 0 240 185" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+        <rect x="65" y="10" width="110" height="150" rx="4" fill="#0d0e04" stroke="#f59e0b" stroke-width="2"/>
+        <circle cx="76" cy="20" r="4" fill="#070a12" stroke="#f59e0b" stroke-width="1.2"/>
+        <text x="120" y="32" text-anchor="middle" fill="#fbbf24" font-size="11" font-family="monospace" font-weight="bold">4N35</text>
+        <text x="120" y="46" text-anchor="middle" fill="#475569" font-size="7.5" font-family="monospace">OPTOACOPLADOR · DIP-6</text>
+        <line x1="10" y1="40" x2="65" y2="40" stroke="#22c55e" stroke-width="2"/><circle cx="10" cy="40" r="4" fill="#22c55e"/>
+        <text x="13" y="33" fill="#4ade80" font-size="7.5" font-family="monospace" font-weight="bold">1·LED+</text>
+        <line x1="10" y1="73" x2="65" y2="73" stroke="#ef4444" stroke-width="2"/><circle cx="10" cy="73" r="4" fill="#ef4444"/>
+        <text x="13" y="66" fill="#f87171" font-size="7.5" font-family="monospace" font-weight="bold">2·LED−</text>
+        <line x1="175" y1="106" x2="230" y2="106" stroke="#64748b" stroke-width="2"/><circle cx="230" cy="106" r="4" fill="#64748b"/>
+        <text x="178" y="99" fill="#94a3b8" font-size="7.5" font-family="monospace" font-weight="bold">4·E</text>
+        <line x1="175" y1="73" x2="230" y2="73" stroke="#06b6d4" stroke-width="2"/><circle cx="230" cy="73" r="4" fill="#06b6d4"/>
+        <text x="178" y="66" fill="#67e8f9" font-size="7.5" font-family="monospace" font-weight="bold">5·C</text>
+        <text x="120" y="138" text-anchor="middle" fill="#334155" font-size="7" font-family="monospace">aislamiento 5300 Vrms</text>
+    </svg>`,
+    "lm324": `<svg viewBox="0 0 240 230" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+        <rect x="70" y="10" width="100" height="200" rx="4" fill="#071828" stroke="#f59e0b" stroke-width="2"/>
+        <circle cx="82" cy="20" r="4" fill="#070a12" stroke="#f59e0b" stroke-width="1.2"/>
+        <text x="120" y="108" text-anchor="middle" fill="#fbbf24" font-size="10" font-family="monospace" font-weight="bold">LM324</text>
+        <text x="120" y="122" text-anchor="middle" fill="#475569" font-size="7" font-family="monospace">QUAD OP-AMP · DIP-14</text>
+        <text x="120" y="136" text-anchor="middle" fill="#1c1400" font-size="18" font-family="serif" font-weight="bold" opacity="0.6">×4</text>
+        <line x1="10" y1="30" x2="70" y2="30" stroke="#f97316" stroke-width="2"/><circle cx="10" cy="30" r="4" fill="#f97316"/>
+        <text x="13" y="24" fill="#fb923c" font-size="7" font-family="monospace">1·OUT1</text>
+        <line x1="10" y1="58" x2="70" y2="58" stroke="#ef4444" stroke-width="2"/><circle cx="10" cy="58" r="4" fill="#ef4444"/>
+        <text x="13" y="52" fill="#f87171" font-size="7" font-family="monospace">2·IN1−</text>
+        <line x1="10" y1="86" x2="70" y2="86" stroke="#22c55e" stroke-width="2"/><circle cx="10" cy="86" r="4" fill="#22c55e"/>
+        <text x="13" y="80" fill="#4ade80" font-size="7" font-family="monospace">3·IN1+</text>
+        <line x1="10" y1="114" x2="70" y2="114" stroke="#06b6d4" stroke-width="2.5"/><circle cx="10" cy="114" r="5" fill="#06b6d4"/>
+        <text x="13" y="108" fill="#67e8f9" font-size="7" font-family="monospace" font-weight="bold">4·VCC+</text>
+        <line x1="170" y1="114" x2="230" y2="114" stroke="#64748b" stroke-width="2.5"/><circle cx="230" cy="114" r="5" fill="#64748b"/>
+        <text x="173" y="108" fill="#94a3b8" font-size="7" font-family="monospace" font-weight="bold">11·GND</text>
+        <line x1="170" y1="30" x2="230" y2="30" stroke="#f97316" stroke-width="2"/><circle cx="230" cy="30" r="4" fill="#f97316"/>
+        <text x="173" y="24" fill="#fb923c" font-size="7" font-family="monospace">14·OUT4</text>
+    </svg>`,
+    "l293d": `<svg viewBox="0 0 240 255" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+        <rect x="70" y="10" width="100" height="225" rx="4" fill="#071828" stroke="#f97316" stroke-width="2"/>
+        <circle cx="82" cy="20" r="4" fill="#070a12" stroke="#f97316" stroke-width="1.2"/>
+        <text x="120" y="120" text-anchor="middle" fill="#fb923c" font-size="10" font-family="monospace" font-weight="bold">L293D</text>
+        <text x="120" y="134" text-anchor="middle" fill="#475569" font-size="7" font-family="monospace">H-BRIDGE · DIP-16</text>
+        <text x="120" y="148" text-anchor="middle" fill="#0f2010" font-size="7" font-family="monospace">2 motores DC / 1 paso</text>
+        <line x1="10" y1="27" x2="70" y2="27" stroke="#a78bfa" stroke-width="2"/><circle cx="10" cy="27" r="4" fill="#a78bfa"/>
+        <text x="13" y="21" fill="#c4b5fd" font-size="6.5" font-family="monospace">1·EN1</text>
+        <line x1="10" y1="54" x2="70" y2="54" stroke="#f97316" stroke-width="2"/><circle cx="10" cy="54" r="4" fill="#f97316"/>
+        <text x="13" y="48" fill="#fb923c" font-size="6.5" font-family="monospace">2·IN1</text>
+        <line x1="170" y1="27" x2="230" y2="27" stroke="#06b6d4" stroke-width="2.5"/><circle cx="230" cy="27" r="5" fill="#06b6d4"/>
+        <text x="173" y="21" fill="#67e8f9" font-size="6.5" font-family="monospace" font-weight="bold">16·Vss 5V</text>
+        <line x1="10" y1="216" x2="70" y2="216" stroke="#ef4444" stroke-width="2.5"/><circle cx="10" cy="216" r="5" fill="#ef4444"/>
+        <text x="13" y="210" fill="#f87171" font-size="6.5" font-family="monospace" font-weight="bold">8·Vs MOT</text>
+    </svg>`,
+    "led": `<svg viewBox="0 0 240 110" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+        <line x1="10" y1="55" x2="80" y2="55" stroke="#94a3b8" stroke-width="2.5"/>
+        <polygon points="80,32 80,78 115,55" fill="#facc15" fill-opacity="0.7" stroke="#fde047" stroke-width="1.5"/>
+        <line x1="115" y1="32" x2="115" y2="78" stroke="#fde047" stroke-width="3"/>
+        <line x1="115" y1="55" x2="230" y2="55" stroke="#94a3b8" stroke-width="2.5"/>
+        <rect x="60" y="38" width="95" height="34" rx="15" fill="#1c1500" stroke="#b45309" stroke-width="1.2"/>
+        <line x1="165" y1="38" x2="165" y2="72" stroke="#475569" stroke-width="2.5"/>
+        <text x="98" y="59" text-anchor="middle" fill="#78350f" font-size="9" font-family="monospace" font-weight="bold">LED</text>
+        <circle cx="10" cy="55" r="5" fill="#22c55e"/><text x="3" y="42" fill="#4ade80" font-size="8" font-family="monospace">ÁNODO (+)</text>
+        <circle cx="230" cy="55" r="5" fill="#ef4444"/><text x="140" y="42" fill="#f87171" font-size="8" font-family="monospace">CÁTODO (−)</text>
+        <text x="120" y="98" text-anchor="middle" fill="#475569" font-size="7" font-family="monospace">Vf: 1.8–3.5V · If: 10–20mA · pata larga=ánodo</text>
+    </svg>`,
+    "zener": `<svg viewBox="0 0 240 110" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+        <line x1="10" y1="55" x2="80" y2="55" stroke="#94a3b8" stroke-width="2.5"/>
+        <polygon points="80,32 80,78 115,55" fill="#818cf8" fill-opacity="0.5" stroke="#818cf8" stroke-width="1.5"/>
+        <line x1="115" y1="32" x2="115" y2="78" stroke="#818cf8" stroke-width="3"/>
+        <line x1="108" y1="32" x2="115" y2="32" stroke="#818cf8" stroke-width="2.5"/>
+        <line x1="115" y1="78" x2="122" y2="78" stroke="#818cf8" stroke-width="2.5"/>
+        <line x1="115" y1="55" x2="230" y2="55" stroke="#94a3b8" stroke-width="2.5"/>
+        <rect x="60" y="38" width="95" height="34" rx="15" fill="#0f0e1f" stroke="#4c1d95" stroke-width="1.2"/>
+        <text x="98" y="59" text-anchor="middle" fill="#4c1d95" font-size="9" font-family="monospace" font-weight="bold">ZENER</text>
+        <circle cx="10" cy="55" r="5" fill="#22c55e"/><text x="3" y="42" fill="#4ade80" font-size="8" font-family="monospace">ÁNODO (+)</text>
+        <circle cx="230" cy="55" r="5" fill="#818cf8"/><text x="148" y="42" fill="#a5b4fc" font-size="8" font-family="monospace">CÁTODO (−)</text>
+    </svg>`,
+    "capacitor": `<svg viewBox="0 0 240 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+        <line x1="8" y1="50" x2="100" y2="50" stroke="#94a3b8" stroke-width="2.5"/>
+        <line x1="100" y1="25" x2="100" y2="75" stroke="#06b6d4" stroke-width="4"/>
+        <line x1="112" y1="25" x2="112" y2="75" stroke="#94a3b8" stroke-width="4"/>
+        <line x1="112" y1="50" x2="170" y2="50" stroke="#94a3b8" stroke-width="2.5"/>
+        <text x="87" y="20" fill="#06b6d4" font-size="9" font-family="monospace" font-weight="bold">+</text>
+        <circle cx="8" cy="50" r="5" fill="#06b6d4"/><text x="0" y="90" fill="#67e8f9" font-size="8" font-family="monospace">+ POSITIVO (pata larga)</text>
+        <circle cx="170" cy="50" r="5" fill="#64748b"/><text x="120" y="90" fill="#94a3b8" font-size="8" font-family="monospace">− NEGATIVO (franja)</text>
+    </svg>`,
+    "74hc04": `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+        <rect x="65" y="10" width="110" height="175" rx="4" fill="#071828" stroke="#10b981" stroke-width="2"/>
+        <circle cx="77" cy="20" r="4" fill="#070a12" stroke="#10b981" stroke-width="1.2"/>
+        <text x="120" y="97" text-anchor="middle" fill="#34d399" font-size="10" font-family="monospace" font-weight="bold">74HC04</text>
+        <text x="120" y="111" text-anchor="middle" fill="#475569" font-size="7.5" font-family="monospace">HEX INVERSOR · DIP-14</text>
+        <text x="120" y="124" text-anchor="middle" fill="#065f46" font-size="8" font-family="monospace">A→¬A (6 puertas NOT)</text>
+        <line x1="10" y1="28" x2="65" y2="28" stroke="#f97316" stroke-width="2"/><circle cx="10" cy="28" r="4" fill="#f97316"/>
+        <text x="13" y="22" fill="#fb923c" font-size="7" font-family="monospace">1A (IN)</text>
+        <line x1="10" y1="56" x2="65" y2="56" stroke="#22c55e" stroke-width="2"/><circle cx="10" cy="56" r="4" fill="#22c55e"/>
+        <text x="13" y="50" fill="#4ade80" font-size="7" font-family="monospace">1Y (OUT)</text>
+        <line x1="10" y1="182" x2="65" y2="182" stroke="#334155" stroke-width="1.5"/><circle cx="10" cy="182" r="3" fill="#334155"/>
+        <text x="13" y="178" fill="#475569" font-size="7" font-family="monospace">7·GND</text>
+        <line x1="175" y1="182" x2="230" y2="182" stroke="#06b6d4" stroke-width="2.5"/><circle cx="230" cy="182" r="5" fill="#06b6d4"/>
+        <text x="178" y="178" fill="#67e8f9" font-size="7" font-family="monospace" font-weight="bold">14·VCC</text>
+    </svg>`,
+    "arduino_uno": `<svg viewBox="0 0 520 400" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+<rect x="130" y="10" width="260" height="375" rx="10" fill="#14380f" stroke="#16a34a" stroke-width="2"/>
+<text x="260" y="33" text-anchor="middle" fill="#4ade80" font-size="9" font-family="monospace" font-weight="bold">ARDUINO UNO R3</text>
+<text x="260" y="46" text-anchor="middle" fill="#166534" font-size="6.5" font-family="monospace">ATmega328P · 16MHz · 5V</text>
+<rect x="168" y="118" width="184" height="70" rx="3" fill="#0a1a0a" stroke="#22c55e" stroke-width="1"/>
+<text x="260" y="151" text-anchor="middle" fill="#22c55e" font-size="8" font-family="monospace">ATmega328P</text>
+<line x1="130" y1="45" x2="18" y2="45" stroke="#ef4444" stroke-width="1.5"/><circle cx="18" cy="45" r="3.5" fill="#ef4444"/><text x="13" y="49" text-anchor="end" fill="#f87171" font-size="7" font-family="monospace">Vin</text>
+<line x1="130" y1="68" x2="18" y2="68" stroke="#64748b" stroke-width="1.5"/><circle cx="18" cy="68" r="3.5" fill="#64748b"/><text x="13" y="72" text-anchor="end" fill="#94a3b8" font-size="7" font-family="monospace">GND</text>
+<line x1="130" y1="114" x2="18" y2="114" stroke="#ef4444" stroke-width="1.5"/><circle cx="18" cy="114" r="3.5" fill="#ef4444"/><text x="13" y="118" text-anchor="end" fill="#f87171" font-size="7" font-family="monospace">5V</text>
+<line x1="130" y1="214" x2="18" y2="214" stroke="#3b82f6" stroke-width="1.5"/><circle cx="18" cy="214" r="3.5" fill="#3b82f6"/><text x="13" y="218" text-anchor="end" fill="#93c5fd" font-size="7" font-family="monospace">A0</text>
+<line x1="130" y1="237" x2="18" y2="237" stroke="#3b82f6" stroke-width="1.5"/><circle cx="18" cy="237" r="3.5" fill="#3b82f6"/><text x="13" y="241" text-anchor="end" fill="#93c5fd" font-size="7" font-family="monospace">A1</text>
+<line x1="130" y1="306" x2="18" y2="306" stroke="#06b6d4" stroke-width="1.5"/><circle cx="18" cy="306" r="3.5" fill="#06b6d4"/><text x="13" y="310" text-anchor="end" fill="#67e8f9" font-size="7" font-family="monospace">A4 SDA</text>
+<line x1="130" y1="329" x2="18" y2="329" stroke="#06b6d4" stroke-width="1.5"/><circle cx="18" cy="329" r="3.5" fill="#06b6d4"/><text x="13" y="333" text-anchor="end" fill="#67e8f9" font-size="7" font-family="monospace">A5 SCL</text>
+<line x1="390" y1="45" x2="502" y2="45" stroke="#f97316" stroke-width="1.5"/><circle cx="502" cy="45" r="3.5" fill="#f97316"/><text x="507" y="49" text-anchor="start" fill="#fb923c" font-size="7" font-family="monospace">D0 RX</text>
+<line x1="390" y1="65" x2="502" y2="65" stroke="#f97316" stroke-width="1.5"/><circle cx="502" cy="65" r="3.5" fill="#f97316"/><text x="507" y="69" text-anchor="start" fill="#fb923c" font-size="7" font-family="monospace">D1 TX</text>
+<line x1="390" y1="105" x2="502" y2="105" stroke="#eab308" stroke-width="1.5"/><circle cx="502" cy="105" r="3.5" fill="#eab308"/><text x="507" y="109" text-anchor="start" fill="#fde047" font-size="7" font-family="monospace">D3~ INT1</text>
+<line x1="390" y1="245" x2="502" y2="245" stroke="#06b6d4" stroke-width="1.5"/><circle cx="502" cy="245" r="3.5" fill="#06b6d4"/><text x="507" y="249" text-anchor="start" fill="#67e8f9" font-size="7" font-family="monospace">D10~ SS</text>
+<line x1="390" y1="265" x2="502" y2="265" stroke="#06b6d4" stroke-width="1.5"/><circle cx="502" cy="265" r="3.5" fill="#06b6d4"/><text x="507" y="269" text-anchor="start" fill="#67e8f9" font-size="7" font-family="monospace">D11~ MOSI</text>
+<line x1="390" y1="285" x2="502" y2="285" stroke="#06b6d4" stroke-width="1.5"/><circle cx="502" cy="285" r="3.5" fill="#06b6d4"/><text x="507" y="289" text-anchor="start" fill="#67e8f9" font-size="7" font-family="monospace">D12 MISO</text>
+<line x1="390" y1="305" x2="502" y2="305" stroke="#06b6d4" stroke-width="1.5"/><circle cx="502" cy="305" r="3.5" fill="#06b6d4"/><text x="507" y="309" text-anchor="start" fill="#67e8f9" font-size="7" font-family="monospace">D13 SCK</text>
+</svg>`,
+    "esp32": `<svg viewBox="0 0 520 445" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+<rect x="130" y="8" width="260" height="430" rx="8" fill="#0d1a2e" stroke="#1e40af" stroke-width="2"/>
+<text x="260" y="28" text-anchor="middle" fill="#60a5fa" font-size="9" font-family="monospace" font-weight="bold">ESP32 DevKit V1 (38 pines)</text>
+<text x="260" y="40" text-anchor="middle" fill="#1e3a5f" font-size="6.5" font-family="monospace">Dual-core 240MHz · 4MB Flash · WiFi · BT</text>
+<rect x="168" y="96" width="184" height="124" rx="4" fill="#334155" stroke="#64748b" stroke-width="1.5"/>
+<text x="260" y="152" text-anchor="middle" fill="#94a3b8" font-size="8.5" font-family="monospace">ESP32-WROOM</text>
+<line x1="130" y1="22" x2="18" y2="22" stroke="#f97316" stroke-width="1.5"/><circle cx="18" cy="22" r="3.5" fill="#f97316"/><text x="13" y="26" text-anchor="end" fill="#fb923c" font-size="7" font-family="monospace">3.3V</text>
+<line x1="130" y1="154" x2="18" y2="154" stroke="#22c55e" stroke-width="1.5"/><circle cx="18" cy="154" r="3.5" fill="#22c55e"/><text x="13" y="158" text-anchor="end" fill="#4ade80" font-size="7" font-family="monospace">GPIO32</text>
+<line x1="130" y1="308" x2="18" y2="308" stroke="#64748b" stroke-width="1.5"/><circle cx="18" cy="308" r="3.5" fill="#64748b"/><text x="13" y="312" text-anchor="end" fill="#94a3b8" font-size="7" font-family="monospace">GND</text>
+<line x1="130" y1="418" x2="18" y2="418" stroke="#ef4444" stroke-width="1.5"/><circle cx="18" cy="418" r="3.5" fill="#ef4444"/><text x="13" y="422" text-anchor="end" fill="#f87171" font-size="7" font-family="monospace">5V Vin</text>
+<line x1="390" y1="22" x2="502" y2="22" stroke="#64748b" stroke-width="1.5"/><circle cx="502" cy="22" r="3.5" fill="#64748b"/><text x="507" y="26" text-anchor="start" fill="#94a3b8" font-size="7" font-family="monospace">GND</text>
+<line x1="390" y1="44" x2="502" y2="44" stroke="#06b6d4" stroke-width="1.5"/><circle cx="502" cy="44" r="3.5" fill="#06b6d4"/><text x="507" y="48" text-anchor="start" fill="#67e8f9" font-size="7" font-family="monospace">23 MOSI</text>
+<line x1="390" y1="66" x2="502" y2="66" stroke="#3b82f6" stroke-width="1.5"/><circle cx="502" cy="66" r="3.5" fill="#3b82f6"/><text x="507" y="70" text-anchor="start" fill="#93c5fd" font-size="7" font-family="monospace">22 SCL</text>
+<line x1="390" y1="132" x2="502" y2="132" stroke="#3b82f6" stroke-width="1.5"/><circle cx="502" cy="132" r="3.5" fill="#3b82f6"/><text x="507" y="136" text-anchor="start" fill="#93c5fd" font-size="7" font-family="monospace">21 SDA</text>
+</svg>`,
+    "default": `<svg viewBox="0 0 240 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+        <rect x="50" y="20" width="140" height="120" rx="6" fill="#0a1628" stroke="#1e3a5f" stroke-width="1.5" stroke-dasharray="5,3"/>
+        <text x="120" y="78" text-anchor="middle" fill="#1e3a5f" font-size="11" font-family="monospace">IC / MÓDULO</text>
+        <text x="120" y="96" text-anchor="middle" fill="#0f2030" font-size="8" font-family="monospace">Diagrama SVG no disponible</text>
+    </svg>`
+};
+
+// ─── BASE DE DATOS LOCAL ──────────────────────────────────────────────────────
+const BD_LOCAL = {
+    "ne555":{"termino":"NE555","categoria":"Temporizador / Integrado Oscilador","descripcion":"Circuito integrado de precisión altamente estable para generación de retardos de tiempo u oscilación. Puede operar en modo monoestable (un pulso) o astable (onda cuadrada continua). El transistor interno en el pin 7 permite cargar/descargar capacitores externos.","vccMax":"4.5V a 16V Vcc · Salida máx. 200mA","encapsulado":"DIP-8 / SOIC-8","imagen":"","aspectosClave":["Modo Astable: f = 1.44 / ((R1 + 2×R2) × C). Genera onda cuadrada sin intervención externa.","Modo Monoestable: t = 1.1 × R × C. El pulso de disparo en pin 2 debe ser < Vcc/3.","Pin 5 (CTRL) desconectado: colocar capacitor cerámico 10nF a GND para filtrar ruido.","Pin 4 (RESET) activo en bajo: si no se usa, conectar directo a Vcc.","La salida puede sourcear y sinkear corriente — revisar corriente máx. del pin 3 (200mA)."],"pines":["Pin 1 — GND (Tierra de referencia)","Pin 2 — TRIGGER (Disparo: activo < Vcc/3)","Pin 3 — OUTPUT (Salida digital)","Pin 4 — RESET (Reinicio, activo bajo)","Pin 5 — CONTROL VOLTAGE (2/3 Vcc interno)","Pin 6 — THRESHOLD (Umbral: activo > 2/3 Vcc)","Pin 7 — DISCHARGE (Descarga del capacitor RC)","Pin 8 — VCC (+Voltaje de alimentación)"],"pinoutKey":"ne555"},
+    "lm7805":{"termino":"LM7805","categoria":"Regulador de Voltaje Lineal Positivo","descripcion":"Regulador monolítico de tres terminales con salida fija de 5V. Incluye protección térmica interna, protección contra cortocircuito y limitación de corriente. Disipa el exceso de voltaje como calor — disipador obligatorio para corrientes > 300mA.","vccMax":"7V a 25V entrada → 5V fijos · 1.5A máx.","encapsulado":"TO-220 / TO-3","imagen":"","aspectosClave":["Voltaje mínimo de entrada: Vin ≥ Vout + 2V (dropout voltage). Bajo esa diferencia, la regulación falla.","Capacitor en entrada 0.33µF y en salida 0.1µF cerámicos: evitan oscilaciones parásitas.","Cálculo de disipación: P = (Vin - 5V) × I. Con Vin=12V y 500mA → disipa 3.5W. Disipador requerido.","Familia L78XX: L7812 (12V), L7809 (9V), L7815 (15V) — misma conexión de pines.","Si la salida supera la entrada momentáneamente (ej. carga inductiva), colocar diodo 1N4007 entre OUT e IN."],"pines":["Pin 1 — INPUT (Entrada, 7V a 25V)","Pin 2 — GND (Común/Tierra)","Pin 3 — OUTPUT (Salida fija 5V)"],"pinoutKey":"lm7805"},
+    "1n4007":{"termino":"1N4007","categoria":"Diodo Rectificador de Silicio","descripcion":"Diodo rectificador estándar de baja frecuencia. Clave en etapas de fuentes de alimentación. Soporte de picos de corriente de hasta 30A. La banda plateada indica el cátodo (terminal negativo).","vccMax":"1000V VRRM · 1.0A If(av) · 30A IFSM","encapsulado":"DO-41 Axial","imagen":"","aspectosClave":["Caída de tensión directa típica: 0.7V a 1A (silicio). A corrientes bajas, puede ser 0.5–0.6V.","Banda plateada/gris en el cuerpo = CÁTODO (terminal negativo, corriente sale).","En puente rectificador: 4 diodos. Vripple = I / (f × C).","No apto para alta frecuencia (> 1kHz). Para switching usar 1N4148 (señal) o Schottky (potencia).","Corriente inversa de fuga a 25°C: < 5µA. Aumenta con temperatura."],"pines":["Terminal sin banda — ÁNODO (+, corriente entra)","Terminal con banda plateada — CÁTODO (-, corriente sale)"],"pinoutKey":"1n4007"},
+    "bc548":{"termino":"BC548","categoria":"Transistor Bipolar NPN","descripcion":"Transistor de propósito general para amplificación y conmutación de baja potencia. La ganancia hFE varía según el sufijo: BC548A (110-220), BC548B (200-450), BC548C (420-800).","vccMax":"Vceo 30V · Ic 100mA · Ptot 500mW · ft 150MHz","encapsulado":"TO-92 Plástico","imagen":"","aspectosClave":["Pinout TO-92 con la cara plana hacia vos: C (izquierda), B (centro), E (derecha). VERIFICAR con datasheet.","Resistencia de base: Rb = (Vcc - Vbe) / Ib. Con Vbe = 0.7V y hFE mínimo del sufijo elegido.","En saturación: Vce(sat) ≈ 0.2V. En corte: Ic ≈ 0A. Para conmutar: llevar a saturación profunda.","Nunca conectar B–E sin resistencia limitadora desde una fuente de tensión: corriente ilimitada destruye el transistor.","Reemplazos: BC547 (30V), BC549 (bajo ruido), 2N2222 (más corriente, TO-18 metal)."],"pines":["Pin 1 — COLECTOR (C)","Pin 2 — BASE (B)","Pin 3 — EMISOR (E)"],"pinoutKey":"bc548"},
+    "lm317":{"termino":"LM317","categoria":"Regulador de Voltaje Lineal Ajustable","descripcion":"Regulador de tres terminales ajustable de 1.25V a 37V. La salida se configura con dos resistencias externas. Referencia interna de 1.25V entre OUT y ADJ.","vccMax":"3V a 40V diferencia Vin-Vout · 1.5A máx.","encapsulado":"TO-220 / TO-3","imagen":"","aspectosClave":["Fórmula: Vout = 1.25V × (1 + R2/R1). Típico: R1=240Ω fijo, R2=potenciómetro.","Corriente de ajuste (Iadj): 50–100µA. R1 debe dimensionarse para que Iadj sea despreciable.","Capacitor en ADJ: 10µF mejora rechazo de ondulación 10dB. Requiere diodo de protección.","Dropout: Vin debe superar Vout en al menos 3V para regulación correcta.","Variante LM337: versión para voltajes negativos, misma lógica de cálculo."],"pines":["Pin 1 — ADJUST (Referencia ajustable)","Pin 2 — INPUT (Entrada)","Pin 3 — OUTPUT (Salida variable)"],"pinoutKey":"lm317"},
+    "2n2222":{"termino":"2N2222","categoria":"Transistor Bipolar NPN de Propósito General","descripcion":"Transistor NPN de mayor capacidad de corriente que el BC548. Muy usado en electrónica de potencia baja y conmutación. La ft de 300MHz lo hace útil también en RF de baja frecuencia.","vccMax":"Vceo 40V · Ic 600mA · Ptot 625mW · ft 300MHz","encapsulado":"TO-18 Metal / TO-92","imagen":"","aspectosClave":["Pinout TO-18 (metal): visto desde abajo, tab identifica el EMISOR.","Pinout TO-92 (2N2222A): EBC de izquierda a derecha con cara plana hacia vos.","hFE mínimo: 100 a Ic=150mA. Cae significativamente a corrientes altas.","En saturación: Vce(sat) < 0.3V a Ic=150mA.","Reemplazos equivalentes: BC337 (TO-92, más económico), PN2222A."],"pines":["Pin 1 — EMISOR (E)","Pin 2 — BASE (B)","Pin 3 — COLECTOR (C)"],"pinoutKey":"2n2222"},
+    "tip31":{"termino":"TIP31","categoria":"Transistor de Potencia NPN","descripcion":"Transistor NPN de potencia media, complementario al TIP32 (PNP). Usado en etapas de salida de audio, control de motores DC y fuentes de alimentación lineales. Requiere disipador para aplicaciones > 500mA continuos.","vccMax":"Vceo 40V · Ic 3A continua · Ptot 40W (con disipador)","encapsulado":"TO-220","imagen":"","aspectosClave":["Con disipador correctamente montado puede disipar hasta 40W a 25°C.","Resistencia térmica juntura-carcasa: 3.125°C/W. Calcular disipador para no superar Tj=150°C.","hFE = 10-50 a alta corriente. Requiere mayor corriente de base que transistores de señal.","TIP31 (40V) / TIP31A (60V) / TIP31B (80V) / TIP31C (100V): misma conexión de pines.","Par complementario TIP32/TIP32C para diseños push-pull."],"pines":["Pin 1 — BASE (B)","Pin 2 — COLECTOR (C, tab metálico)","Pin 3 — EMISOR (E)"],"pinoutKey":"tip31"},
+    "lm741":{"termino":"LM741","categoria":"Amplificador Operacional","descripcion":"Amplificador operacional de propósito general con compensación interna. Referencia histórica en el estudio de AO: comparadores, amplificadores inversores/no inversores, integradores, sumadores.","vccMax":"±18V dual (36V total) · Salida ±13V típico","encapsulado":"DIP-8 / TO-99","imagen":"","aspectosClave":["GBW (Gain-Bandwidth Product): 1MHz. A ganancia 10, ancho de banda efectivo = 100kHz.","Slew Rate: 0.5V/µs. Limita la amplitud máxima a altas frecuencias (distorsión de pendiente).","Offset de entrada típico: 1–6mV. En aplicaciones de precisión, usar LM324 o OP07.","Requiere alimentación dual ±Vcc para que la salida pueda ir a 0V en modo inversor.","Pin 1 y 5: compensación de offset externo con potenciómetro de 10kΩ."],"pines":["Pin 1 — OFFSET NULL 1","Pin 2 — IN– (Entrada Inversora)","Pin 3 — IN+ (Entrada No Inversora)","Pin 4 — VCC– (Alimentación Negativa)","Pin 5 — OFFSET NULL 2","Pin 6 — OUTPUT (Salida)","Pin 7 — VCC+ (Alimentación Positiva)","Pin 8 — N/C (No conectado)"],"pinoutKey":"lm741"},
+    "4n35":{"termino":"4N35","categoria":"Optoacoplador / Optoaislador","descripcion":"Optoaislador con LED infrarrojo y fototransistor NPN. Proporciona aislamiento galvánico entre circuitos de control (baja tensión/digital) y circuitos de potencia o AC.","vccMax":"Viso 5300Vrms · CTR 100% mín · If 10mA típico","encapsulado":"DIP-6","imagen":"","aspectosClave":["CTR (Current Transfer Ratio): Ic/If × 100%. Mínimo 100%.","Resistencia en serie del LED emisor: R = (Vcc - 1.2V) / If_deseado.","Pin 6 (BASE del fototransistor): puede dejarse sin conectar o usarse para ajustar CTR.","Para cargas AC: combinar con TRIAC y MOC3021 para disparo aislado.","Tiempo de respuesta: ton/toff ≈ 2µs — apto para frecuencias de conmutación hasta ~100kHz."],"pines":["Pin 1 — ÁNODO LED (+)","Pin 2 — CÁTODO LED (-)","Pin 3 — N/C","Pin 4 — EMISOR TRANSISTOR","Pin 5 — COLECTOR TRANSISTOR","Pin 6 — BASE TRANSISTOR (opcional)"],"pinoutKey":"4n35"},
+    "irf540":{"termino":"IRF540","categoria":"MOSFET Canal N de Potencia","descripcion":"MOSFET de canal N para conmutación de potencia. Ideal para control PWM de motores DC, LEDs de alta potencia y fuentes conmutadas. Se activa con Vgs > 4V, conduce completamente a Vgs = 10V.","vccMax":"Vds 100V · Id 28A · Rds(on) 44mΩ · Ptot 150W","encapsulado":"TO-220","imagen":"","aspectosClave":["Rds(on) = 44mΩ a Vgs=10V. Pérdidas en conducción: P = Id² × Rds(on).","Vgs(th) = 2–4V (umbral). Para conmutación completa con 5V lógica: verificar Vgs=5V en curvas.","Diodo intrínseco (body diode): permite conducción inversa pero con pérdidas.","La puerta es capacitiva (1.5nF). En alta frecuencia de switching, la corriente de driver = C × dV/dt.","Disipador obligatorio para P > 5W. Resistencia térmica juntura-carcasa: 0.83°C/W."],"pines":["Pin 1 — GATE (G, Puerta de control)","Pin 2 — DRAIN (D, Tab metálico, colector de corriente)","Pin 3 — SOURCE (S, retorno de corriente)"],"pinoutKey":"irf540"},
+    "lm324":{"termino":"LM324","categoria":"Amplificador Operacional Cuádruple","descripcion":"Cuatro amplificadores operacionales en un solo encapsulado DIP-14. Opera con alimentación simple o dual, con salida que puede llegar hasta 0V. Más moderno y versátil que el LM741 para la mayoría de aplicaciones de señal.","vccMax":"3V a 32V (simple) / ±1.5V a ±16V (dual)","encapsulado":"DIP-14 / SOIC-14","imagen":"","aspectosClave":["Puede operar con alimentación simple desde 3V — no requiere dual como el LM741.","GBW: 1MHz por amplificador. Adecuado para audio hasta ~10kHz con ganancia razonable.","4 AO independientes: eficiente para proyectos con múltiples etapas de amplificación o filtrado.","Salida llega a ~1.5V sobre el negativo de alimentación — útil con alimentación simple.","Común en circuitos de nivel/umbral, comparadores con histéresis (Schmitt trigger) y filtros activos."],"pines":["Pin 1 — OUT1","Pin 2 — IN1–","Pin 3 — IN1+","Pin 4 — VCC+","Pin 5 — IN2+","Pin 6 — IN2–","Pin 7 — OUT2","Pin 8 — OUT3","Pin 9 — IN3–","Pin 10 — IN3+","Pin 11 — GND","Pin 12 — IN4+","Pin 13 — IN4–","Pin 14 — OUT4"],"pinoutKey":"lm324"},
+    "l293d":{"termino":"L293D","categoria":"Driver de Motor DC / H-Bridge","descripcion":"Driver puente H cuádruple con diodos de protección internos. Controla hasta 2 motores DC bidireccionales o 1 motor paso a paso bipolar. Las entradas EN (Enable) permiten control PWM de velocidad.","vccMax":"Vs 4.5V a 36V (motores) · Vss 5V (lógica) · 600mA/canal","encapsulado":"DIP-16","imagen":"","aspectosClave":["Dos fuentes de alimentación separadas: Vss (lógica 5V) y Vs (motores, hasta 36V).","Diodos de flyback internos: protegen contra picos de la carga inductiva del motor.","Control PWM en pin EN1/EN2: frecuencia hasta 5kHz para velocidad variable.","Caída de tensión interna: ~1.4V por transistor. La tensión efectiva en el motor = Vs - 2.8V.","Para motores que requieren más corriente, usar L298N (2A/canal) o TB6612FNG."],"pines":["Pin 1 — EN1 (Enable canal 1)","Pin 2 — IN1","Pin 3 — OUT1","Pin 4/5 — GND","Pin 6 — OUT2","Pin 7 — IN2","Pin 8 — Vs (Voltaje motores)","Pin 9 — EN2 (Enable canal 2)","Pin 10 — IN3","Pin 11 — OUT3","Pin 12/13 — GND","Pin 14 — OUT4","Pin 15 — IN4","Pin 16 — Vss (Lógica 5V)"],"pinoutKey":"l293d"},
+    "led":{"termino":"LED","categoria":"Diodo Emisor de Luz","descripcion":"Componente semiconductor que convierte corriente eléctrica en luz. Opera solo en polarización directa. La pata larga es el ánodo (+). El bisel o achatamiento en la base del encapsulado indica el cátodo (−).","vccMax":"Vf: 1.8–2.2V (rojo/amarillo) / 2.8–3.5V (azul/verde/blanco) · If: 10–20mA típico","encapsulado":"DO-35 / 3mm / 5mm / SMD","imagen":"","aspectosClave":["SIEMPRE usar resistencia limitadora: R = (Vcc − Vf) / If. Con 5V, Vf=2V, If=10mA → R = 300Ω → usar 330Ω.","Pata larga = ÁNODO (+). Pata corta / bisel en la base = CÁTODO (−).","Corriente máxima absoluta: 30–50mA según el tipo. Superar ese límite quema el LED instantáneamente.","En paralelo: NO conectar LEDs en paralelo sin resistencia individual por cada uno (corriente desigual).","LEDs de alta eficiencia modernos funcionan bien a 2–5mA con brillo suficiente para señalización."],"pines":["Terminal larga — ÁNODO (+, corriente entra)","Terminal corta / bisel — CÁTODO (−, corriente sale)"],"pinoutKey":"led"},
+    "zener":{"termino":"Zener","categoria":"Diodo Zener — Regulador de Tensión","descripcion":"Diodo diseñado para operar en la región de ruptura inversa (tensión Zener) de forma estable y controlada. Mantiene un voltaje constante en sus terminales. Fundamental en referencias de tensión, protección de sobrevoltaje y regulación simple.","vccMax":"Vz: 2.4V a 200V según serie · Potencia: 0.5W / 1W / 5W","encapsulado":"DO-35 / DO-41 / SMD","imagen":"","aspectosClave":["Opera en inversa: el cátodo va al positivo y el ánodo al negativo de la fuente.","Resistencia serie obligatoria: Rs = (Vcc − Vz) / Iz. Sin Rs la corriente es ilimitada.","Corriente mínima de operación: Iz(min) ≈ 5mA para regulación estable. Máxima: Pz/Vz.","Banda de identificación del cuerpo = CÁTODO (igual que diodo rectificador).","Series comunes: 1N47xx (0.5W) — ej: 1N4733=5.1V, 1N4742=12V."],"pines":["Terminal sin banda — ÁNODO (+, en regulación va a GND)","Terminal con banda — CÁTODO (−, en regulación va a Vcc vía Rs)"],"pinoutKey":"zener"},
+    "capacitor":{"termino":"Capacitor","categoria":"Capacitor — Almacenamiento de Carga","descripcion":"Componente pasivo que almacena energía en un campo eléctrico. Los electrolíticos son polarizados y de alta capacidad. Los cerámicos son no polarizados y de baja capacidad. Usos: filtrado de fuentes, desacoplamiento, temporizadores RC.","vccMax":"Electrolítico: 1µF–47000µF / 6.3V–450V · Cerámico: 1pF–100nF / hasta 1kV","encapsulado":"Electrolítico radial / Cerámico disco / SMD","imagen":"","aspectosClave":["Electrolítico POLARIZADO: pata larga = (+). Conectar invertido lo destruye o revienta.","Cerámico: no polarizado, puede conectarse en cualquier sentido. Ideal para desacoplamiento (100nF entre Vcc y GND lo más cerca posible del IC).","Fórmula RC: τ = R × C (constante de tiempo). En 5τ el capacitor está cargado al 99%.","En filtros de fuente: C = I / (2 × f × ΔV). A 50Hz, 1A, Vripple=1V → C ≈ 10000µF.","Capacitores en paralelo: Ctotal = C1 + C2. En serie: 1/Ctotal = 1/C1 + 1/C2."],"pines":["Terminal larga / marcada (+) — POSITIVO (electrolítico)","Terminal corta / franja (−) — NEGATIVO (electrolítico)","Cerámico: sin polaridad, ambas terminales equivalentes"],"pinoutKey":"capacitor"},
+    "74hc04":{"termino":"74HC04","categoria":"Compuerta Lógica — Hex Inversor (NOT)","descripcion":"Seis puertas inversoras (NOT) independientes en un solo DIP-14. La salida es siempre el complemento lógico de la entrada. La versión HC opera a 2V–6V con lógica CMOS de alta velocidad.","vccMax":"2V a 6V (HC) · IOH/IOL ±25mA · tp 7ns a 5V","encapsulado":"DIP-14 / SOIC-14","imagen":"","aspectosClave":["Pines 7 (GND) y 14 (VCC) son OBLIGATORIOS aunque no aparezcan en el esquemático.","Entradas flotantes = comportamiento indefinido. Siempre conectar a VCC o GND via resistencia pull.","Tabla de verdad: A=0→Y=1 / A=1→Y=0. Útil para inversión de señal, osciladores RC y buffers.","Oscilador simple: conectar salida a entrada via R (100kΩ) y C (10nF) → frecuencia ≈ 1/(2.2×R×C).","Familia compatible: 74LS04 (TTL, 5V solo), 74HCT04 (compatible TTL en HC), CD4069 (CMOS 3–15V)."],"pines":["Pin 1 — 1A (entrada inv. 1)","Pin 2 — 1Y (salida inv. 1)","Pin 3 — 2A (entrada inv. 2)","Pin 4 — 2Y (salida inv. 2)","Pin 5 — 3A (entrada inv. 3)","Pin 6 — 3Y (salida inv. 3)","Pin 7 — GND","Pin 8 — 4A (entrada inv. 4)","Pin 9 — 4Y (salida inv. 4)","Pin 10 — 5A (entrada inv. 5)","Pin 11 — 5Y (salida inv. 5)","Pin 12 — 6A (entrada inv. 6)","Pin 13 — 6Y (salida inv. 6)","Pin 14 — VCC"],"pinoutKey":"74hc04"},
+    "arduinouno":{"termino":"Arduino Uno R3","categoria":"Placa de Desarrollo — Microcontrolador","descripcion":"Placa de desarrollo basada en el ATmega328P. 14 pines digitales (6 con PWM), 6 entradas analógicas, oscilador de 16MHz, conexión USB-B. Estándar de facto en prototipado y enseñanza de electrónica y sistemas embebidos.","vccMax":"Entrada DC: 7–12V (Vin) · Salidas: 5V / 3.3V · I/O: 40mA máx por pin","encapsulado":"PCB 68.6mm × 53.4mm · Header 2.54mm","imagen":"","aspectosClave":["Pines PWM (~): D3, D5, D6, D9, D10, D11 — frecuencia 490Hz por defecto. Resolución 8 bits.","I2C: A4 (SDA) + A5 (SCL). SPI: D10(SS), D11(MOSI), D12(MISO), D13(SCK). UART: D0(RX) / D1(TX).","ADC de 10 bits en A0–A5: resolución 4.9mV con Vref=5V.","Corriente máxima total de todos los pines I/O: 200mA. Pin 3.3V: 50mA.","Bootloader ocupa 0.5KB del Flash. Velocidad de upload por defecto: 115200 baud."],"pines":["Vin — Entrada de alimentación externa (7–12V)","GND — Tierra","5V — Salida regulada 5V","3.3V — Salida 3.3V 50mA","A0–A5 — Entradas analógicas (10 bits ADC)","A4 / SDA — I2C Data","A5 / SCL — I2C Clock","D0 / RX — UART Recepción","D1 / TX — UART Transmisión","D2 — Interrupción INT0","D3~ — PWM + INT1","D5~/D6~ — PWM (980Hz)","D9~/D10~/D11~ — PWM (490Hz)","D10~ — SPI SS","D11~ — SPI MOSI","D12 — SPI MISO","D13 — SPI SCK + LED onboard"],"pinoutKey":"arduino_uno"},
+    "esp32":{"termino":"ESP32 DevKit V1","categoria":"Placa de Desarrollo — Microcontrolador + WiFi + BT","descripcion":"Placa de desarrollo basada en el módulo ESP32-WROOM. Procesador dual-core Xtensa LX6 a 240MHz con WiFi 802.11 b/g/n y Bluetooth 4.2/BLE integrados. 34 GPIOs utilizables, ADC de 12 bits, DAC de 8 bits.","vccMax":"Vin: 5V via USB · 3.3V regulado interno · GPIO: 3.3V lógica · I/O: 40mA máx por pin","encapsulado":"PCB 51mm × 25mm · Header 2.54mm · 38 pines","imagen":"","aspectosClave":["GPIO6–11 conectados a Flash SPI interna: NUNCA usar como I/O — bloquea el chip o lo deja sin boot.","GPIO34, 35, 36(VP), 39(VN): solo entrada — no tienen resistencia pull-up/down interna.","ADC2 no funciona mientras WiFi está activo — usar ADC1 (GPIO32–39) para lecturas analógicas con WiFi.","DAC en GPIO25 (DAC1) y GPIO26 (DAC2): salida analógica real de 8 bits, 0–3.3V.","GPIO0 y GPIO2: pines de boot. En programación, GPIO0=LOW entra en modo descarga."],"pines":["3.3V — Salida regulada 3.3V","EN — Reset/Enable chip","GPIO36(VP) / GPIO39(VN) — Solo entrada ADC","GPIO32 / GPIO33 — I/O + ADC1 + Touch","GPIO25 — I/O + DAC1","GPIO26 — I/O + DAC2","GPIO27/GPIO14/GPIO12/GPIO13 — I/O + Touch","GND — Tierra","GPIO23 — SPI MOSI","GPIO22 — I2C SCL","GPIO21 — I2C SDA","GPIO19 — SPI MISO","GPIO18 — SPI SCK","GPIO5 — SPI SS","GPIO17 (TX2) / GPIO16 (RX2) — UART2","GPIO4 — I/O + ADC2 + Touch","GPIO0 — Boot pin (cuidado al usar)","GPIO2 — Boot pin + LED onboard","5V Vin — Entrada 5V","GPIO6-11 — NO USAR: Flash interna"],"pinoutKey":"esp32"}
+};
+
+let datosComponente = null;
+
+function getPinoutSVG(key, pines) {
+    if (key !== "default" && PINOUTS_SVG[key]) return PINOUTS_SVG[key];
+    if (!pines || pines.length === 0) return PINOUTS_SVG["default"];
+    const total = pines.length;
+    const mitad = Math.ceil(total / 2);
+    const izq = pines.slice(0, mitad);
+    const der = pines.slice(mitad);
+    const alturaMin = Math.max(160, mitad * 32 + 40);
+    const colores = ["#06b6d4","#f97316","#22c55e","#a78bfa","#f59e0b","#ef4444","#64748b","#38bdf8","#4ade80","#fb923c","#c084fc","#fbbf24"];
+    const getColor = i => colores[i % colores.length];
+    const nombreCorto = p => {
+        const match = p.match(/[-—]\s*(.+)/);
+        if (!match) return p.replace(/pin\s*\d+/i,'').trim().substring(0,12);
+        return match[1].replace(/\(.*\)/,'').trim().substring(0,12);
+    };
+    let svgLines = `<svg viewBox="0 0 240 ${alturaMin}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+        <rect x="70" y="20" width="100" height="${alturaMin-40}" rx="4" fill="#071828" stroke="#334155" stroke-width="1.5"/>
+        <text x="120" y="${alturaMin/2-8}" text-anchor="middle" fill="#1e3a5f" font-size="9" font-family="monospace">IC</text>`;
+    izq.forEach((p, i) => {
+        const y = 38 + i * 32; const c = getColor(i);
+        svgLines += `<line x1="10" y1="${y}" x2="70" y2="${y}" stroke="${c}" stroke-width="2"/>
+        <circle cx="10" cy="${y}" r="4" fill="${c}"/>
+        <text x="14" y="${y-5}" fill="${c}" font-size="7" font-family="monospace">${i+1}·${nombreCorto(p)}</text>`;
+    });
+    der.forEach((p, i) => {
+        const y = 38 + i * 32; const c = getColor(mitad + i);
+        svgLines += `<line x1="170" y1="${y}" x2="230" y2="${y}" stroke="${c}" stroke-width="2"/>
+        <circle cx="230" cy="${y}" r="4" fill="${c}"/>
+        <text x="172" y="${y-5}" fill="${c}" font-size="7" font-family="monospace">${mitad+i+1}·${nombreCorto(p)}</text>`;
+    });
+    return svgLines + `</svg>`;
+}
+
+function imprimirPantalla() {
+    const container = document.getElementById('resultado-container');
+    const comp = datosComponente;
+    const svgPinout = getPinoutSVG(comp.pinoutKey || "default", comp.pines);
+    container.innerHTML = `
+        <div class="fade-in">
+            <div class="border-b border-slate-800 pb-3 mb-5 flex items-start justify-between gap-4">
+                <div>
+                    <span class="bg-cyan-500/10 text-cyan-400 text-[10px] px-2.5 py-0.5 rounded border border-cyan-500/20 font-bold uppercase">${comp.categoria}</span>
+                    <h2 class="text-2xl font-black text-slate-100 mt-1.5">${comp.termino}</h2>
+                </div>
+                <span class="text-[10px] font-mono bg-slate-900 text-slate-500 px-2 py-1 rounded border border-slate-800 whitespace-nowrap">${comp.encapsulado}</span>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="bg-[#0d1321] border border-slate-800 rounded-xl p-4">
+                        <h3 class="text-xs font-bold uppercase text-slate-500 mb-2 tracking-wider">📋 Descripción</h3>
+                        <p class="text-slate-300 text-sm leading-relaxed">${comp.descripcion}</p>
+                    </div>
+                    <div class="bg-[#0d1321] border border-slate-800 rounded-xl p-4">
+                        <h3 class="text-xs font-bold uppercase text-orange-400 mb-2 tracking-wider">⚡ Umbrales Críticos</h3>
+                        <p class="text-slate-200 font-mono text-sm">${comp.vccMax}</p>
+                    </div>
+                    <div class="bg-[#0d1321] border border-slate-800 rounded-xl p-4">
+                        <h3 class="text-xs font-bold uppercase text-cyan-400 mb-3 tracking-wider">💡 Notas Técnicas de Cátedra</h3>
+                        <ul class="space-y-2">
+                            ${comp.aspectosClave.map(x => `<li class="flex gap-2 text-sm text-slate-300"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>${x}</span></li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="bg-[#0d1321] border border-slate-800 rounded-xl p-4">
+                        <h3 class="text-xs font-bold uppercase text-slate-500 mb-3 tracking-wider">📌 Diagrama de Pines</h3>
+                        <div class="bg-[#070a12] rounded-lg p-3 mb-3" style="min-height:120px">${svgPinout}</div>
+                        <div class="flex gap-2 mb-3">
+                            <a href="https://www.google.com/search?q=${encodeURIComponent(comp.termino + ' pinout terminals datasheet')}&tbm=isch" target="_blank" class="flex-1 flex items-center justify-center gap-1.5 bg-[#0d1321] border border-slate-700 hover:border-cyan-500/50 text-slate-300 hover:text-cyan-300 text-[10px] font-bold px-2 py-2 rounded-lg transition">🖼️ Ver Pinout Real</a>
+                            <a href="https://www.alldatasheet.com/search/?q=${encodeURIComponent(comp.termino)}" target="_blank" class="flex-1 flex items-center justify-center gap-1.5 bg-[#0d1321] border border-slate-700 hover:border-orange-500/50 text-slate-300 hover:text-orange-300 text-[10px] font-bold px-2 py-2 rounded-lg transition">📄 Datasheet</a>
+                        </div>
+                        <div class="space-y-1.5 font-mono text-xs">
+                            ${comp.pines.map((p,i) => `<div class="bg-[#070a12] px-3 py-2 border border-slate-800/80 rounded-lg text-slate-300 flex items-center gap-2"><span class="text-slate-600 shrink-0">${i+1}.</span>${p}</div>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+}
+
+function mostrarNoEncontrado(query) {
+    document.getElementById('resultado-container').innerHTML = `
+        <div class="bg-[#0d1321] border border-slate-700 rounded-xl p-8 text-center fade-in">
+            <div class="text-4xl mb-3">🔍</div>
+            <h3 class="text-slate-200 font-bold text-lg mb-1">"${query.toUpperCase()}" no indexado localmente</h3>
+            <p class="text-slate-400 text-sm mb-5">Este componente no está en la base de datos local.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-lg mx-auto">
+                <div class="bg-[#070a12] border border-cyan-500/20 rounded-xl p-4 text-left">
+                    <div class="text-cyan-400 font-bold text-xs mb-1">⚡ Opción 1 — Configurar Gemini</div>
+                    <p class="text-slate-400 text-xs mb-3">Conectá tu API Key para análisis extendido de cualquier componente.</p>
+                    <button onclick="toggleModal()" class="bg-cyan-500 text-slate-950 font-bold text-xs px-4 py-2 rounded-lg w-full">Configurar API Key →</button>
+                </div>
+                <div class="bg-[#070a12] border border-slate-700 rounded-xl p-4 text-left">
+                    <div class="text-slate-300 font-bold text-xs mb-1">📚 Opción 2 — Datasheet oficial</div>
+                    <p class="text-slate-400 text-xs mb-3">Buscá el datasheet completo en el repositorio oficial.</p>
+                    <a href="https://www.alldatasheet.com/search/?q=${encodeURIComponent(query)}" target="_blank" class="block bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs px-4 py-2 rounded-lg w-full text-center transition">Buscar Datasheet ↗</a>
+                </div>
+            </div>
+        </div>`;
+}
+
+async function buscarComponente() {
+    const query = document.getElementById('input-busqueda').value.trim();
+    if(!query) return;
+    const btn = document.getElementById('btn-buscar');
+    btn.innerText = "⏳"; btn.disabled = true;
+    const keyLimpia = query.toLowerCase().replace(/[\s\-_]/g, '');
+    const apiKey = localStorage.getItem('gemini_api_key');
+    if (BD_LOCAL[keyLimpia]) {
+        datosComponente = BD_LOCAL[keyLimpia];
+        imprimirPantalla();
+        btn.innerText = "Analizar"; btn.disabled = false;
+        return;
+    }
+    if(apiKey) {
+        try {
+            document.getElementById('resultado-container').innerHTML = `<div class="text-center py-12 text-slate-500 text-sm">Consultando Gemini AI...</div>`;
+            const prompt = `Eres un Ingeniero Electrónico experto. Analiza el componente electrónico: "${query}". Responde EXCLUSIVAMENTE con un objeto JSON plano (sin markdown, sin \`\`\`, sin texto extra) con esta estructura exacta: {"termino":"${query.toUpperCase()}","categoria":"...","descripcion":"...","vccMax":"...","encapsulado":"...","imagen":"","aspectosClave":["detalle técnico 1","detalle técnico 2","detalle técnico 3","detalle técnico 4"],"pines":["Pin 1 — nombre (función)","Pin 2 — nombre (función)"],"pinoutKey":"default"}`;
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({contents:[{parts:[{text:prompt}]}]})
+            });
+            const data = await res.json();
+            let txt = data.candidates[0].content.parts[0].text.replace(/```json/g,"").replace(/```/g,"").trim();
+            datosComponente = JSON.parse(txt);
+            imprimirPantalla();
+            document.getElementById('badge-modo').textContent = '☁️ Gemini AI';
+            document.getElementById('badge-modo').className = 'text-[10px] font-mono text-purple-400 bg-purple-500/10 px-2 py-1 rounded-md border border-purple-500/20';
+        } catch(e) { mostrarNoEncontrado(query); }
+    } else { mostrarNoEncontrado(query); }
+    btn.innerText = "Analizar"; btn.disabled = false;
+}
+
+function buscarRapido(termino) {
+    document.getElementById('input-busqueda').value = termino;
+    buscarComponente();
+}
+
+function toggleModal() {
+    document.getElementById('modal-config').classList.toggle('hidden');
+    document.getElementById('api-key-input').value = localStorage.getItem('gemini_api_key') || '';
+}
+function guardarKey() {
+    localStorage.setItem('gemini_api_key', document.getElementById('api-key-input').value.trim());
+    toggleModal();
+    document.getElementById('badge-modo').textContent = '☁️ Gemini Conectado';
+    document.getElementById('badge-modo').className = 'text-[10px] font-mono text-purple-400 bg-purple-500/10 px-2 py-1 rounded-md border border-purple-500/20';
+}
+
+window.onload = () => {
+    const q = localStorage.getItem('query_busqueda_inicial');
+    if(q) { document.getElementById('input-busqueda').value = q; localStorage.removeItem('query_busqueda_inicial'); setTimeout(buscarComponente, 100); }
+    document.getElementById('input-busqueda').addEventListener('keydown', e => { if(e.key==='Enter') buscarComponente(); });
+    buscarRapido('NE555');
+};
+</script>
+</body>
+</html>

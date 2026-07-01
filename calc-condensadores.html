@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sr. Z — Calculadora Condensadores</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: radial-gradient(ellipse at 50% 20%, #1a2744 0%, #0a0f1e 55%, #060a14 100%); min-height:100vh; }
+        .card { background:rgba(13,19,33,.85); border:1px solid #1e293b; border-radius:14px; }
+        input[type=number] { background:#0d1117; border:1px solid #1e293b; color:#e2e8f0; border-radius:8px; padding:6px 10px; width:100%; font-family:monospace; font-size:13px; outline:none; transition:border .2s; }
+        input[type=number]:focus { border-color:#06b6d4; }
+        select { background:#0d1117; border:1px solid #1e293b; color:#e2e8f0; border-radius:8px; padding:6px 10px; width:100%; font-family:monospace; font-size:13px; outline:none; }
+        select option { background:#0d1117; }
+        .result-val { font-family:'Courier New',monospace; color:#00ff41; text-shadow:0 0 6px #00ff41; }
+        .formula { font-family:monospace; font-size:11px; color:#94a3b8; background:#0d1117; padding:8px 12px; border-radius:8px; border-left:2px solid #06b6d4; }
+        .tab-btn { padding:6px 14px; border-radius:8px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; cursor:pointer; border:1px solid #1e293b; background:transparent; color:#64748b; transition:all .2s; }
+        .tab-btn.active { background:#0e4454; border-color:#06b6d4; color:#06b6d4; }
+        .cap-input { border:1px solid #1e293b; border-radius:10px; padding:10px 14px; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+        .cap-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    </style>
+</head>
+<body class="text-slate-100 font-sans">
+
+<div class="flex items-center gap-4 px-5 py-2 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-sm sticky top-0 z-50">
+    <a href="index.html" class="text-xs text-slate-500 hover:text-cyan-400 transition">← Panel</a>
+    <span class="text-sm font-black uppercase tracking-wide text-slate-200">⚡ Calculadora Condensadores</span>
+    <span class="text-[10px] text-slate-600">Serie, paralelo, carga, energía</span>
+</div>
+
+<div class="max-w-5xl mx-auto p-5 space-y-5">
+
+<!-- TABS -->
+<div class="flex gap-2 flex-wrap">
+    <button class="tab-btn active" onclick="setTab('combinacion')" id="tab-combinacion">Combinación</button>
+    <button class="tab-btn" onclick="setTab('carga')" id="tab-carga">Carga / Descarga RC</button>
+    <button class="tab-btn" onclick="setTab('energia')" id="tab-energia">Energía</button>
+    <button class="tab-btn" onclick="setTab('codigo')" id="tab-codigo">Código de colores</button>
+</div>
+
+<!-- ===================== TAB: COMBINACION ===================== -->
+<div id="panel-combinacion" class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+    <div class="card p-5 space-y-4">
+        <div class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Condensadores</div>
+
+        <div class="flex gap-2">
+            <button onclick="setModo('serie')"    id="btn-serie"    class="tab-btn active flex-1">Serie</button>
+            <button onclick="setModo('paralelo')" id="btn-paralelo" class="tab-btn flex-1">Paralelo</button>
+        </div>
+
+        <div id="caps-container"></div>
+
+        <div class="flex gap-2">
+            <button onclick="agregarCap()" class="text-[10px] px-3 py-1.5 rounded border border-slate-700 text-cyan-400 hover:border-cyan-500 transition flex-1">+ Cap</button>
+            <button onclick="quitarCap()"  class="text-[10px] px-3 py-1.5 rounded border border-slate-700 text-slate-500 hover:border-slate-500 transition flex-1">− Cap</button>
+        </div>
+
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase tracking-wider">Tensión aplicada (V)</label>
+            <input type="number" id="comb-V" value="12" step="1" min="0" oninput="calcCombinacion()">
+        </div>
+
+        <div class="space-y-1 pt-2 border-t border-slate-800">
+            <div class="text-[10px] text-slate-500 uppercase font-bold mb-1">Presets</div>
+            <button onclick="presetFiltro()"     class="w-full text-[10px] px-3 py-1.5 rounded border border-slate-700 text-slate-400 hover:border-cyan-500 hover:text-cyan-400 transition text-left">Filtro fuente (100µF + 10µF)</button>
+            <button onclick="presetAcoplamiento()" class="w-full text-[10px] px-3 py-1.5 rounded border border-slate-700 text-slate-400 hover:border-cyan-500 hover:text-cyan-400 transition text-left">Acoplamiento AC (1µF + 10µF serie)</button>
+            <button onclick="presetBypass()"     class="w-full text-[10px] px-3 py-1.5 rounded border border-slate-700 text-slate-400 hover:border-cyan-500 hover:text-cyan-400 transition text-left">Bypass (100nF + 10nF)</button>
+        </div>
+    </div>
+
+    <div class="card p-5 space-y-4">
+        <div class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Resultados</div>
+
+        <div class="bg-slate-950 rounded-xl p-4 space-y-3">
+            <div class="flex justify-between">
+                <span class="text-[11px] text-slate-500">Capacidad equivalente</span>
+                <span id="res-Ceq" class="result-val text-2xl">—</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-[11px] text-slate-500">Carga total (Q)</span>
+                <span id="res-Q" class="result-val">—</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-[11px] text-slate-500">Energía almacenada</span>
+                <span id="res-E" class="result-val">—</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-[11px] text-slate-500">Tensión mínima de trabajo</span>
+                <span id="res-Vmin" class="text-yellow-400 font-mono text-sm">—</span>
+            </div>
+        </div>
+
+        <div id="tabla-caps" class="space-y-1.5"></div>
+
+        <div class="space-y-1.5">
+            <div class="formula" id="formula-modo">Serie: 1/Ceq = Σ(1/Cn)</div>
+        </div>
+    </div>
+
+    <div class="card p-5 flex flex-col gap-3">
+        <div class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Diagrama</div>
+        <svg id="comb-svg" viewBox="0 0 220 300" class="w-full flex-1"></svg>
+    </div>
+
+</div>
+
+<!-- ===================== TAB: CARGA ===================== -->
+<div id="panel-carga" class="grid grid-cols-1 lg:grid-cols-3 gap-5 hidden">
+
+    <div class="card p-5 space-y-4">
+        <div class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Circuito RC</div>
+
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase tracking-wider">Resistencia R (Ω)</label>
+            <input type="number" id="rc-R" value="10000" step="100" min="1" oninput="calcRC()">
+        </div>
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase tracking-wider">Capacidad C</label>
+            <div class="flex gap-2">
+                <input type="number" id="rc-C" value="100" step="10" min="0.001" oninput="calcRC()" class="flex-1">
+                <select id="rc-Cunit" onchange="calcRC()" class="!w-24">
+                    <option value="1e-12">pF</option>
+                    <option value="1e-9">nF</option>
+                    <option value="1e-6" selected>µF</option>
+                    <option value="1e-3">mF</option>
+                </select>
+            </div>
+        </div>
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase tracking-wider">Tensión de alimentación (V)</label>
+            <input type="number" id="rc-V" value="12" step="1" min="0.1" oninput="calcRC()">
+        </div>
+
+        <div class="bg-slate-950 rounded-xl p-4 space-y-2 mt-2">
+            <div class="flex justify-between">
+                <span class="text-[11px] text-slate-500">Constante τ (tau)</span>
+                <span id="rc-tau" class="result-val text-lg">—</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-[11px] text-slate-500">5τ (99% carga)</span>
+                <span id="rc-5tau" class="result-val">—</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-[11px] text-slate-500">t½ (50% carga)</span>
+                <span id="rc-thalf" class="result-val">—</span>
+            </div>
+        </div>
+
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase tracking-wider">Tiempo a calcular</label>
+            <div class="flex gap-2">
+                <input type="number" id="rc-t" value="1" step="0.1" min="0" oninput="calcRC()" class="flex-1">
+                <select id="rc-tunit" onchange="calcRC()" class="!w-24">
+                    <option value="1e-9">ns</option>
+                    <option value="1e-6">µs</option>
+                    <option value="1e-3" selected>ms</option>
+                    <option value="1">s</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="bg-slate-950 rounded-xl p-3 space-y-1.5">
+            <div class="flex justify-between">
+                <span class="text-[11px] text-slate-500">Vc(t) — carga</span>
+                <span id="rc-Vc" class="result-val">—</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-[11px] text-slate-500">Vc(t) — descarga desde V</span>
+                <span id="rc-Vd" class="result-val">—</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card p-5 col-span-2">
+        <div class="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-3">Curva de carga/descarga</div>
+        <canvas id="rc-canvas" width="600" height="280" class="w-full rounded-xl bg-slate-950"></canvas>
+        <div class="mt-2 flex gap-4 text-[10px] text-slate-500">
+            <span><span class="inline-block w-4 h-0.5 bg-cyan-400 align-middle mr-1"></span>Carga V(1−e^(−t/τ))</span>
+            <span><span class="inline-block w-4 h-0.5 bg-orange-400 align-middle mr-1"></span>Descarga V·e^(−t/τ)</span>
+            <span><span class="inline-block w-2 h-2 rounded-full bg-yellow-400 align-middle mr-1"></span>t seleccionado</span>
+        </div>
+        <div class="formula mt-3">Vc(t) = V × (1 − e^(−t/τ)) | τ = R × C</div>
+    </div>
+
+</div>
+
+<!-- ===================== TAB: ENERGÍA ===================== -->
+<div id="panel-energia" class="grid grid-cols-1 lg:grid-cols-2 gap-5 hidden">
+
+    <div class="card p-5 space-y-4">
+        <div class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Datos</div>
+
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase tracking-wider">Capacidad C</label>
+            <div class="flex gap-2">
+                <input type="number" id="en-C" value="1000" step="10" min="0" oninput="calcEnergia()" class="flex-1">
+                <select id="en-Cunit" onchange="calcEnergia()" class="!w-24">
+                    <option value="1e-12">pF</option>
+                    <option value="1e-9">nF</option>
+                    <option value="1e-6" selected>µF</option>
+                    <option value="1e-3">mF</option>
+                    <option value="1">F</option>
+                </select>
+            </div>
+        </div>
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase tracking-wider">Tensión V (V)</label>
+            <input type="number" id="en-V" value="12" step="0.1" min="0" oninput="calcEnergia()">
+        </div>
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase tracking-wider">Tensión de descarga Vf (V)</label>
+            <input type="number" id="en-Vf" value="0" step="0.1" min="0" oninput="calcEnergia()">
+            <div class="text-[10px] text-slate-600 mt-1">0 para descarga completa. Útil en supercapacitores.</div>
+        </div>
+
+        <div class="bg-slate-950 rounded-xl p-4 space-y-2.5">
+            <div class="flex justify-between">
+                <span class="text-[11px] text-slate-500">Energía total almacenada</span>
+                <span id="en-E" class="result-val text-xl">—</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-[11px] text-slate-500">Energía utilizable (Vi→Vf)</span>
+                <span id="en-Eutil" class="result-val">—</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-[11px] text-slate-500">Carga almacenada Q</span>
+                <span id="en-Qe" class="result-val">—</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-[11px] text-slate-500">Corriente de pico (R=1Ω)</span>
+                <span id="en-Ipeak" class="text-orange-400 font-mono text-sm">—</span>
+            </div>
+        </div>
+
+        <div class="space-y-1.5">
+            <div class="formula">E = ½ × C × V²</div>
+            <div class="formula">E_util = ½ × C × (Vi² − Vf²)</div>
+            <div class="formula">Q = C × V</div>
+        </div>
+    </div>
+
+    <div class="card p-5">
+        <div class="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-3">Equivalencias de energía</div>
+        <div id="equiv-container" class="space-y-2"></div>
+
+        <div class="mt-4 pt-3 border-t border-slate-800">
+            <div class="text-[10px] text-slate-500 uppercase font-bold mb-2">Comparativa con baterías</div>
+            <div id="bat-compare" class="space-y-1.5"></div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ===================== TAB: CÓDIGO COLORES ===================== -->
+<div id="panel-codigo" class="grid grid-cols-1 lg:grid-cols-2 gap-5 hidden">
+
+    <div class="card p-5 space-y-4">
+        <div class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Decodificar código</div>
+
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase tracking-wider">Código (ej: 104, 220, 4n7, 100n)</label>
+            <input type="text" id="cod-input" value="104"
+                style="background:#0d1117;border:1px solid #1e293b;color:#e2e8f0;border-radius:8px;padding:6px 10px;width:100%;font-family:monospace;font-size:16px;outline:none;"
+                oninput="decodificar()">
+        </div>
+
+        <div class="bg-slate-950 rounded-xl p-4 space-y-2">
+            <div class="flex justify-between">
+                <span class="text-[11px] text-slate-500">Capacidad</span>
+                <span id="cod-C" class="result-val text-xl">—</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-[11px] text-slate-500">En pF</span>
+                <span id="cod-pF" class="result-val">—</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-[11px] text-slate-500">En nF</span>
+                <span id="cod-nF" class="result-val">—</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-[11px] text-slate-500">En µF</span>
+                <span id="cod-uF" class="result-val">—</span>
+            </div>
+        </div>
+
+        <div class="border-t border-slate-800 pt-3">
+            <div class="text-[10px] text-slate-500 font-bold uppercase mb-2">Tabla referencia rápida</div>
+            <div id="cod-tabla" class="space-y-0.5 text-[10px] font-mono"></div>
+        </div>
+    </div>
+
+    <div class="card p-5">
+        <div class="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-3">Guía de lectura</div>
+        <div class="space-y-3 text-[11px] text-slate-400">
+            <div class="bg-slate-950 rounded-lg p-3 space-y-1">
+                <div class="text-cyan-400 font-bold">Código numérico 3 dígitos (cerámico, multicapa)</div>
+                <div>• <span class="text-slate-200">104</span> → 10 × 10⁴ pF = 100.000 pF = 100 nF = 0,1 µF</div>
+                <div>• <span class="text-slate-200">473</span> → 47 × 10³ pF = 47.000 pF = 47 nF</div>
+                <div>• <span class="text-slate-200">220</span> → 22 × 10⁰ pF = 22 pF</div>
+                <div class="text-[10px] text-slate-600 mt-1">Últimos 2 dígitos: valor. Último: multiplicador (10^n). Si termina en 0: sin multiplicador.</div>
+            </div>
+            <div class="bg-slate-950 rounded-lg p-3 space-y-1">
+                <div class="text-cyan-400 font-bold">Código alfanumérico</div>
+                <div>• <span class="text-slate-200">4n7</span> → 4,7 nF</div>
+                <div>• <span class="text-slate-200">100n</span> → 100 nF</div>
+                <div>• <span class="text-slate-200">2µ2</span> o <span class="text-slate-200">2u2</span> → 2,2 µF</div>
+                <div>• <span class="text-slate-200">p47</span> → 0,47 pF</div>
+            </div>
+            <div class="bg-slate-950 rounded-lg p-3 space-y-1">
+                <div class="text-cyan-400 font-bold">Letra de tolerancia (opcional al final)</div>
+                <div class="grid grid-cols-2 gap-x-4 text-[10px]">
+                    <span>B = ±0.1pF</span><span>C = ±0.25pF</span>
+                    <span>D = ±0.5%</span><span>F = ±1%</span>
+                    <span>G = ±2%</span><span>J = ±5%</span>
+                    <span>K = ±10%</span><span>M = ±20%</span>
+                    <span>Z = +80%/−20%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</div>
+
+<script>
+// ===== HELPERS =====
+function fmtC(F) {
+    if (!isFinite(F)||F<=0) return '—';
+    if (F >= 1)    return F.toFixed(4)+' F';
+    if (F >= 1e-3) return (F*1e3).toPrecision(4)+' mF';
+    if (F >= 1e-6) return (F*1e6).toPrecision(4)+' µF';
+    if (F >= 1e-9) return (F*1e9).toPrecision(4)+' nF';
+    return (F*1e12).toPrecision(4)+' pF';
+}
+function fmtTime(s) {
+    if (!isFinite(s)||s<=0) return '—';
+    if (s >= 1)    return s.toFixed(4)+' s';
+    if (s >= 1e-3) return (s*1e3).toFixed(4)+' ms';
+    if (s >= 1e-6) return (s*1e6).toFixed(4)+' µs';
+    return (s*1e9).toFixed(4)+' ns';
+}
+function fmtE(J) {
+    if (!isFinite(J)||J<=0) return '—';
+    if (J >= 1e3)  return (J/1e3).toFixed(4)+' kJ';
+    if (J >= 1)    return J.toFixed(6)+' J';
+    if (J >= 1e-3) return (J*1e3).toFixed(4)+' mJ';
+    if (J >= 1e-6) return (J*1e6).toFixed(4)+' µJ';
+    return (J*1e9).toFixed(4)+' nJ';
+}
+
+// ===== TABS =====
+const TABS = ['combinacion','carga','energia','codigo'];
+function setTab(t) {
+    TABS.forEach(id => {
+        document.getElementById('panel-'+id).classList.toggle('hidden', id!==t);
+        const btn = document.getElementById('tab-'+id);
+        if (btn) btn.classList.toggle('active', id===t);
+    });
+    if (t==='carga') { calcRC(); drawRC(); }
+    if (t==='energia') calcEnergia();
+    if (t==='codigo') { renderCodTabla(); decodificar(); }
+}
+
+// ===== COMBINACION =====
+let caps = [{ C: 100e-6, nombre:'C1', color:'#06b6d4' }, { C: 10e-6, nombre:'C2', color:'#a855f7' }];
+let modoComb = 'serie';
+const COLORS6 = ['#06b6d4','#a855f7','#ef4444','#22c55e','#f59e0b','#ec4899'];
+
+function setModo(m) {
+    modoComb = m;
+    document.getElementById('btn-serie').classList.toggle('active', m==='serie');
+    document.getElementById('btn-paralelo').classList.toggle('active', m==='paralelo');
+    calcCombinacion();
+}
+
+function renderCapInputs() {
+    const c = document.getElementById('caps-container');
+    c.innerHTML = '';
+    caps.forEach((cap,i) => {
+        const d = document.createElement('div');
+        d.className = 'cap-input';
+        d.innerHTML = `
+            <div class="cap-dot" style="background:${cap.color}"></div>
+            <input type="number" value="${(cap.C*1e6).toPrecision(4)}" step="1" min="0.001"
+                style="background:#0d1117;border:1px solid #1e293b;color:#e2e8f0;border-radius:6px;padding:4px 8px;width:80px;font-family:monospace;font-size:12px;outline:none;"
+                oninput="caps[${i}].C=parseFloat(this.value)*1e-6||1e-6; calcCombinacion()">
+            <span style="color:${cap.color};font-size:11px;font-weight:700;margin-left:2px;">${cap.nombre} µF</span>`;
+        c.appendChild(d);
+    });
+}
+
+function agregarCap() {
+    if (caps.length >= 6) return;
+    const i = caps.length;
+    caps.push({ C: 100e-6, nombre:'C'+(i+1), color:COLORS6[i%6] });
+    renderCapInputs(); calcCombinacion();
+}
+function quitarCap() {
+    if (caps.length <= 2) return;
+    caps.pop(); renderCapInputs(); calcCombinacion();
+}
+
+function presetFiltro()      { caps=[{C:100e-6,nombre:'C1',color:'#06b6d4'},{C:10e-6,nombre:'C2',color:'#a855f7'}]; modoComb='paralelo'; document.getElementById('btn-serie').classList.remove('active'); document.getElementById('btn-paralelo').classList.add('active'); renderCapInputs(); calcCombinacion(); }
+function presetAcoplamiento(){ caps=[{C:1e-6,nombre:'C1',color:'#06b6d4'},{C:10e-6,nombre:'C2',color:'#a855f7'}]; modoComb='serie'; document.getElementById('btn-serie').classList.add('active'); document.getElementById('btn-paralelo').classList.remove('active'); renderCapInputs(); calcCombinacion(); }
+function presetBypass()      { caps=[{C:100e-9,nombre:'C1',color:'#06b6d4'},{C:10e-9,nombre:'C2',color:'#a855f7'}]; modoComb='paralelo'; document.getElementById('btn-serie').classList.remove('active'); document.getElementById('btn-paralelo').classList.add('active'); renderCapInputs(); calcCombinacion(); }
+
+function calcCombinacion() {
+    const V = parseFloat(document.getElementById('comb-V').value) || 12;
+    let Ceq;
+    if (modoComb === 'paralelo') {
+        Ceq = caps.reduce((s,c)=>s+c.C, 0);
+    } else {
+        Ceq = 1 / caps.reduce((s,c)=>s+1/c.C, 0);
+    }
+    const Q = Ceq * V;
+    const E = 0.5 * Ceq * V * V;
+
+    document.getElementById('res-Ceq').textContent = fmtC(Ceq);
+    document.getElementById('res-Q').textContent   = (Q*1e6).toFixed(3)+' µC';
+    document.getElementById('res-E').textContent   = fmtE(E);
+
+    const Vmax = V;
+    document.getElementById('res-Vmin').textContent = `≥ ${V} V (tensión de trabajo)`;
+
+    const tabla = document.getElementById('tabla-caps');
+    tabla.innerHTML = '';
+    caps.forEach((cap,i) => {
+        let Vcap, Qcap;
+        if (modoComb === 'serie') {
+            Vcap = Q / cap.C;
+            Qcap = Q;
+        } else {
+            Vcap = V;
+            Qcap = cap.C * V;
+        }
+        const d = document.createElement('div');
+        d.className = 'flex justify-between text-[10px] px-2 py-1.5 rounded bg-slate-950';
+        d.innerHTML = `<span style="color:${cap.color}">${cap.nombre} (${fmtC(cap.C)})</span>
+            <span class="text-slate-400">${Vcap.toFixed(2)}V | ${(Qcap*1e6).toFixed(2)}µC</span>`;
+        tabla.appendChild(d);
+    });
+
+    document.getElementById('formula-modo').textContent = modoComb === 'serie'
+        ? 'Serie: 1/Ceq = Σ(1/Cn)  |  Q igual en todos'
+        : 'Paralelo: Ceq = ΣCn  |  V igual en todos';
+
+    dibujarCombSVG(Ceq, V);
+}
+
+function dibujarCombSVG(Ceq, V) {
+    const svg = document.getElementById('comb-svg');
+    const n = caps.length;
+    const ns = 'http://www.w3.org/2000/svg';
+    svg.innerHTML = '';
+    const W=220, H=300;
+    svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+
+    const el = (tag,attrs,txt) => {
+        const e = document.createElementNS(ns,tag);
+        Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));
+        if(txt!==undefined) e.textContent=txt;
+        return e;
+    };
+
+    if (modoComb === 'serie') {
+        const spacing = (H-80) / (n+1);
+        let y = 40;
+        svg.appendChild(el('line',{x1:W/2,y1:10,x2:W/2,y2:40,stroke:'#ef4444','stroke-width':2}));
+        caps.forEach((cap,i) => {
+            const cy = y + spacing/2;
+            // capacitor symbol
+            svg.appendChild(el('line',{x1:W/2,y1:y,x2:W/2,y2:cy-8,stroke:cap.color,'stroke-width':1.5}));
+            svg.appendChild(el('line',{x1:W/2-16,y1:cy-6,x2:W/2+16,y2:cy-6,stroke:cap.color,'stroke-width':3}));
+            svg.appendChild(el('line',{x1:W/2-16,y1:cy+6,x2:W/2+16,y2:cy+6,stroke:cap.color,'stroke-width':3}));
+            svg.appendChild(el('line',{x1:W/2,y1:cy+8,x2:W/2,y2:y+spacing,stroke:cap.color,'stroke-width':1.5}));
+            svg.appendChild(el('text',{x:W/2+22,y:cy+4,'font-size':9,fill:cap.color,'font-weight':'bold'},cap.nombre));
+            y += spacing;
+        });
+        svg.appendChild(el('line',{x1:W/2,y1:y,x2:W/2,y2:H-10,stroke:'#374151','stroke-width':2}));
+        svg.appendChild(el('text',{x:W/2,y:H-2,'text-anchor':'middle','font-size':8,fill:'#64748b'},`Ceq = ${fmtC(Ceq)}`));
+    } else {
+        const bx=40, spacing=(W-80)/n;
+        svg.appendChild(el('line',{x1:bx,y1:30,x2:W-bx,y2:30,stroke:'#ef4444','stroke-width':2}));
+        svg.appendChild(el('line',{x1:bx,y1:H-30,x2:W-bx,y2:H-30,stroke:'#374151','stroke-width':2}));
+        svg.appendChild(el('line',{x1:bx,y1:30,x2:bx,y2:H-30,stroke:'#374151','stroke-width':1}));
+        svg.appendChild(el('line',{x1:W-bx,y1:30,x2:W-bx,y2:H-30,stroke:'#374151','stroke-width':1}));
+
+        caps.forEach((cap,i) => {
+            const cx = bx + spacing*(i+0.5);
+            const my = H/2;
+            svg.appendChild(el('line',{x1:cx,y1:30,x2:cx,y2:my-10,stroke:cap.color,'stroke-width':1.5}));
+            svg.appendChild(el('line',{x1:cx-14,y1:my-6,x2:cx+14,y2:my-6,stroke:cap.color,'stroke-width':3}));
+            svg.appendChild(el('line',{x1:cx-14,y1:my+6,x2:cx+14,y2:my+6,stroke:cap.color,'stroke-width':3}));
+            svg.appendChild(el('line',{x1:cx,y1:my+8,x2:cx,y2:H-30,stroke:cap.color,'stroke-width':1.5}));
+            svg.appendChild(el('text',{x:cx,y:my+24,'text-anchor':'middle','font-size':8,fill:cap.color,'font-weight':'bold'},cap.nombre));
+        });
+        svg.appendChild(el('text',{x:W/2,y:H-2,'text-anchor':'middle','font-size':8,fill:'#64748b'},`Ceq = ${fmtC(Ceq)}`));
+    }
+}
+
+// ===== RC =====
+function calcRC() {
+    const R  = parseFloat(document.getElementById('rc-R').value)||10000;
+    const Cv = parseFloat(document.getElementById('rc-C').value)||100;
+    const Cu = parseFloat(document.getElementById('rc-Cunit').value)||1e-6;
+    const V  = parseFloat(document.getElementById('rc-V').value)||12;
+    const tv = parseFloat(document.getElementById('rc-t').value)||1;
+    const tu = parseFloat(document.getElementById('rc-tunit').value)||1e-3;
+    const C  = Cv * Cu;
+    const t  = tv * tu;
+
+    const tau   = R * C;
+    const tau5  = 5 * tau;
+    const thalf = Math.log(2) * tau;
+    const Vc    = V * (1 - Math.exp(-t/tau));
+    const Vd    = V * Math.exp(-t/tau);
+
+    document.getElementById('rc-tau').textContent  = fmtTime(tau);
+    document.getElementById('rc-5tau').textContent = fmtTime(tau5);
+    document.getElementById('rc-thalf').textContent= fmtTime(thalf);
+    document.getElementById('rc-Vc').textContent   = Vc.toFixed(4)+' V';
+    document.getElementById('rc-Vd').textContent   = Vd.toFixed(4)+' V';
+
+    drawRC();
+}
+
+function drawRC() {
+    const R  = parseFloat(document.getElementById('rc-R').value)||10000;
+    const Cv = parseFloat(document.getElementById('rc-C').value)||100;
+    const Cu = parseFloat(document.getElementById('rc-Cunit').value)||1e-6;
+    const V  = parseFloat(document.getElementById('rc-V').value)||12;
+    const tv = parseFloat(document.getElementById('rc-t').value)||1;
+    const tu = parseFloat(document.getElementById('rc-tunit').value)||1e-3;
+    const C  = Cv * Cu;
+    const t  = tv * tu;
+    const tau = R * C;
+
+    const canvas = document.getElementById('rc-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const px = 50, py = 20, pw = W-px-20, ph = H-py-30;
+
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = '#060a14';
+    ctx.fillRect(0,0,W,H);
+
+    // Grid
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 0.5;
+    for (let i=0; i<=5; i++) {
+        const y = py + ph * i/5;
+        ctx.beginPath(); ctx.moveTo(px,y); ctx.lineTo(px+pw,y); ctx.stroke();
+    }
+    for (let i=0; i<=10; i++) {
+        const x = px + pw * i/10;
+        ctx.beginPath(); ctx.moveTo(x,py); ctx.lineTo(x,py+ph); ctx.stroke();
+    }
+
+    const tmax = 6 * tau;
+    const toX = t => px + (t/tmax) * pw;
+    const vToY = v => py + ph - (v/V) * ph;
+
+    // Carga
+    ctx.beginPath(); ctx.strokeStyle='#06b6d4'; ctx.lineWidth=2;
+    for (let i=0; i<=200; i++) {
+        const ti = tmax * i/200;
+        const vi = V * (1 - Math.exp(-ti/tau));
+        i===0 ? ctx.moveTo(toX(ti), vToY(vi)) : ctx.lineTo(toX(ti), vToY(vi));
+    }
+    ctx.stroke();
+
+    // Descarga
+    ctx.beginPath(); ctx.strokeStyle='#fb923c'; ctx.lineWidth=2;
+    for (let i=0; i<=200; i++) {
+        const ti = tmax * i/200;
+        const vi = V * Math.exp(-ti/tau);
+        i===0 ? ctx.moveTo(toX(ti), vToY(vi)) : ctx.lineTo(toX(ti), vToY(vi));
+    }
+    ctx.stroke();
+
+    // tau markers
+    [1,2,3,5].forEach(n => {
+        const tx = toX(n*tau);
+        if (tx < px || tx > px+pw) return;
+        ctx.strokeStyle = '#374151'; ctx.lineWidth = 1; ctx.setLineDash([3,3]);
+        ctx.beginPath(); ctx.moveTo(tx,py); ctx.lineTo(tx,py+ph); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle='#475569'; ctx.font='9px monospace'; ctx.textAlign='center';
+        ctx.fillText(n===1?'τ':n+'τ', tx, py+ph+12);
+    });
+
+    // Punto t actual
+    const tClamp = Math.min(t, tmax*0.99);
+    const Vc = V*(1-Math.exp(-tClamp/tau));
+    ctx.beginPath(); ctx.arc(toX(tClamp),vToY(Vc),5,0,Math.PI*2);
+    ctx.fillStyle='#fbbf24'; ctx.fill();
+
+    // Axes labels
+    ctx.fillStyle='#64748b'; ctx.font='10px monospace'; ctx.textAlign='right';
+    for (let i=0; i<=5; i++) {
+        ctx.fillText((V*i/5).toFixed(1)+'V', px-4, py+ph-ph*i/5+4);
+    }
+    ctx.textAlign='center'; ctx.fillStyle='#64748b';
+    ctx.fillText('0', px, py+ph+12);
+    ctx.fillText(fmtTime(tmax), px+pw, py+ph+12);
+}
+
+// ===== ENERGÍA =====
+function calcEnergia() {
+    const Cv = parseFloat(document.getElementById('en-C').value)||1000;
+    const Cu = parseFloat(document.getElementById('en-Cunit').value)||1e-6;
+    const V  = parseFloat(document.getElementById('en-V').value)||12;
+    const Vf = parseFloat(document.getElementById('en-Vf').value)||0;
+    const C  = Cv * Cu;
+
+    const E     = 0.5 * C * V * V;
+    const Eutil = 0.5 * C * (V*V - Vf*Vf);
+    const Q     = C * V;
+    const Ipeak = V / 1; // R=1Ω
+
+    document.getElementById('en-E').textContent     = fmtE(E);
+    document.getElementById('en-Eutil').textContent = fmtE(Eutil);
+    document.getElementById('en-Qe').textContent    = (Q*1e3).toFixed(4)+' mC';
+    document.getElementById('en-Ipeak').textContent = Ipeak.toFixed(2)+' A (con R=1Ω)';
+
+    const ec = document.getElementById('equiv-container');
+    ec.innerHTML = '';
+    const equivs = [
+        ['LED encendido 1s', 0.02*1, '(20mA, ~1V)'],
+        ['Arduino activo 1s', 0.05*0.005*1, '(50mA, 5V)'],
+        ['Relé accionado 1s', 0.1*0.012*1, '(100mA, 12V)'],
+        ['Motor pequeño 1s', 0.5*0.005*1, '(500mA, 5V)'],
+        ['Resistor 1kΩ a 12V 1s', 0.144*1, '(144mW × 1s)'],
+    ];
+    equivs.forEach(([label, Eref, note]) => {
+        const ratio = E / Eref;
+        const d = document.createElement('div');
+        d.className = 'flex justify-between text-[10px] px-2 py-1.5 rounded bg-slate-950';
+        const color = ratio >= 1 ? '#22c55e' : '#ef4444';
+        d.innerHTML = `<span class="text-slate-400">${label} <span class="text-slate-600">${note}</span></span>
+            <span style="color:${color};font-family:monospace">${ratio.toFixed(2)}×</span>`;
+        ec.appendChild(d);
+    });
+
+    const bc = document.getElementById('bat-compare');
+    bc.innerHTML = '';
+    const bats = [
+        ['CR2032', 0.691],
+        ['AA (1.5V)', 4500],
+        ['9V 6F22', 225],
+        ['18650 Li-ion', 12960],
+    ];
+    bats.forEach(([name, mWh]) => {
+        const Jbat = mWh * 3.6;
+        const pct = (E/Jbat*100).toFixed(4);
+        const d = document.createElement('div');
+        d.className = 'flex justify-between text-[10px] px-2 py-1.5 rounded bg-slate-950';
+        d.innerHTML = `<span class="text-slate-400">${name}</span>
+            <span class="text-slate-600 font-mono">${fmtE(Jbat)}</span>
+            <span class="text-cyan-400 font-mono">${pct}%</span>`;
+        bc.appendChild(d);
+    });
+}
+
+// ===== CÓDIGO DE COLORES =====
+const COD_REF = [
+    ['1p0','1 pF'],['2p2','2.2 pF'],['4p7','4.7 pF'],['10','10 pF'],['22','22 pF'],
+    ['47','47 pF'],['100','100 pF'],['101','100 pF'],['221','220 pF'],['471','470 pF'],
+    ['102','1 nF'],['222','2.2 nF'],['472','4.7 nF'],['103','10 nF'],['223','22 nF'],
+    ['473','47 nF'],['104','100 nF'],['224','220 nF'],['474','470 nF'],
+    ['105','1 µF'],['225','2.2 µF'],['475','4.7 µF'],['106','10 µF'],
+];
+
+function renderCodTabla() {
+    const t = document.getElementById('cod-tabla');
+    t.innerHTML = '';
+    COD_REF.forEach(([cod,val]) => {
+        const d = document.createElement('div');
+        d.className = 'flex justify-between py-0.5 px-1';
+        d.innerHTML = `<span class="text-cyan-400">${cod}</span><span class="text-slate-400">${val}</span>`;
+        t.appendChild(d);
+    });
+}
+
+function decodificar() {
+    const raw = document.getElementById('cod-input').value.trim();
+    let pF = null;
+
+    // Alfanumérico: 4n7, 100n, 2µ2, 2u2, p47, 1m0
+    const alfaMatch = raw.match(/^(\d*\.?\d*)\s*([pnuµmf])(\d*\.?\d*)$/i);
+    if (alfaMatch) {
+        const [,a,unit,b] = alfaMatch;
+        const val = parseFloat((a||'0') + (b ? '.'+b : ''));
+        const mult = {p:1, n:1e3, u:1e6, µ:1e6, m:1e9, f:1e12}[unit.toLowerCase()]||1;
+        pF = val * mult;
+    }
+    // Código 3 dígitos
+    else if (/^\d{3}$/.test(raw)) {
+        const d1 = parseInt(raw[0]);
+        const d2 = parseInt(raw[1]);
+        const exp = parseInt(raw[2]);
+        pF = (d1*10 + d2) * Math.pow(10, exp);
+    }
+    // Numérico directo (1 o 2 dígitos = pF)
+    else if (/^\d{1,2}$/.test(raw)) {
+        pF = parseInt(raw);
+    }
+
+    if (pF !== null && isFinite(pF)) {
+        const F = pF * 1e-12;
+        document.getElementById('cod-C').textContent  = fmtC(F);
+        document.getElementById('cod-pF').textContent = pF.toPrecision(4)+' pF';
+        document.getElementById('cod-nF').textContent = (pF/1e3).toPrecision(4)+' nF';
+        document.getElementById('cod-uF').textContent = (pF/1e6).toPrecision(4)+' µF';
+    } else {
+        ['cod-C','cod-pF','cod-nF','cod-uF'].forEach(id => document.getElementById(id).textContent='?');
+    }
+}
+
+// ===== INIT =====
+renderCapInputs();
+calcCombinacion();
+renderCodTabla();
+decodificar();
+</script>
+</body>
+</html>

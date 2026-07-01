@@ -1,0 +1,304 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sr. Z — Fórmulas Fotovoltaica</title>
+<style>
+:root{--accent:#facc15;--accent-b:#1a1500;--border:#2e2500;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#070b14;color:#cbd5e1;font-family:system-ui,sans-serif;font-size:15px;line-height:1.7;}
+a{text-decoration:none;}
+.top-nav{position:fixed;top:0;left:0;right:0;height:52px;background:rgba(7,11,20,.97);backdrop-filter:blur(10px);border-bottom:1px solid #1e293b;z-index:50;display:flex;align-items:center;padding:0 20px;gap:12px;}
+.top-nav .brand{font-size:18px;font-weight:900;background:linear-gradient(90deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.top-nav a{font-size:12px;color:#475569;}.top-nav a:hover{color:#e2e8f0;}
+.search-box{margin-left:auto;background:#0f172a;border:1px solid #1e293b;color:#e2e8f0;border-radius:8px;padding:5px 12px;font-size:13px;outline:none;width:180px;}
+.layout{display:grid;grid-template-columns:220px 1fr;padding-top:52px;min-height:100vh;}
+@media(min-width:1200px){.layout{grid-template-columns:220px 1fr 220px;}}
+.left-nav{position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;border-right:1px solid #1e293b;padding:16px 0 40px;}
+.left-nav a{display:block;padding:5px 18px;font-size:13px;color:#475569;transition:color .15s,background .15s;}
+.left-nav a:hover{color:#e2e8f0;background:#0f172a;}
+.left-nav a.active{color:var(--accent);font-weight:700;background:var(--accent-b);border-left:2px solid var(--accent);padding-left:16px;}
+.nav-cat{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#1e293b;padding:14px 18px 4px;}
+.nav-back{font-size:12px;color:#334155;padding:6px 18px;display:block;}.nav-back:hover{color:#94a3b8!important;}
+.content{padding:40px 52px;max-width:860px;margin:0 auto;}
+@media(max-width:900px){.content{padding:24px 20px;}}
+.page-title{font-size:26px;font-weight:900;color:#e2e8f0;margin-bottom:4px;}
+.page-sub{font-size:13px;color:#64748b;margin-bottom:44px;}
+.section{margin-bottom:52px;scroll-margin-top:68px;}
+.section-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:22px;}
+.fgroup{margin-bottom:30px;}
+.fname{font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:10px;}
+.fblock{background:#0c1422;border:1px solid var(--border);border-radius:10px;padding:20px 28px;margin:8px 0;text-align:center;}
+.fl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#1a1200;margin-bottom:8px;text-align:left;}
+.fm{font-size:22px;font-family:'Courier New',monospace;color:#f1f5f9;font-weight:700;line-height:1.5;}
+.fa{font-size:15px;font-family:'Courier New',monospace;color:#94a3b8;margin-top:7px;line-height:1.6;}
+.vars{list-style:none;margin-top:12px;}
+.vars li{font-size:14px;color:#475569;padding:2px 0;display:flex;gap:8px;align-items:baseline;line-height:1.6;}
+.vars li::before{content:'▸';color:#1a1200;flex-shrink:0;font-size:11px;}
+.vars li code{color:#fde047;font-family:'Courier New',monospace;font-size:13px;background:#0f172a;padding:1px 6px;border-radius:3px;flex-shrink:0;}
+.note{font-size:15px;color:#64748b;background:#0c1422;border-left:3px solid var(--border);padding:10px 14px;border-radius:0 8px 8px 0;margin-top:12px;line-height:1.7;}
+.right-toc{display:none;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;padding:20px 18px;border-left:1px solid #1e293b;}
+@media(min-width:1200px){.right-toc{display:block;}}
+.toc-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#1e293b;margin-bottom:10px;}
+.right-toc a{display:block;font-size:12px;color:#334155;padding:4px 0 4px 10px;border-left:1px solid #1e293b;margin-bottom:2px;line-height:1.4;transition:color .15s,border-color .15s;}
+.right-toc a:hover{color:#e2e8f0;border-color:var(--accent);}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <span class="brand">Sr.Z</span>
+  <a href="index.html">Inicio</a>
+  <a href="formulas-hub.html">Fórmulas</a>
+  <a href="laboratorio.html">Laboratorio</a><a href="componentes.html">Componentes</a>
+  <input class="search-box" type="text" placeholder="Buscar..." oninput="buscar(this.value)">
+</nav>
+<div class="layout">
+<aside class="left-nav">
+  <a class="nav-back" href="index.html">← Inicio</a>
+  <a class="nav-back" href="formulas-hub.html">📚 Hub Fórmulas</a>
+  <div class="nav-cat">Electricidad</div>
+  <a href="formulas-electricidad.html">⚡ Electricidad</a>
+  <a href="formulas-electronica.html">🔬 Electrónica</a>
+  <a href="formulas-transformadores.html">🔄 Transformadores</a>
+  <a href="formulas-motores.html">⚙ Motores</a>
+  <a href="formulas-pcbs.html">🖥 PCBs</a>
+  <div class="nav-cat">Física</div>
+  <a href="formulas-electromagnetismo.html">📡 Electromagnetismo</a>
+  <a href="formulas-termodinamica.html">🌡 Termodinámica</a>
+  <a href="formulas-hidrostatica.html">💧 Fluidos</a>
+  <div class="nav-cat">Energía</div>
+  <a href="formulas-fotovoltaica.html" class="active">☀ Fotovoltaica</a>
+</aside>
+<main class="content">
+  <h1 class="page-title">☀ Energía Fotovoltaica</h1>
+  <p class="page-sub">Panel solar · Strings · Inversor/MPPT · Baterías · Cableado DC · Radiación · Dimensionado</p>
+
+  <section class="section" id="panel">
+    <div class="section-title">Panel Solar — Curva I-V</div>
+    <div class="fgroup">
+      <div class="fname">Parámetros clave del panel (STC)</div>
+      <div class="fblock">
+        <div class="fa">STC: 1000 W/m² · 25°C · AM 1.5</div>
+        <div class="fm">P_max = V_mp · I_mp</div>
+        <div class="fa">FF = P_max / (V_oc · I_sc)  →  FF típico 0.72–0.82</div>
+        <div class="fa">η_panel = P_max / (G · A_panel)</div>
+      </div>
+      <ul class="vars">
+        <li><code>V_oc</code> — Tensión circuito abierto [V]</li>
+        <li><code>I_sc</code> — Corriente cortocircuito [A]</li>
+        <li><code>V_mp, I_mp</code> — Tensión y corriente en MPP</li>
+        <li><code>G</code> — Irradiancia [W/m²] · <code>A</code> — Área panel [m²]</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Corrección por temperatura</div>
+      <div class="fblock">
+        <div class="fm">V_oc(T) = V_oc_STC + β · (T_cell − 25)</div>
+        <div class="fa">I_sc(T) = I_sc_STC · (1 + α · (T_cell − 25))</div>
+        <div class="fa">T_cell = T_amb + (NOCT − 20) · G/800</div>
+      </div>
+      <ul class="vars">
+        <li><code>β</code> — Coef. tensión: −0.3 a −0.4 %/°C (reduce V al calentar)</li>
+        <li><code>α</code> — Coef. corriente: +0.04 a +0.06 %/°C (aumenta I al calentar)</li>
+        <li><code>NOCT</code> — Temp. operación normal celda: 43–48°C típico</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Corrección por irradiancia</div>
+      <div class="fblock">
+        <div class="fm">I_sc(G) = I_sc_STC · G / 1000</div>
+        <div class="fa">P(G) ≈ P_STC · G/1000  (lineal en I, V varía ~log)</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="strings">
+    <div class="section-title">Strings — Serie y Paralelo</div>
+    <div class="fgroup">
+      <div class="fname">Paneles en serie (string)</div>
+      <div class="fblock">
+        <div class="fm">V_string = N_serie · V_mp_panel</div>
+        <div class="fa">I_string = I_mp_panel  (constante)</div>
+        <div class="fa">V_oc_string = N_serie · V_oc_panel</div>
+      </div>
+      <div class="note">V_oc máxima en frío determina límite del inversor. Calcular con temperatura mínima del sitio.</div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Strings en paralelo</div>
+      <div class="fblock">
+        <div class="fm">I_total = N_paralelo · I_mp_string</div>
+        <div class="fa">V_total = V_mp_string  (constante)</div>
+        <div class="fa">P_array = V_total · I_total</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Número de paneles en serie — límites</div>
+      <div class="fblock">
+        <div class="fm">N_max = V_max_inversor / V_oc_panel(T_min)</div>
+        <div class="fa">N_min = V_min_MPPT / V_mp_panel(T_max)</div>
+      </div>
+      <ul class="vars"><li>Rango MPPT inversor típico: 200–800 V · V_max: 1000 V (residencial) / 1500 V (utility)</li></ul>
+    </div>
+  </section>
+
+  <section class="section" id="inversor">
+    <div class="section-title">Inversor y MPPT</div>
+    <div class="fgroup">
+      <div class="fname">Ratio DC/AC — sobredimensionado FV</div>
+      <div class="fblock">
+        <div class="fm">DC/AC ratio = P_pico_FV / P_nominal_inversor</div>
+        <div class="fa">Óptimo: 1.1 – 1.3  (clipping aceptable &lt;1–2 % energía anual)</div>
+      </div>
+      <div class="note">Ratio &gt;1.3 puede recortar producción en horas pico. Analizar con curvas de irradiancia del sitio.</div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Eficiencia del inversor</div>
+      <div class="fblock">
+        <div class="fm">η_inv = P_AC / P_DC</div>
+        <div class="fa">η_Euro = Σ(η_i · w_i)  ponderada por distribución de carga real</div>
+        <div class="fa">w: 0.03·5% + 0.06·10% + 0.13·20% + 0.1·30% + 0.48·50% + 0.2·100%</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Pérdidas del sistema (PR)</div>
+      <div class="fblock">
+        <div class="fm">PR = E_real / E_ideal</div>
+        <div class="fa">PR típico: 0.75–0.85  (75–85 %)</div>
+        <div class="fa">Pérdidas: temperatura ~5% · cableado ~2% · inversor ~4% · suciedad ~2%</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="baterias">
+    <div class="section-title">Banco de Baterías</div>
+    <div class="fgroup">
+      <div class="fname">Capacidad requerida</div>
+      <div class="fblock">
+        <div class="fm">C_batería = E_diaria · N_autonomía / (DOD · V_banco · η_batería)</div>
+      </div>
+      <ul class="vars">
+        <li><code>DOD</code> — Profundidad de descarga: plomo 0.5 · LiFePO4 0.8–0.9</li>
+        <li><code>N_autonomía</code> — Días sin sol (1–3 típico)</li>
+        <li><code>η_batería</code> — Eficiencia carga-descarga: 0.85–0.95</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Estado de carga (SOC) y ciclos</div>
+      <div class="fblock">
+        <div class="fm">SOC = C_actual / C_nominal × 100 %</div>
+        <div class="fa">DOD = 1 − SOC_mínimo</div>
+        <div class="fa">Vida útil: plomo 500 ciclos (50% DOD) · LFP 3000+ ciclos (80% DOD)</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Configuración serie-paralelo baterías</div>
+      <div class="fblock">
+        <div class="fm">V_banco = N_serie · V_unidad</div>
+        <div class="fa">C_banco = N_paralelo · C_unidad  [Ah]</div>
+        <div class="fa">E_banco = V_banco · C_banco · DOD  [Wh]</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="cableado">
+    <div class="section-title">Cableado DC</div>
+    <div class="fgroup">
+      <div class="fname">Sección de cable DC</div>
+      <div class="fblock">
+        <div class="fm">S = ρ · 2L · I / ΔV_max</div>
+        <div class="fa">ΔV_max recomendado: 1–3 % de V_string</div>
+        <div class="fa">ρ_Cu = 0.0172 Ω·mm²/m</div>
+      </div>
+      <ul class="vars">
+        <li><code>L</code> — Longitud un sentido [m] · <code>2L</code> — ida y vuelta</li>
+        <li><code>S</code> — Sección [mm²] · cables FV típicos: 4 mm² o 6 mm²</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Protección — fusible de string</div>
+      <div class="fblock">
+        <div class="fm">I_fusible ≥ 1.25 · I_sc_string</div>
+        <div class="fa">I_fusible ≤ 2.4 · I_sc_string  (límite cable y panel)</div>
+      </div>
+      <div class="note">Fusibles necesarios cuando hay ≥3 strings en paralelo. IEC 60364-7-712.</div>
+    </div>
+  </section>
+
+  <section class="section" id="radiacion">
+    <div class="section-title">Radiación y Orientación</div>
+    <div class="fgroup">
+      <div class="fname">Horas Solar Pico (HSP)</div>
+      <div class="fblock">
+        <div class="fm">HSP = H_dia / 1000  [h]</div>
+        <div class="fa">E_dia = P_pico · HSP · PR  [Wh/día]</div>
+      </div>
+      <ul class="vars">
+        <li><code>H_dia</code> — Irradiación diaria [Wh/m²] — dato de PVGIS/NASA</li>
+        <li>Buenos Aires: HSP ≈ 4–5 h/día promedio anual</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Ángulo de inclinación óptimo</div>
+      <div class="fblock">
+        <div class="fm">β_opt ≈ |latitud| − 10°  (verano) / |latitud| + 10°  (invierno)</div>
+        <div class="fa">β_opt anual ≈ |latitud| ± 0–5°</div>
+      </div>
+      <div class="note">En Argentina (lat −34°): inclinación óptima anual ≈ 30–34°, orientación norte.</div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Separación entre filas (sombras)</div>
+      <div class="fblock">
+        <div class="fm">d = h · cos β / tan(α_sol_min)</div>
+        <div class="fa">α_sol_min: elevación solar al mediodía del solsticio de invierno</div>
+        <div class="fa">α_sol = 90° − |latitud| − 23.5°</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="dimensionado">
+    <div class="section-title">Dimensionado del Sistema</div>
+    <div class="fgroup">
+      <div class="fname">Potencia pico necesaria</div>
+      <div class="fblock">
+        <div class="fm">P_pico = E_diaria / (HSP · PR)</div>
+        <div class="fa">N_paneles = P_pico / P_panel</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Procedimiento de dimensionado</div>
+      <div class="fblock">
+        <div class="fa">1. Calcular E_diaria [Wh/día] del consumo</div>
+        <div class="fa">2. Obtener HSP del sitio (PVGIS)</div>
+        <div class="fa">3. P_pico = E / (HSP × PR)</div>
+        <div class="fa">4. N_paneles = ceil(P_pico / P_panel)</div>
+        <div class="fa">5. Configurar strings → verificar rango MPPT</div>
+        <div class="fa">6. Dimensionar batería si off-grid</div>
+        <div class="fa">7. Calcular secciones de cable y protecciones</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Payback y LCOE</div>
+      <div class="fblock">
+        <div class="fm">Payback = Inversión / (E_anual · Tarifa)</div>
+        <div class="fa">LCOE = Inversión / (E_anual · Vida_útil)  [$/kWh]</div>
+        <div class="fa">Vida útil: 25–30 años · degradación panel: 0.5–0.7 %/año</div>
+      </div>
+    </div>
+  </section>
+</main>
+<aside class="right-toc">
+  <div class="toc-title">En esta página</div>
+  <a href="#panel">Panel Solar I-V</a>
+  <a href="#strings">Strings</a>
+  <a href="#inversor">Inversor y MPPT</a>
+  <a href="#baterias">Banco de Baterías</a>
+  <a href="#cableado">Cableado DC</a>
+  <a href="#radiacion">Radiación</a>
+  <a href="#dimensionado">Dimensionado</a>
+</aside>
+</div>
+<script>function buscar(q){q=q.toLowerCase().trim();document.querySelectorAll('.section').forEach(s=>{s.style.display=!q||(s.textContent.toLowerCase().includes(q))?'':'none';});}</script>
+</body>
+</html>
+

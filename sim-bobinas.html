@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sr. Z — Simulador Bobinas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: radial-gradient(ellipse at 50% 20%, #1a2744 0%, #0a0f1e 55%, #060a14 100%); min-height:100vh; }
+        .card { background:rgba(13,19,33,.85); border:1px solid #1e293b; border-radius:14px; }
+        input[type=range] { -webkit-appearance:none; width:100%; height:6px; border-radius:3px; background:#1e293b; outline:none; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:#a855f7; cursor:pointer; }
+        input[type=number], select { background:#0d1117; border:1px solid #1e293b; color:#e2e8f0; border-radius:8px; padding:6px 10px; width:100%; font-family:monospace; font-size:13px; outline:none; }
+        select option { background:#0d1117; }
+        .result-val { font-family:'Courier New',monospace; color:#00ff41; text-shadow:0 0 6px #00ff41; }
+        .formula { font-family:monospace; font-size:11px; color:#94a3b8; background:#0d1117; padding:8px 12px; border-radius:8px; border-left:2px solid #a855f7; }
+        .tab-btn { padding:6px 14px; border-radius:8px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; cursor:pointer; border:1px solid #1e293b; background:transparent; color:#64748b; transition:all .2s; }
+        .tab-btn.active { background:#1e0a2e; border-color:#a855f7; color:#a855f7; }
+    </style>
+</head>
+<body class="text-slate-100 font-sans">
+
+<div class="flex items-center gap-4 px-5 py-2 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-sm sticky top-0 z-50">
+    <a href="index.html" class="text-xs text-slate-500 hover:text-purple-400 transition">← Panel</a>
+    <span class="text-sm font-black uppercase tracking-wide text-slate-200">🌀 Simulador Bobinas / Inductores</span>
+    <span class="text-[10px] text-slate-600">RL, XL, energía, combinaciones</span>
+</div>
+
+<div class="max-w-6xl mx-auto p-5 space-y-5">
+
+<div class="flex gap-2">
+    <button class="tab-btn active" onclick="setTab('rl')"    id="tab-rl">Circuito RL</button>
+    <button class="tab-btn"        onclick="setTab('xl')"    id="tab-xl">Reactancia XL</button>
+    <button class="tab-btn"        onclick="setTab('combo')" id="tab-combo">Combinación</button>
+    <button class="tab-btn"        onclick="setTab('fisica')" id="tab-fisica">Diseño físico</button>
+</div>
+
+<!-- RL -->
+<div id="panel-rl" class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+    <div class="card p-5 space-y-4">
+        <div class="text-xs font-bold text-purple-400 uppercase tracking-wider">Circuito RL</div>
+
+        <div>
+            <div class="flex justify-between mb-1">
+                <label class="text-[11px] text-slate-500 uppercase">Inductancia L</label>
+                <span id="rl-L-val" class="text-purple-400 font-mono text-xs">10 mH</span>
+            </div>
+            <input type="range" id="rl-L" min="0.001" max="1000" step="0.1" value="10" oninput="rlSlider('rl-L','rl-L-val',' mH'); calcRL()">
+        </div>
+        <div>
+            <div class="flex justify-between mb-1">
+                <label class="text-[11px] text-slate-500 uppercase">Resistencia R</label>
+                <span id="rl-R-val" class="text-purple-400 font-mono text-xs">100 Ω</span>
+            </div>
+            <input type="range" id="rl-R" min="1" max="10000" step="1" value="100" oninput="rlSlider('rl-R','rl-R-val',' Ω'); calcRL()">
+        </div>
+        <div>
+            <div class="flex justify-between mb-1">
+                <label class="text-[11px] text-slate-500 uppercase">Tensión V</label>
+                <span id="rl-V-val" class="text-purple-400 font-mono text-xs">12 V</span>
+            </div>
+            <input type="range" id="rl-V" min="1" max="48" step="0.5" value="12" oninput="rlSlider('rl-V','rl-V-val',' V'); calcRL()">
+        </div>
+
+        <div class="bg-slate-950 rounded-xl p-4 space-y-2">
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">τ = L/R</span><span id="rl-tau" class="result-val text-lg">—</span></div>
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">I∞ (estado estable)</span><span id="rl-Iinf" class="result-val">—</span></div>
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">I(τ) — 63%</span><span id="rl-Itau" class="result-val">—</span></div>
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">Energía almacenada</span><span id="rl-E" class="result-val">—</span></div>
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">VL pico (t=0)</span><span id="rl-VL0" class="result-val">—</span></div>
+        </div>
+
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase">Tiempo t a calcular</label>
+            <div class="flex gap-2 mt-1">
+                <input type="number" id="rl-t" value="0.5" step="0.1" min="0" oninput="calcRL()" class="flex-1">
+                <select id="rl-tunit" onchange="calcRL()" style="background:#0d1117;border:1px solid #1e293b;color:#e2e8f0;border-radius:8px;padding:6px 8px;font-family:monospace;font-size:13px;outline:none;width:64px;">
+                    <option value="1e-9">ns</option>
+                    <option value="1e-6">µs</option>
+                    <option value="1e-3" selected>ms</option>
+                    <option value="1">s</option>
+                </select>
+            </div>
+        </div>
+        <div class="bg-slate-950 rounded-xl p-3 space-y-1.5">
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">I(t) carga</span><span id="rl-It" class="result-val">—</span></div>
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">I(t) descarga</span><span id="rl-Idt" class="result-val">—</span></div>
+        </div>
+    </div>
+    <div class="card p-5 col-span-2">
+        <div class="text-[10px] text-slate-500 uppercase font-bold mb-3">Corriente I(t) — Carga y descarga RL</div>
+        <canvas id="rl-canvas" width="600" height="260" class="w-full rounded-xl bg-slate-950"></canvas>
+        <div class="mt-3 flex gap-4 text-[10px] text-slate-500">
+            <span><span class="inline-block w-4 h-0.5 bg-purple-400 align-middle mr-1"></span>Carga I(1−e^(−t/τ))</span>
+            <span><span class="inline-block w-4 h-0.5 bg-orange-400 align-middle mr-1"></span>Descarga I·e^(−t/τ)</span>
+        </div>
+        <div class="formula mt-3">I(t) = (V/R) × (1 − e^(−t·R/L)) | τ = L/R</div>
+    </div>
+</div>
+
+<!-- XL -->
+<div id="panel-xl" class="grid grid-cols-1 lg:grid-cols-3 gap-5 hidden">
+    <div class="card p-5 space-y-4">
+        <div class="text-xs font-bold text-purple-400 uppercase tracking-wider">Reactancia inductiva</div>
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase">Inductancia L</label>
+            <div class="flex gap-2 mt-1">
+                <input type="number" id="xl-L" value="100" step="1" min="0.001" oninput="calcXL()" class="flex-1">
+                <select id="xl-Lunit" onchange="calcXL()" style="background:#0d1117;border:1px solid #1e293b;color:#e2e8f0;border-radius:8px;padding:6px 8px;font-family:monospace;font-size:13px;outline:none;width:64px;">
+                    <option value="1e-9">nH</option>
+                    <option value="1e-6">µH</option>
+                    <option value="1e-3" selected>mH</option>
+                    <option value="1">H</option>
+                </select>
+            </div>
+        </div>
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase">Resistencia serie R (Ω)</label>
+            <input type="number" id="xl-R" value="10" step="1" min="0" oninput="calcXL()">
+        </div>
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase">Frecuencia f</label>
+            <div class="flex gap-2 mt-1">
+                <input type="number" id="xl-f" value="1000" step="100" min="1" oninput="calcXL()" class="flex-1">
+                <select id="xl-funit" onchange="calcXL()" style="background:#0d1117;border:1px solid #1e293b;color:#e2e8f0;border-radius:8px;padding:6px 8px;font-family:monospace;font-size:13px;outline:none;width:64px;">
+                    <option value="1">Hz</option>
+                    <option value="1e3" selected>kHz</option>
+                    <option value="1e6">MHz</option>
+                </select>
+            </div>
+        </div>
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase">Tensión Vac (V)</label>
+            <input type="number" id="xl-V" value="5" step="0.1" min="0.1" oninput="calcXL()">
+        </div>
+        <div class="bg-slate-950 rounded-xl p-4 space-y-2">
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">XL = 2πfL</span><span id="xl-XL" class="result-val text-xl">—</span></div>
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">Impedancia Z</span><span id="xl-Z" class="result-val">—</span></div>
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">Corriente I</span><span id="xl-I" class="result-val">—</span></div>
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">Ángulo de fase φ</span><span id="xl-phi" class="result-val">—</span></div>
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">Factor de calidad Q</span><span id="xl-Q" class="result-val">—</span></div>
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">Freq. corte (3dB)</span><span id="xl-fc" class="result-val">—</span></div>
+        </div>
+        <div class="formula">XL = 2π × f × L | Z = √(R²+XL²)</div>
+    </div>
+    <div class="card p-5 col-span-2">
+        <div class="text-[10px] text-slate-500 uppercase font-bold mb-3">XL vs Frecuencia</div>
+        <canvas id="xl-canvas" width="600" height="280" class="w-full rounded-xl bg-slate-950"></canvas>
+    </div>
+</div>
+
+<!-- COMBO -->
+<div id="panel-combo" class="grid grid-cols-1 lg:grid-cols-3 gap-5 hidden">
+    <div class="card p-5 space-y-4">
+        <div class="text-xs font-bold text-purple-400 uppercase tracking-wider">Combinación bobinas</div>
+        <div class="flex gap-2">
+            <button onclick="setModoBobinas('serie')"    id="btn-bserie"    class="tab-btn active flex-1">Serie</button>
+            <button onclick="setModoBobinas('paralelo')" id="btn-bparalelo" class="tab-btn flex-1">Paralelo</button>
+        </div>
+        <div id="bobinas-container" class="space-y-2"></div>
+        <div class="flex gap-2">
+            <button onclick="agregarBobina()" class="text-[10px] px-3 py-1.5 rounded border border-slate-700 text-purple-400 hover:border-purple-500 transition flex-1">+ Bobina</button>
+            <button onclick="quitarBobina()"  class="text-[10px] px-3 py-1.5 rounded border border-slate-700 text-slate-500 hover:border-slate-500 transition flex-1">− Bobina</button>
+        </div>
+        <div class="bg-slate-950 rounded-xl p-4 space-y-2">
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">Leq</span><span id="combo-Leq" class="result-val text-xl">—</span></div>
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">Req</span><span id="combo-Req" class="result-val">—</span></div>
+        </div>
+        <div class="formula" id="combo-formula">Serie: Leq = ΣLn</div>
+    </div>
+    <div class="card p-5 col-span-2">
+        <div class="text-[10px] text-slate-500 uppercase font-bold mb-3">Diagrama</div>
+        <svg id="combo-svg" viewBox="0 0 580 200" class="w-full rounded-xl bg-slate-950"></svg>
+    </div>
+</div>
+
+<!-- FISICA -->
+<div id="panel-fisica" class="grid grid-cols-1 lg:grid-cols-2 gap-5 hidden">
+    <div class="card p-5 space-y-4">
+        <div class="text-xs font-bold text-purple-400 uppercase tracking-wider">Diseño toroide / solenoide</div>
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase">Tipo</label>
+            <select id="fis-tipo" onchange="calcFisica()">
+                <option value="solenoide">Solenoide (núcleo aire)</option>
+                <option value="toroide">Toroide (núcleo ferrita)</option>
+            </select>
+        </div>
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase">Número de vueltas N</label>
+            <input type="number" id="fis-N" value="50" step="1" min="1" oninput="calcFisica()">
+        </div>
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase">Diámetro D (mm)</label>
+            <input type="number" id="fis-D" value="20" step="1" min="1" oninput="calcFisica()">
+        </div>
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase">Longitud l (mm) — solenoide / h toroide</label>
+            <input type="number" id="fis-l" value="30" step="1" min="1" oninput="calcFisica()">
+        </div>
+        <div id="fis-mu-row">
+            <label class="text-[11px] text-slate-500 uppercase">µr — permeabilidad relativa núcleo</label>
+            <select id="fis-mu" onchange="calcFisica()">
+                <option value="1">Aire (µr=1)</option>
+                <option value="10">Polvo hierro T30 (µr≈10)</option>
+                <option value="75" selected>Ferrita T50 (µr≈75)</option>
+                <option value="200">Ferrita MnZn (µr≈200)</option>
+                <option value="1000">Hierro silicio (µr≈1000)</option>
+                <option value="custom">Personalizado</option>
+            </select>
+        </div>
+        <div id="fis-mu-custom" class="hidden">
+            <label class="text-[11px] text-slate-500 uppercase">µr personalizado</label>
+            <input type="number" id="fis-mu-val" value="75" step="1" min="1" oninput="calcFisica()">
+        </div>
+        <div class="bg-slate-950 rounded-xl p-4 space-y-2">
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">Inductancia L</span><span id="fis-L" class="result-val text-xl">—</span></div>
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">Área sección A</span><span id="fis-A" class="result-val">—</span></div>
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">AL (nH/N²)</span><span id="fis-AL" class="result-val">—</span></div>
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">Vueltas para L objetivo</span><span id="fis-Ntarget" class="result-val">—</span></div>
+        </div>
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase">L objetivo (µH)</label>
+            <input type="number" id="fis-Ltarget" value="100" step="10" min="0.001" oninput="calcFisica()">
+        </div>
+        <div class="formula" id="fis-formula">L = µ₀µr × N² × A / l</div>
+    </div>
+    <div class="card p-5">
+        <div class="text-[10px] text-slate-500 uppercase font-bold mb-3">Visualización</div>
+        <svg id="fis-svg" viewBox="0 0 340 260" class="w-full rounded-xl bg-slate-950"></svg>
+        <div class="mt-3 space-y-1.5 text-[11px] text-slate-400">
+            <div>• <span class="text-purple-400">Solenoide:</span> L = µ₀ × µr × N² × π×(D/2)² / l</div>
+            <div>• <span class="text-purple-400">Toroide:</span> L = µ₀ × µr × N² × A / (2π×Rm)</div>
+            <div>• <span class="text-purple-400">AL:</span> L(nH) = AL × N²</div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<script>
+const TAB_IDS = ['rl','xl','combo','fisica'];
+function setTab(t) {
+    TAB_IDS.forEach(id => {
+        document.getElementById('panel-'+id).classList.toggle('hidden', id!==t);
+        document.getElementById('tab-'+id).classList.toggle('active', id===t);
+    });
+    if(t==='rl')    calcRL();
+    if(t==='xl')    calcXL();
+    if(t==='combo') calcCombo();
+    if(t==='fisica'){ calcFisica(); }
+}
+
+function fmtL(H) {
+    if(!isFinite(H)||H<=0) return '—';
+    if(H>=1)     return H.toFixed(4)+' H';
+    if(H>=1e-3)  return (H*1e3).toPrecision(4)+' mH';
+    if(H>=1e-6)  return (H*1e6).toPrecision(4)+' µH';
+    return (H*1e9).toPrecision(4)+' nH';
+}
+function fmtTime(s){
+    if(!isFinite(s)||s<=0) return '—';
+    if(s>=1) return s.toFixed(4)+' s';
+    if(s>=1e-3) return (s*1e3).toFixed(4)+' ms';
+    if(s>=1e-6) return (s*1e6).toFixed(4)+' µs';
+    return (s*1e9).toFixed(4)+' ns';
+}
+function fmtFreq(hz){
+    if(hz>=1e6) return (hz/1e6).toFixed(3)+' MHz';
+    if(hz>=1e3) return (hz/1e3).toFixed(3)+' kHz';
+    return hz.toFixed(1)+' Hz';
+}
+
+// ===== RL =====
+function rlSlider(id,vid,unit){
+    document.getElementById(vid).textContent = parseFloat(document.getElementById(id).value).toFixed(1)+unit;
+}
+
+function calcRL(){
+    const L   = parseFloat(document.getElementById('rl-L').value)*1e-3;
+    const R   = parseFloat(document.getElementById('rl-R').value);
+    const V   = parseFloat(document.getElementById('rl-V').value);
+    const tv  = parseFloat(document.getElementById('rl-t').value)||0.5;
+    const tu  = parseFloat(document.getElementById('rl-tunit').value)||1e-3;
+    const t   = tv * tu;
+    const tau = L / R;
+    const Iinf = V / R;
+    const E   = 0.5 * L * Iinf * Iinf;
+    document.getElementById('rl-tau').textContent  = fmtTime(tau);
+    document.getElementById('rl-Iinf').textContent = (Iinf*1000).toFixed(3)+' mA';
+    document.getElementById('rl-Itau').textContent = (Iinf*0.6321*1000).toFixed(3)+' mA';
+    document.getElementById('rl-E').textContent    = E<1e-3 ? (E*1e6).toFixed(2)+' µJ' : (E*1e3).toFixed(2)+' mJ';
+    document.getElementById('rl-VL0').textContent  = V.toFixed(2)+' V';
+    document.getElementById('rl-It').textContent   = (Iinf*(1-Math.exp(-t/tau))*1000).toFixed(4)+' mA';
+    document.getElementById('rl-Idt').textContent  = (Iinf*Math.exp(-t/tau)*1000).toFixed(4)+' mA';
+    drawRL(L,R,V,tau,Iinf,t);
+}
+
+function drawRL(L,R,V,tau,Iinf,t_mark){
+    const canvas=document.getElementById('rl-canvas');
+    const ctx=canvas.getContext('2d');
+    const W=canvas.width,H=canvas.height;
+    const px=55,py=15,pw=W-px-20,ph=H-py-35;
+    ctx.clearRect(0,0,W,H); ctx.fillStyle='#060a14'; ctx.fillRect(0,0,W,H);
+    const tmax=6*tau;
+    const toX=t=>px+(t/tmax)*pw;
+    const toY=i=>py+ph-(i/Iinf)*ph;
+    ctx.strokeStyle='#1e293b'; ctx.lineWidth=0.5;
+    for(let i=0;i<=5;i++){const y=py+ph*i/5;ctx.beginPath();ctx.moveTo(px,y);ctx.lineTo(px+pw,y);ctx.stroke();}
+    for(let i=0;i<=6;i++){const x=px+pw*i/6;ctx.beginPath();ctx.moveTo(x,py);ctx.lineTo(x,py+ph);ctx.stroke();}
+    // Carga
+    ctx.beginPath();ctx.strokeStyle='#a855f7';ctx.lineWidth=2;
+    for(let i=0;i<=200;i++){const ti=tmax*i/200;const ii=Iinf*(1-Math.exp(-ti/tau));i===0?ctx.moveTo(toX(ti),toY(ii)):ctx.lineTo(toX(ti),toY(ii));}
+    ctx.stroke();
+    // Descarga
+    ctx.beginPath();ctx.strokeStyle='#fb923c';ctx.lineWidth=2;
+    for(let i=0;i<=200;i++){const ti=tmax*i/200;const ii=Iinf*Math.exp(-ti/tau);i===0?ctx.moveTo(toX(ti),toY(ii)):ctx.lineTo(toX(ti),toY(ii));}
+    ctx.stroke();
+    // tau marks
+    [1,2,3,5].forEach(n=>{
+        const tx=toX(n*tau);
+        ctx.strokeStyle='#374151';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+        ctx.beginPath();ctx.moveTo(tx,py);ctx.lineTo(tx,py+ph);ctx.stroke();ctx.setLineDash([]);
+        ctx.fillStyle='#475569';ctx.font='9px monospace';ctx.textAlign='center';
+        ctx.fillText(n===1?'τ':n+'τ',tx,py+ph+14);
+    });
+    // Punto
+    const t_c=Math.min(t_mark,tmax*0.99);
+    const ic=Iinf*(1-Math.exp(-t_c/tau));
+    ctx.beginPath();ctx.arc(toX(t_c),toY(ic),5,0,Math.PI*2);ctx.fillStyle='#fbbf24';ctx.fill();
+    ctx.fillStyle='#64748b';ctx.font='10px monospace';ctx.textAlign='right';
+    for(let i=0;i<=5;i++) ctx.fillText((Iinf*i/5*1000).toFixed(1)+'mA',px-4,toY(Iinf*i/5)+4);
+    ctx.textAlign='center';
+    ctx.fillText('0',px,py+ph+14);
+    ctx.fillText(fmtTime(tmax),px+pw,py+ph+14);
+}
+
+// ===== XL =====
+function calcXL(){
+    const Lv=parseFloat(document.getElementById('xl-L').value)||100;
+    const Lu=parseFloat(document.getElementById('xl-Lunit').value)||1e-3;
+    const L=Lv*Lu;
+    const R=parseFloat(document.getElementById('xl-R').value)||10;
+    const fv=parseFloat(document.getElementById('xl-f').value)||1000;
+    const fu=parseFloat(document.getElementById('xl-funit').value)||1e3;
+    const f=fv*fu;
+    const V=parseFloat(document.getElementById('xl-V').value)||5;
+    const XL=2*Math.PI*f*L;
+    const Z=Math.sqrt(R*R+XL*XL);
+    const I=V/Z;
+    const phi=Math.atan2(XL,R)*180/Math.PI;
+    const Q=XL/R;
+    const fc=R/(2*Math.PI*L);
+    document.getElementById('xl-XL').textContent = XL>=1000?(XL/1000).toFixed(2)+'kΩ':XL.toFixed(2)+'Ω';
+    document.getElementById('xl-Z').textContent  = Z>=1000?(Z/1000).toFixed(2)+'kΩ':Z.toFixed(2)+'Ω';
+    document.getElementById('xl-I').textContent  = I<0.001?(I*1e6).toFixed(2)+'µA':(I*1000).toFixed(3)+'mA';
+    document.getElementById('xl-phi').textContent= phi.toFixed(1)+'°';
+    document.getElementById('xl-Q').textContent  = Q.toFixed(2);
+    document.getElementById('xl-fc').textContent = fmtFreq(fc);
+    drawXL(L,R,f);
+}
+
+function drawXL(L,R,f_op){
+    const canvas=document.getElementById('xl-canvas');
+    if(!canvas) return;
+    const ctx=canvas.getContext('2d');
+    const W=canvas.width,H=canvas.height;
+    const px=60,py=15,pw=W-px-20,ph=H-py-35;
+    ctx.clearRect(0,0,W,H); ctx.fillStyle='#060a14'; ctx.fillRect(0,0,W,H);
+    const fmax=f_op*10; const XL_max=(2*Math.PI*fmax*L)*1.1;
+    const toX=f=>px+(f/fmax)*pw;
+    const toY=xl=>py+ph-(xl/XL_max)*ph;
+    ctx.strokeStyle='#1e293b';ctx.lineWidth=0.5;
+    for(let i=0;i<=5;i++){const y=py+ph*i/5;ctx.beginPath();ctx.moveTo(px,y);ctx.lineTo(px+pw,y);ctx.stroke();}
+    for(let i=0;i<=10;i++){const x=px+pw*i/10;ctx.beginPath();ctx.moveTo(x,py);ctx.lineTo(x,py+ph);ctx.stroke();}
+    // XL curve
+    ctx.beginPath();ctx.strokeStyle='#a855f7';ctx.lineWidth=2.5;
+    for(let i=1;i<=200;i++){const fi=fmax*i/200;const xl=2*Math.PI*fi*L;i===1?ctx.moveTo(toX(fi),toY(xl)):ctx.lineTo(toX(fi),toY(xl));}
+    ctx.stroke();
+    // Z curve
+    ctx.beginPath();ctx.strokeStyle='#06b6d4';ctx.lineWidth=1.5;
+    for(let i=1;i<=200;i++){const fi=fmax*i/200;const xl=2*Math.PI*fi*L;const z=Math.sqrt(R*R+xl*xl);i===1?ctx.moveTo(toX(fi),toY(Math.min(z,XL_max))):ctx.lineTo(toX(fi),toY(Math.min(z,XL_max)));}
+    ctx.stroke();
+    // fc line
+    const fc=R/(2*Math.PI*L);
+    if(fc<fmax){
+        ctx.strokeStyle='#fbbf24';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+        ctx.beginPath();ctx.moveTo(toX(fc),py);ctx.lineTo(toX(fc),py+ph);ctx.stroke();ctx.setLineDash([]);
+        ctx.fillStyle='#fbbf24';ctx.font='9px monospace';ctx.textAlign='center';
+        ctx.fillText('fc='+fmtFreq(fc),toX(fc),py+ph+14);
+    }
+    // Op point
+    const xl_op=2*Math.PI*f_op*L;
+    ctx.beginPath();ctx.arc(toX(f_op),toY(Math.min(xl_op,XL_max*0.99)),5,0,Math.PI*2);ctx.fillStyle='#fbbf24';ctx.fill();
+    ctx.fillStyle='#64748b';ctx.font='10px monospace';ctx.textAlign='right';
+    for(let i=0;i<=5;i++){const xl=XL_max*i/5;ctx.fillText(xl>=1000?(xl/1000).toFixed(1)+'kΩ':xl.toFixed(0)+'Ω',px-4,toY(xl)+4);}
+    ctx.textAlign='center';
+    ctx.fillText(fmtFreq(fmax/4),px+pw/4,py+ph+14);
+    ctx.fillText(fmtFreq(fmax/2),px+pw/2,py+ph+14);
+    ctx.fillText(fmtFreq(fmax),px+pw,py+ph+14);
+    // Legend
+    ctx.fillStyle='#a855f7';ctx.font='9px monospace';ctx.textAlign='left';ctx.fillText('XL',px+pw-60,py+15);
+    ctx.fillStyle='#06b6d4';ctx.fillText('Z',px+pw-40,py+15);
+}
+
+// ===== COMBO =====
+let bobinas=[{L:10e-3,R:1,nombre:'L1',color:'#a855f7'},{L:22e-3,R:2,nombre:'L2',color:'#06b6d4'}];
+let modoBobinas='serie';
+const BCOLORS=['#a855f7','#06b6d4','#ef4444','#22c55e','#f59e0b','#ec4899'];
+function setModoBobinas(m){
+    modoBobinas=m;
+    document.getElementById('btn-bserie').classList.toggle('active',m==='serie');
+    document.getElementById('btn-bparalelo').classList.toggle('active',m==='paralelo');
+    calcCombo();
+}
+function agregarBobina(){
+    if(bobinas.length>=6) return;
+    const i=bobinas.length;
+    bobinas.push({L:10e-3,R:1,nombre:'L'+(i+1),color:BCOLORS[i%6]});
+    renderBobinas();calcCombo();
+}
+function quitarBobina(){if(bobinas.length<=2) return; bobinas.pop();renderBobinas();calcCombo();}
+function renderBobinas(){
+    const c=document.getElementById('bobinas-container');c.innerHTML='';
+    bobinas.forEach((b,i)=>{
+        const d=document.createElement('div');
+        d.style.cssText='border:1px solid #1e293b;border-radius:10px;padding:8px 12px;';
+        d.innerHTML=`<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:${b.color}"></div>
+            <span style="font-size:11px;font-weight:700;color:${b.color}">${b.nombre}</span></div>
+            <div style="display:flex;gap:6px;">
+            <input type="number" value="${(b.L*1e3).toFixed(1)}" step="1" min="0.001"
+                style="background:#0d1117;border:1px solid #1e293b;color:#e2e8f0;border-radius:6px;padding:4px 8px;width:70px;font-family:monospace;font-size:12px;outline:none;"
+                oninput="bobinas[${i}].L=parseFloat(this.value)*1e-3||1e-3; calcCombo()">
+            <span style="color:#64748b;font-size:10px;align-self:center;">mH</span>
+            <input type="number" value="${b.R}" step="0.1" min="0"
+                style="background:#0d1117;border:1px solid #1e293b;color:#e2e8f0;border-radius:6px;padding:4px 8px;width:55px;font-family:monospace;font-size:12px;outline:none;"
+                oninput="bobinas[${i}].R=parseFloat(this.value)||0; calcCombo()">
+            <span style="color:#64748b;font-size:10px;align-self:center;">Ω</span></div>`;
+        c.appendChild(d);
+    });
+}
+function calcCombo(){
+    let Leq,Req;
+    if(modoBobinas==='serie'){
+        Leq=bobinas.reduce((s,b)=>s+b.L,0);
+        Req=bobinas.reduce((s,b)=>s+b.R,0);
+    } else {
+        Leq=1/bobinas.reduce((s,b)=>s+1/b.L,0);
+        Req=1/bobinas.reduce((s,b)=>s+1/b.R,0);
+    }
+    document.getElementById('combo-Leq').textContent=fmtL(Leq);
+    document.getElementById('combo-Req').textContent=Req.toFixed(3)+' Ω';
+    document.getElementById('combo-formula').textContent=modoBobinas==='serie'?'Serie: Leq = ΣLn | Req = ΣRn':'Paralelo: 1/Leq = Σ1/Ln';
+    drawComboSVG();
+}
+function drawComboSVG(){
+    const svg=document.getElementById('combo-svg');
+    const ns='http://www.w3.org/2000/svg';svg.innerHTML='';
+    const el=(tag,attrs,txt)=>{const e=document.createElementNS(ns,tag);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));if(txt!==undefined)e.textContent=txt;return e;};
+    const W=580,H=200,n=bobinas.length;
+    if(modoBobinas==='serie'){
+        const spacing=W/(n+1);
+        let x=spacing/2;
+        svg.appendChild(el('line',{x1:10,y1:H/2,x2:x,y2:H/2,stroke:'#ef4444','stroke-width':2}));
+        bobinas.forEach((b,i)=>{
+            svg.appendChild(el('rect',{x:x,y:H/2-18,width:60,height:36,rx:8,fill:'#1e0a2e',stroke:b.color,'stroke-width':2}));
+            svg.appendChild(el('text',{x:x+30,y:H/2+5,'text-anchor':'middle',fill:b.color,'font-size':10,'font-weight':'bold'},b.nombre));
+            svg.appendChild(el('text',{x:x+30,y:H/2+18,'text-anchor':'middle',fill:'#64748b','font-size':9},fmtL(b.L)));
+            if(i<n-1){svg.appendChild(el('line',{x1:x+60,y1:H/2,x2:x+spacing,y2:H/2,stroke:'#64748b','stroke-width':1.5}));}
+            x+=spacing;
+        });
+        svg.appendChild(el('line',{x1:x-spacing+60,y1:H/2,x2:W-10,y2:H/2,stroke:'#374151','stroke-width':2}));
+    } else {
+        const bw=60,bh=36,xL=80,xR=W-80;
+        svg.appendChild(el('line',{x1:10,y1:H/2,x2:xL,y2:H/2,stroke:'#ef4444','stroke-width':2}));
+        svg.appendChild(el('line',{x1:xR,y1:H/2,x2:W-10,y2:H/2,stroke:'#374151','stroke-width':2}));
+        svg.appendChild(el('line',{x1:xL,y1:30,x2:xL,y2:H-30,stroke:'#374151','stroke-width':1}));
+        svg.appendChild(el('line',{x1:xR,y1:30,x2:xR,y2:H-30,stroke:'#374151','stroke-width':1}));
+        const spacing=(H-60)/(n-1||1);
+        bobinas.forEach((b,i)=>{
+            const y=30+i*spacing;
+            const mx=(xL+xR)/2-bw/2;
+            svg.appendChild(el('line',{x1:xL,y1:y+bh/2,x2:mx,y2:y+bh/2,stroke:b.color,'stroke-width':1.5}));
+            svg.appendChild(el('rect',{x:mx,y:y,width:bw,height:bh,rx:8,fill:'#1e0a2e',stroke:b.color,'stroke-width':2}));
+            svg.appendChild(el('text',{x:mx+bw/2,y:y+bh/2+5,'text-anchor':'middle',fill:b.color,'font-size':10,'font-weight':'bold'},b.nombre));
+            svg.appendChild(el('line',{x1:mx+bw,y1:y+bh/2,x2:xR,y2:y+bh/2,stroke:b.color,'stroke-width':1.5}));
+        });
+    }
+}
+
+// ===== FISICA =====
+function calcFisica(){
+    const tipo=document.getElementById('fis-tipo').value;
+    const N=parseInt(document.getElementById('fis-N').value)||50;
+    const D=parseFloat(document.getElementById('fis-D').value)*1e-3||0.02;
+    const l=parseFloat(document.getElementById('fis-l').value)*1e-3||0.03;
+    const muSel=document.getElementById('fis-mu').value;
+    const mu_r = muSel==='custom' ? parseFloat(document.getElementById('fis-mu-val').value)||1 : parseFloat(muSel)||75;
+    document.getElementById('fis-mu-custom').classList.toggle('hidden', muSel!=='custom');
+    const mu0=4*Math.PI*1e-7;
+    const r=D/2;
+    const A=Math.PI*r*r;
+    let L_H;
+    if(tipo==='solenoide'){
+        L_H=mu0*mu_r*N*N*A/l;
+    } else {
+        const Rm=D/2;
+        L_H=mu0*mu_r*N*N*A/(2*Math.PI*Rm);
+    }
+    const AL=L_H*1e9/(N*N);
+    const Ltarget=parseFloat(document.getElementById('fis-Ltarget').value)*1e-6||100e-6;
+    const Ntarget=Math.ceil(Math.sqrt(Ltarget/(mu0*mu_r*A/(tipo==='solenoide'?l:2*Math.PI*(D/2)))));
+    document.getElementById('fis-L').textContent=fmtL(L_H);
+    document.getElementById('fis-A').textContent=(A*1e6).toFixed(3)+' mm²';
+    document.getElementById('fis-AL').textContent=AL.toFixed(2)+' nH/N²';
+    document.getElementById('fis-Ntarget').textContent=Ntarget+' vueltas';
+    drawFisicaSVG(tipo,N,D*1e3,l*1e3,mu_r);
+}
+function drawFisicaSVG(tipo,N,D_mm,l_mm,mu_r){
+    const svg=document.getElementById('fis-svg');
+    const ns='http://www.w3.org/2000/svg';svg.innerHTML='';
+    const el=(tag,attrs,txt)=>{const e=document.createElementNS(ns,tag);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));if(txt!==undefined)e.textContent=txt;return e;};
+    const W=340,H=260;
+    if(tipo==='solenoide'){
+        const cx=W/2,cy=H/2-20,sw=180,sh=60;
+        svg.appendChild(el('rect',{x:cx-sw/2,y:cy-sh/2,width:sw,height:sh,rx:8,fill:'#1e0a2e',stroke:'#a855f7','stroke-width':2}));
+        const turns=Math.min(N,20);
+        for(let i=0;i<turns;i++){
+            const x=cx-sw/2+15+i*(sw-30)/(turns-1||1);
+            svg.appendChild(el('line',{x1:x,y1:cy-sh/2,x2:x,y2:cy+sh/2,stroke:'#a855f777','stroke-width':2}));
+        }
+        svg.appendChild(el('text',{x:cx,y:cy+5,'text-anchor':'middle',fill:'#a855f7','font-size':11,'font-weight':'bold'},`N=${N} vueltas`));
+        svg.appendChild(el('text',{x:cx,y:cy+20,'text-anchor':'middle',fill:'#64748b','font-size':9},`µr=${mu_r}`));
+        svg.appendChild(el('line',{x1:cx-sw/2-20,y1:cy,x2:cx-sw/2,y2:cy,stroke:'#ef4444','stroke-width':2}));
+        svg.appendChild(el('line',{x1:cx+sw/2,y1:cy,x2:cx+sw/2+20,y2:cy,stroke:'#374151','stroke-width':2}));
+        svg.appendChild(el('text',{x:cx,y:cy+sh/2+18,'text-anchor':'middle',fill:'#475569','font-size':9},`l=${l_mm}mm | D=${D_mm}mm`));
+        // Field lines
+        for(let i=-2;i<=2;i++){
+            const y=cy+i*10;
+            svg.appendChild(el('line',{x1:cx-sw/2+5,y1:y,x2:cx+sw/2-5,y2:y,stroke:'#a855f722','stroke-width':1,'stroke-dasharray':'4 4'}));
+        }
+    } else {
+        const cx=W/2,cy=H/2-10,r=70;
+        svg.appendChild(el('circle',{cx,cy,r,fill:'none',stroke:'#1e293b','stroke-width':20}));
+        svg.appendChild(el('circle',{cx,cy,r,fill:'none',stroke:'#a855f7','stroke-width':2}));
+        const turns=Math.min(N,24);
+        for(let i=0;i<turns;i++){
+            const angle=i*2*Math.PI/turns;
+            const x1=(cx+r*Math.cos(angle)).toFixed(1);
+            const y1=(cy+r*Math.sin(angle)).toFixed(1);
+            const x2=(cx+(r+12)*Math.cos(angle)).toFixed(1);
+            const y2=(cy+(r+12)*Math.sin(angle)).toFixed(1);
+            svg.appendChild(el('line',{x1,y1,x2,y2,stroke:'#a855f7','stroke-width':2.5}));
+        }
+        svg.appendChild(el('text',{x:cx,y:cy+5,'text-anchor':'middle',fill:'#a855f7','font-size':10,'font-weight':'bold'},`N=${N}`));
+        svg.appendChild(el('text',{x:cx,y:cy+18,'text-anchor':'middle',fill:'#64748b','font-size':9},`µr=${mu_r}`));
+        svg.appendChild(el('text',{x:cx,y:cy+r+28,'text-anchor':'middle',fill:'#475569','font-size':9},`D=${D_mm}mm`));
+    }
+}
+
+// Init
+renderBobinas();
+calcRL();
+calcXL();
+calcCombo();
+calcFisica();
+
+document.getElementById('fis-mu').addEventListener('change',function(){
+    document.getElementById('fis-mu-custom').classList.toggle('hidden',this.value!=='custom');
+    calcFisica();
+});
+</script>
+</body>
+</html>

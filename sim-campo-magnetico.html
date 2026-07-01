@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sr. Z — Campo Magnético</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: radial-gradient(ellipse at 50% 20%, #1a2744 0%, #0a0f1e 55%, #060a14 100%); min-height:100vh; user-select:none; }
+        .card { background:rgba(13,19,33,.85); border:1px solid #1e293b; border-radius:14px; }
+        #mag-canvas { cursor:crosshair; }
+        .tool-btn { padding:5px 10px; border-radius:7px; font-size:11px; font-weight:700; cursor:pointer; border:1px solid #1e293b; background:transparent; color:#64748b; transition:all .15s; }
+        .tool-btn.active { border-color:#06b6d4; color:#06b6d4; background:#031220; }
+        .tool-btn:hover:not(.active) { border-color:#334155; color:#94a3b8; }
+        .formula { font-family:monospace; font-size:11px; color:#94a3b8; background:#0d1117; padding:7px 11px; border-radius:7px; border-left:2px solid #06b6d4; }
+        input[type=range] { -webkit-appearance:none; width:100%; height:5px; border-radius:3px; background:#1e293b; outline:none; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:#06b6d4; cursor:pointer; }
+    </style>
+</head>
+<body class="text-slate-100 font-sans">
+
+<div class="flex items-center gap-4 px-5 py-2 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-sm sticky top-0 z-50">
+    <a href="index.html" class="text-xs text-slate-500 hover:text-cyan-400 transition">← Panel</a>
+    <span class="text-sm font-black uppercase tracking-wide text-slate-200">🧲 Simulador Campo Magnético</span>
+    <span class="text-[10px] text-slate-600">Conductores con corriente — campo B circular</span>
+</div>
+
+<div class="max-w-full mx-auto p-4 flex gap-4 flex-col lg:flex-row">
+
+<!-- TOOLBAR -->
+<div class="card p-4 flex flex-col gap-3 lg:w-52 flex-shrink-0">
+    <div class="text-[10px] font-bold text-cyan-400 uppercase tracking-wider">Herramienta</div>
+    <div class="flex flex-col gap-1.5">
+        <button class="tool-btn active" onclick="setTool('out')"  id="btn-out">⊙ Corriente saliente</button>
+        <button class="tool-btn"        onclick="setTool('in')"   id="btn-in">⊗ Corriente entrante</button>
+        <button class="tool-btn"        onclick="setTool('move')" id="btn-move">✥ Mover conductor</button>
+        <button class="tool-btn"        onclick="setTool('del')"  id="btn-del">✕ Eliminar</button>
+    </div>
+
+    <div class="border-t border-slate-800 pt-3 space-y-2">
+        <div class="text-[10px] font-bold text-slate-500 uppercase">Intensidad I</div>
+        <input type="range" id="current-mag" min="1" max="20" step="1" value="5"
+            oninput="document.getElementById('cur-val').textContent=this.value+' A'">
+        <div class="text-[10px] text-cyan-400 font-mono text-center" id="cur-val">5 A</div>
+    </div>
+
+    <div class="border-t border-slate-800 pt-3 space-y-2">
+        <div class="text-[10px] font-bold text-slate-500 uppercase">Visualización</div>
+        <label class="flex items-center gap-2 text-[11px] text-slate-400 cursor-pointer">
+            <input type="checkbox" id="show-lines" checked onchange="redraw()" class="accent-cyan-500"> Líneas de campo
+        </label>
+        <label class="flex items-center gap-2 text-[11px] text-slate-400 cursor-pointer">
+            <input type="checkbox" id="show-arrows" checked onchange="redraw()" class="accent-cyan-500"> Flechas
+        </label>
+        <label class="flex items-center gap-2 text-[11px] text-slate-400 cursor-pointer">
+            <input type="checkbox" id="show-grid" checked onchange="redraw()" class="accent-cyan-500"> Grilla vectorial
+        </label>
+        <label class="flex items-center gap-2 text-[11px] text-slate-400 cursor-pointer">
+            <input type="checkbox" id="show-force" onchange="redraw()" class="accent-cyan-500"> Fuerza entre conductores
+        </label>
+    </div>
+
+    <div class="border-t border-slate-800 pt-3 space-y-1.5">
+        <div class="text-[10px] font-bold text-slate-500 uppercase mb-1">Ejemplos</div>
+        <button onclick="loadExample('uno')"      class="tool-btn w-full">1 conductor</button>
+        <button onclick="loadExample('dos-igual')"class="tool-btn w-full">2 paralelos iguales</button>
+        <button onclick="loadExample('dos-op')"   class="tool-btn w-full">2 paralelos opuestos</button>
+        <button onclick="loadExample('solenoide')"class="tool-btn w-full">Solenoide (5 hilos)</button>
+        <button onclick="loadExample('cuadrado')" class="tool-btn w-full">4 conductores</button>
+    </div>
+
+    <div class="border-t border-slate-800 pt-3">
+        <button onclick="clearAll()" class="tool-btn w-full">🗑 Limpiar</button>
+    </div>
+
+    <div class="space-y-1.5">
+        <div class="formula">B = µ₀I / 2πr</div>
+        <div class="formula">F/L = µ₀I₁I₂/2πd</div>
+        <div class="text-[9px] text-slate-600">µ₀ = 4π×10⁻⁷ T·m/A</div>
+    </div>
+
+    <div id="info-mag" class="text-[10px] text-slate-500 min-h-12 bg-slate-950 rounded-lg p-2"></div>
+</div>
+
+<!-- CANVAS -->
+<div class="flex-1 card p-2 overflow-hidden">
+    <canvas id="mag-canvas" width="780" height="580"></canvas>
+</div>
+
+</div>
+
+<script>
+const canvas = document.getElementById('mag-canvas');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+const mu0 = 4*Math.PI*1e-7;
+const SCALE = 50; // px per meter
+
+let tool = 'out';
+let conductors = []; // {x,y,I} positive=out, negative=in
+let dragging = null;
+let mouseX = W/2, mouseY = H/2;
+
+function setTool(t) {
+    tool=t;
+    document.querySelectorAll('.tool-btn[id^=btn-]').forEach(b=>b.classList.remove('active'));
+    document.getElementById('btn-'+t)?.classList.add('active');
+}
+
+function getB(px,py) {
+    let bx=0, by=0;
+    conductors.forEach(c=>{
+        const dx=px-c.x, dy=py-c.y;
+        const r2=dx*dx+dy*dy;
+        if(r2<4) return;
+        const r=Math.sqrt(r2);
+        // B magnitude (scaled), direction perpendicular to r (right-hand rule)
+        const mag=c.I/r;  // proportional to µ₀I/2πr, scaled
+        // For current out (+z), B is counter-clockwise: (-dy, dx)/r
+        bx += mag*(-dy)/r;
+        by += mag*(dx)/r;
+    });
+    return {bx,by};
+}
+
+function redraw() {
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#020810'; ctx.fillRect(0,0,W,H);
+
+    if(document.getElementById('show-lines').checked)  drawFieldLines();
+    if(document.getElementById('show-grid').checked)   drawVectorGrid();
+    if(document.getElementById('show-force').checked)  drawForces();
+    drawConductors();
+}
+
+function drawFieldLines() {
+    if(conductors.length===0) return;
+    // For each conductor, draw circular field lines at various radii
+    conductors.forEach(c=>{
+        const radii=[20,40,65,95,130,170];
+        radii.forEach(r=>{
+            const intensity=Math.min(1,Math.abs(c.I)/15);
+            const alpha=Math.floor(intensity*140+30).toString(16).padStart(2,'0');
+            ctx.beginPath();
+            ctx.arc(c.x,c.y,r,0,Math.PI*2);
+            ctx.strokeStyle=(c.I>0?'#06b6d4':'#f59e0b')+alpha;
+            ctx.lineWidth=1.2;
+            ctx.stroke();
+            // Arrow on circle
+            if(document.getElementById('show-arrows').checked){
+                const ang=c.I>0?-Math.PI/2:Math.PI/2; // top of circle, CCW or CW
+                const ax=c.x+r*Math.cos(ang);
+                const ay=c.y+r*Math.sin(ang);
+                const tangDir=c.I>0?0:Math.PI;
+                const col=c.I>0?'#06b6d4':'#f59e0b';
+                ctx.beginPath();ctx.strokeStyle=col+alpha;ctx.lineWidth=1.5;
+                ctx.moveTo(ax,ay);
+                ctx.lineTo(ax+7*Math.cos(tangDir-0.4),ay+7*Math.sin(tangDir-0.4));
+                ctx.moveTo(ax,ay);
+                ctx.lineTo(ax+7*Math.cos(tangDir+0.4),ay+7*Math.sin(tangDir+0.4));
+                ctx.stroke();
+            }
+        });
+    });
+
+    // Superposition lines — trace from distributed seed points
+    if(conductors.length>1){
+        const seeds=[];
+        for(let a=0;a<16;a++){
+            seeds.push({x:W/2+200*Math.cos(2*Math.PI*a/16),y:H/2+200*Math.sin(2*Math.PI*a/16)});
+        }
+        seeds.forEach(s=>{
+            let x=s.x,y=s.y;
+            ctx.beginPath();ctx.moveTo(x,y);
+            ctx.strokeStyle='#06b6d422';ctx.lineWidth=1;
+            for(let i=0;i<800;i++){
+                const {bx,by}=getB(x,y);
+                const mag=Math.sqrt(bx*bx+by*by);
+                if(mag<1e-9) break;
+                x+=bx/mag*3; y+=by/mag*3;
+                if(x<0||x>W||y<0||y>H) break;
+                ctx.lineTo(x,y);
+            }
+            ctx.stroke();
+        });
+    }
+}
+
+function drawVectorGrid() {
+    const step=35;
+    for(let y=step/2;y<H;y+=step){
+        for(let x=step/2;x<W;x+=step){
+            const {bx,by}=getB(x,y);
+            const mag=Math.sqrt(bx*bx+by*by);
+            if(mag<1e-6) continue;
+            const len=Math.min(12, mag*0.8);
+            const nx=bx/mag, ny=by/mag;
+            const alpha=Math.min(1,mag/30);
+            const col=`rgba(6,182,212,${(alpha*0.6).toFixed(2)})`;
+            const ex=x+nx*len, ey=y+ny*len;
+            ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(ex,ey);
+            ctx.strokeStyle=col;ctx.lineWidth=1;ctx.stroke();
+            // Arrowhead
+            const ang=Math.atan2(ny,nx);
+            ctx.beginPath();
+            ctx.moveTo(ex,ey);
+            ctx.lineTo(ex-4*Math.cos(ang-0.5),ey-4*Math.sin(ang-0.5));
+            ctx.moveTo(ex,ey);
+            ctx.lineTo(ex-4*Math.cos(ang+0.5),ey-4*Math.sin(ang+0.5));
+            ctx.strokeStyle=col;ctx.stroke();
+        }
+    }
+}
+
+function drawForces() {
+    // Draw force arrows between conductor pairs
+    for(let i=0;i<conductors.length;i++){
+        for(let j=i+1;j<conductors.length;j++){
+            const a=conductors[i],b=conductors[j];
+            const dx=b.x-a.x,dy=b.y-a.y;
+            const r=Math.sqrt(dx*dx+dy*dy);
+            if(r<1) continue;
+            const attract=Math.sign(a.I)===Math.sign(b.I);
+            const col=attract?'#22c55e':'#ef4444';
+            const fDir=attract?1:-1; // attract=toward each other
+            const nx=dx/r, ny=dy/r;
+            // Arrow on conductor A
+            ctx.beginPath();ctx.strokeStyle=col;ctx.lineWidth=2;
+            ctx.moveTo(a.x,a.y);ctx.lineTo(a.x+nx*fDir*30,a.y+ny*fDir*30);ctx.stroke();
+            ctx.beginPath();const ang=Math.atan2(ny*fDir,nx*fDir);
+            ctx.moveTo(a.x+nx*fDir*30,a.y+ny*fDir*30);
+            ctx.lineTo(a.x+nx*fDir*30-7*Math.cos(ang-0.5),a.y+ny*fDir*30-7*Math.sin(ang-0.5));
+            ctx.moveTo(a.x+nx*fDir*30,a.y+ny*fDir*30);
+            ctx.lineTo(a.x+nx*fDir*30-7*Math.cos(ang+0.5),a.y+ny*fDir*30-7*Math.sin(ang+0.5));
+            ctx.stroke();
+            // Mid label
+            ctx.fillStyle=col;ctx.font='8px monospace';ctx.textAlign='center';
+            ctx.fillText(attract?'Atracción':'Repulsión',(a.x+b.x)/2,(a.y+b.y)/2-6);
+        }
+    }
+}
+
+function drawConductors() {
+    conductors.forEach(c=>{
+        const isOut=c.I>0;
+        const col=isOut?'#06b6d4':'#f59e0b';
+        const grad=ctx.createRadialGradient(c.x,c.y,2,c.x,c.y,20);
+        grad.addColorStop(0,col+'88');grad.addColorStop(1,col+'00');
+        ctx.beginPath();ctx.arc(c.x,c.y,20,0,Math.PI*2);ctx.fillStyle=grad;ctx.fill();
+        ctx.beginPath();ctx.arc(c.x,c.y,12,0,Math.PI*2);
+        ctx.fillStyle=col+'33';ctx.strokeStyle=col;ctx.lineWidth=2;ctx.fill();ctx.stroke();
+        // Symbol
+        ctx.fillStyle=col;ctx.font='bold 14px monospace';ctx.textAlign='center';
+        ctx.fillText(isOut?'⊙':'⊗',c.x,c.y+5);
+        // Label
+        ctx.fillStyle='#94a3b8';ctx.font='8px monospace';
+        ctx.fillText(`${Math.abs(c.I)}A`,c.x,c.y+26);
+    });
+
+    // Hover
+    if(tool==='out'||tool==='in'){
+        ctx.beginPath();ctx.arc(mouseX,mouseY,12,0,Math.PI*2);
+        ctx.strokeStyle=tool==='out'?'#06b6d444':'#f59e0b44';ctx.lineWidth=2;ctx.setLineDash([4,4]);ctx.stroke();ctx.setLineDash([]);
+    }
+}
+
+// Events
+canvas.addEventListener('click',e=>{
+    const r=canvas.getBoundingClientRect();
+    const mx=e.clientX-r.left,my=e.clientY-r.top;
+    if(tool==='out'||tool==='in'){
+        const mag=parseInt(document.getElementById('current-mag').value)||5;
+        conductors.push({x:mx,y:my,I:tool==='out'?mag:-mag});
+        redraw(); updateInfo(mx,my);
+    } else if(tool==='del'){
+        const before=conductors.length;
+        conductors=conductors.filter(c=>Math.hypot(mx-c.x,my-c.y)>14);
+        if(conductors.length<before) redraw();
+    }
+});
+
+canvas.addEventListener('mousedown',e=>{
+    if(tool!=='move') return;
+    const r=canvas.getBoundingClientRect();
+    const mx=e.clientX-r.left,my=e.clientY-r.top;
+    dragging=conductors.find(c=>Math.hypot(mx-c.x,my-c.y)<14)||null;
+});
+canvas.addEventListener('mousemove',e=>{
+    const r=canvas.getBoundingClientRect();
+    mouseX=e.clientX-r.left;mouseY=e.clientY-r.top;
+    if(dragging){dragging.x=mouseX;dragging.y=mouseY;redraw();}
+    else{updateInfo(mouseX,mouseY);if(tool==='out'||tool==='in')redraw();}
+});
+canvas.addEventListener('mouseup',()=>{if(dragging){redraw();dragging=null;}});
+
+function updateInfo(mx,my) {
+    const {bx,by}=getB(mx,my);
+    const mag=Math.sqrt(bx*bx+by*by);
+    const ang=Math.atan2(by,bx)*180/Math.PI;
+    document.getElementById('info-mag').innerHTML=
+        `<div class="text-cyan-400 font-bold mb-1">Cursor (${Math.round(mx)}, ${Math.round(my)})</div>
+        <div>|B| = ${mag.toFixed(2)} u.a.</div>
+        <div>θ = ${ang.toFixed(1)}°</div>
+        <div class="mt-1 text-slate-600">Conductores: ${conductors.length}</div>`;
+}
+
+function clearAll(){ conductors=[]; redraw(); }
+
+function loadExample(name){
+    conductors=[];
+    const cx=W/2,cy=H/2,d=100;
+    if(name==='uno'){
+        conductors=[{x:cx,y:cy,I:8}];
+    } else if(name==='dos-igual'){
+        conductors=[{x:cx-d,y:cy,I:5},{x:cx+d,y:cy,I:5}];
+    } else if(name==='dos-op'){
+        conductors=[{x:cx-d,y:cy,I:5},{x:cx+d,y:cy,I:-5}];
+    } else if(name==='solenoide'){
+        for(let i=0;i<5;i++) conductors.push({x:cx-160+i*80,y:cy,I:8});
+    } else if(name==='cuadrado'){
+        conductors=[{x:cx-d,y:cy-d,I:5},{x:cx+d,y:cy-d,I:-5},{x:cx-d,y:cy+d,I:-5},{x:cx+d,y:cy+d,I:5}];
+    }
+    redraw();
+}
+
+loadExample('dos-igual');
+</script>
+</body>
+</html>

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sr. Z — Comparador Baterías</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: radial-gradient(ellipse at 50% 20%, #1a2744 0%, #0a0f1e 55%, #060a14 100%); min-height:100vh; }
+        .card { background:rgba(13,19,33,.85); border:1px solid #1e293b; border-radius:14px; }
+        input[type=number], select { background:#0d1117; border:1px solid #1e293b; color:#e2e8f0; border-radius:8px; padding:6px 10px; width:100%; font-family:monospace; font-size:13px; outline:none; transition:border .2s; }
+        input[type=number]:focus { border-color:#06b6d4; }
+        select option { background:#0d1117; }
+        .result-val { font-family:'Courier New',monospace; color:#00ff41; text-shadow:0 0 6px #00ff41; }
+        .formula { font-family:monospace; font-size:11px; color:#94a3b8; background:#0d1117; padding:8px 12px; border-radius:8px; border-left:2px solid #22c55e; }
+        .bat-card { border:1px solid #1e293b; border-radius:12px; padding:14px; transition:border .2s; }
+        .bat-card:hover { border-color:#334155; }
+        .tab-btn { padding:6px 14px; border-radius:8px; font-size:11px; font-weight:700; text-transform:uppercase; cursor:pointer; border:1px solid #1e293b; background:transparent; color:#64748b; transition:all .2s; }
+        .tab-btn.active { background:#0a1f14; border-color:#22c55e; color:#22c55e; }
+        .bar-wrap { background:#1e293b; border-radius:4px; height:8px; width:100%; }
+        .bar-fill { height:100%; border-radius:4px; transition:width .4s; }
+        .winner { border-color:#22c55e !important; background:rgba(34,197,94,.04); }
+    </style>
+</head>
+<body class="text-slate-100 font-sans">
+
+<div class="flex items-center gap-4 px-5 py-2 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-sm sticky top-0 z-50">
+    <a href="index.html" class="text-xs text-slate-500 hover:text-green-400 transition">← Panel</a>
+    <span class="text-sm font-black uppercase tracking-wide text-slate-200">🔋 Comparador de Baterías</span>
+    <span class="text-[10px] text-slate-600">Capacidad, autonomía, densidad energética</span>
+</div>
+
+<div class="max-w-6xl mx-auto p-5 space-y-5">
+
+<div class="flex gap-2 flex-wrap">
+    <button class="tab-btn active" onclick="setTab('comparar')" id="tab-comparar">Comparar baterías</button>
+    <button class="tab-btn"        onclick="setTab('autonomia')" id="tab-autonomia">Autonomía</button>
+    <button class="tab-btn"        onclick="setTab('serie-par')" id="tab-serie-par">Serie / Paralelo</button>
+</div>
+
+<!-- ===== COMPARAR ===== -->
+<div id="panel-comparar" class="space-y-4">
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4" id="baterias-grid"></div>
+
+    <div class="card p-5">
+        <div class="text-xs font-bold text-green-400 uppercase tracking-wider mb-4">Comparativa</div>
+        <canvas id="comp-canvas" width="900" height="260" class="w-full rounded-xl bg-slate-950"></canvas>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-4" id="comp-tabla"></div>
+    </div>
+</div>
+
+<!-- ===== AUTONOMIA ===== -->
+<div id="panel-autonomia" class="grid grid-cols-1 lg:grid-cols-3 gap-5 hidden">
+    <div class="card p-5 space-y-4">
+        <div class="text-xs font-bold text-green-400 uppercase tracking-wider">Batería</div>
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase">Capacidad (mAh)</label>
+            <input type="number" id="aut-mAh" value="2500" step="100" min="1" oninput="calcAutonomia()">
+        </div>
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase">Tensión nominal (V)</label>
+            <input type="number" id="aut-V" value="3.7" step="0.1" min="0.1" oninput="calcAutonomia()">
+        </div>
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase">Eficiencia descarga (%)</label>
+            <input type="number" id="aut-eff" value="85" step="1" min="1" max="100" oninput="calcAutonomia()">
+        </div>
+        <div class="border-t border-slate-800 pt-3">
+            <div class="text-[11px] text-slate-500 uppercase font-bold mb-2">Consumidores</div>
+            <div id="consumers-list" class="space-y-2"></div>
+            <button onclick="addConsumer()" class="mt-2 w-full text-[10px] px-3 py-1.5 rounded border border-slate-700 text-green-400 hover:border-green-500 transition">+ Añadir consumidor</button>
+        </div>
+        <div class="space-y-2">
+            <div class="text-[11px] text-slate-500 uppercase font-bold">Presets</div>
+            <button onclick="presetArduino()" class="w-full text-[10px] px-3 py-1.5 rounded border border-slate-700 text-slate-400 hover:border-green-500 hover:text-green-400 transition text-left">Arduino + sensores + WiFi</button>
+            <button onclick="presetESP()" class="w-full text-[10px] px-3 py-1.5 rounded border border-slate-700 text-slate-400 hover:border-green-500 hover:text-green-400 transition text-left">ESP32 modo activo/sleep</button>
+            <button onclick="presetLed()" class="w-full text-[10px] px-3 py-1.5 rounded border border-slate-700 text-slate-400 hover:border-green-500 hover:text-green-400 transition text-left">LEDs decorativos (20×10mA)</button>
+        </div>
+    </div>
+    <div class="card p-5 col-span-2 space-y-4">
+        <div class="text-xs font-bold text-green-400 uppercase tracking-wider">Resultados</div>
+        <div class="bg-slate-950 rounded-xl p-4 grid grid-cols-2 gap-4">
+            <div><div class="text-[10px] text-slate-500 uppercase">Corriente total</div><div id="aut-Itotal" class="result-val text-xl mt-1">—</div></div>
+            <div><div class="text-[10px] text-slate-500 uppercase">Potencia total</div><div id="aut-Ptotal" class="result-val text-xl mt-1">—</div></div>
+            <div><div class="text-[10px] text-slate-500 uppercase">Autonomía</div><div id="aut-horas" class="text-green-400 font-mono text-2xl font-bold mt-1">—</div></div>
+            <div><div class="text-[10px] text-slate-500 uppercase">Energía utilizable</div><div id="aut-Wh" class="result-val text-xl mt-1">—</div></div>
+        </div>
+        <div id="aut-barra-wrap" class="space-y-3"></div>
+        <canvas id="aut-canvas" width="520" height="200" class="w-full rounded-xl bg-slate-950"></canvas>
+    </div>
+</div>
+
+<!-- ===== SERIE / PARALELO ===== -->
+<div id="panel-serie-par" class="grid grid-cols-1 lg:grid-cols-3 gap-5 hidden">
+    <div class="card p-5 space-y-4">
+        <div class="text-xs font-bold text-green-400 uppercase tracking-wider">Celda base</div>
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase">Tensión celda (V)</label>
+            <input type="number" id="sp-V" value="3.7" step="0.1" min="0.1" oninput="calcSP()">
+        </div>
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase">Capacidad celda (mAh)</label>
+            <input type="number" id="sp-mAh" value="3000" step="100" min="1" oninput="calcSP()">
+        </div>
+        <div>
+            <label class="text-[11px] text-slate-500 uppercase">Ri interna (mΩ)</label>
+            <input type="number" id="sp-Ri" value="50" step="1" min="1" oninput="calcSP()">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="text-[11px] text-slate-500 uppercase">Celdas serie (S)</label>
+                <input type="number" id="sp-S" value="3" step="1" min="1" max="20" oninput="calcSP()">
+            </div>
+            <div>
+                <label class="text-[11px] text-slate-500 uppercase">Celdas paralelo (P)</label>
+                <input type="number" id="sp-P" value="1" step="1" min="1" max="20" oninput="calcSP()">
+            </div>
+        </div>
+        <div class="text-[10px] text-slate-600">Ej: 3S1P = 11.1V | 3S2P = 11.1V 6Ah</div>
+        <div class="bg-slate-950 rounded-xl p-4 space-y-2.5">
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">Configuración</span><span id="sp-config" class="text-yellow-400 font-mono font-bold">—</span></div>
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">Tensión pack</span><span id="sp-Vpack" class="result-val text-xl">—</span></div>
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">Capacidad pack</span><span id="sp-mAhpack" class="result-val">—</span></div>
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">Energía pack</span><span id="sp-Wh" class="result-val">—</span></div>
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">Ri pack</span><span id="sp-Ripack" class="result-val">—</span></div>
+            <div class="flex justify-between"><span class="text-[11px] text-slate-500">Celdas totales</span><span id="sp-total" class="result-val">—</span></div>
+        </div>
+        <div class="space-y-1.5">
+            <div class="formula">V_pack = V_celda × S</div>
+            <div class="formula">C_pack = C_celda × P (mAh)</div>
+            <div class="formula">Ri_pack = Ri × S / P</div>
+        </div>
+    </div>
+    <div class="card p-5 col-span-2">
+        <div class="text-[10px] text-slate-500 uppercase font-bold mb-3">Diagrama del pack</div>
+        <svg id="sp-svg" viewBox="0 0 580 280" class="w-full rounded-xl bg-slate-950"></svg>
+    </div>
+</div>
+
+</div>
+
+<script>
+// ===== DATOS BATERÍAS =====
+const BAT_DB = [
+    { id:'cr2032', nombre:'CR2032', tipo:'Litio primaria', V:3.0, mAh:225, Wh:0.68, peso:3, ciclos:1, ri:10000, color:'#64748b' },
+    { id:'aaa',    nombre:'AAA',    tipo:'Alcalina',       V:1.5, mAh:1200, Wh:1.8, peso:11.5, ciclos:1, ri:500, color:'#94a3b8' },
+    { id:'aa',     nombre:'AA',     tipo:'Alcalina',       V:1.5, mAh:3000, Wh:4.5, peso:24, ciclos:1, ri:300, color:'#cbd5e1' },
+    { id:'9v',     nombre:'9V 6F22',tipo:'Alcalina',       V:9.0, mAh:550, Wh:4.95, peso:46, ciclos:1, ri:1500, color:'#f59e0b' },
+    { id:'18650',  nombre:'18650',  tipo:'Li-Ion',         V:3.7, mAh:3200, Wh:11.8, peso:47, ciclos:500, ri:50, color:'#06b6d4' },
+    { id:'21700',  nombre:'21700',  tipo:'Li-Ion',         V:3.7, mAh:5000, Wh:18.5, peso:70, ciclos:800, ri:30, color:'#0ea5e9' },
+    { id:'lipo1s', nombre:'LiPo 1S',tipo:'LiPo',           V:3.7, mAh:2500, Wh:9.25, peso:42, ciclos:300, ri:30, color:'#a855f7' },
+    { id:'lifepo', nombre:'LiFePO4',tipo:'LFP',            V:3.2, mAh:3000, Wh:9.6, peso:70, ciclos:2000, ri:15, color:'#22c55e' },
+    { id:'nimh',   nombre:'NiMH AA',tipo:'NiMH',           V:1.2, mAh:2500, Wh:3.0, peso:26, ciclos:1000, ri:80, color:'#f97316' },
+    { id:'leadacid',nombre:'Pb-Ac 12V',tipo:'Pb-Ácido',   V:12.0, mAh:7000, Wh:84, peso:2400, ciclos:300, ri:10, color:'#ef4444' },
+    { id:'custom1',nombre:'Personalizada A',tipo:'Custom', V:3.7, mAh:2000, Wh:7.4, peso:50, ciclos:300, ri:50, color:'#fbbf24' },
+    { id:'custom2',nombre:'Personalizada B',tipo:'Custom', V:7.4, mAh:5000, Wh:37, peso:200, ciclos:300, ri:40, color:'#ec4899' },
+];
+
+let selBats = ['18650','lifepo','lipo1s'];
+const TABS_MAIN = ['comparar','autonomia','serie-par'];
+
+function setTab(t) {
+    TABS_MAIN.forEach(id=>{
+        document.getElementById('panel-'+id).classList.toggle('hidden',id!==t);
+        document.getElementById('tab-'+id).classList.toggle('active',id===t);
+    });
+    if(t==='comparar') renderComparar();
+    if(t==='autonomia') { renderConsumers(); calcAutonomia(); }
+    if(t==='serie-par') calcSP();
+}
+
+// ===== COMPARAR =====
+function renderComparar() {
+    const grid = document.getElementById('baterias-grid');
+    grid.innerHTML = '';
+    selBats.forEach((bid,idx) => {
+        const b = BAT_DB.find(x=>x.id===bid) || BAT_DB[0];
+        const densE = (b.Wh / (b.peso/1000)).toFixed(0);
+        const densV = b.peso > 0 ? (b.Wh / (b.peso)).toFixed(2) : '—';
+        const div = document.createElement('div');
+        div.className = 'bat-card';
+        div.innerHTML = `
+        <div class="flex justify-between items-center mb-3">
+            <div>
+                <select class="text-sm font-bold" style="background:transparent;border:none;color:${b.color};font-weight:700;outline:none;width:160px;"
+                    onchange="selBats[${idx}]=this.value; renderComparar(); drawCompCanvas();">
+                    ${BAT_DB.map(x=>`<option value="${x.id}" ${x.id===bid?'selected':''}>${x.nombre}</option>`).join('')}
+                </select>
+                <div class="text-[10px] text-slate-600 mt-0.5">${b.tipo}</div>
+            </div>
+            <div class="w-8 h-12 rounded-md" style="background:${b.color}22;border:2px solid ${b.color}44;"></div>
+        </div>
+        <div class="space-y-1.5 text-[11px]">
+            ${row('Tensión',b.V+' V',b.color)}
+            ${row('Capacidad',b.mAh+' mAh',b.color)}
+            ${row('Energía',b.Wh.toFixed(2)+' Wh',b.color)}
+            ${row('Densidad energética',densE+' Wh/kg',b.color)}
+            ${row('Peso',b.peso+(b.peso>1000?' g ('+( b.peso/1000).toFixed(2)+'kg)':' g'),b.color)}
+            ${row('Ciclos vida',b.ciclos===1?'Primaria (1)':b.ciclos+'+ ciclos',b.color)}
+            ${row('Ri interna',b.ri+(b.ri>=1000?' mΩ ('+(b.ri/1000).toFixed(1)+'Ω)':' mΩ'),b.color)}
+        </div>`;
+        grid.appendChild(div);
+    });
+    drawCompCanvas();
+    renderCompTabla();
+}
+
+function row(label, val, color) {
+    return `<div class="flex justify-between"><span class="text-slate-500">${label}</span><span style="color:${color};font-family:monospace;font-weight:600;">${val}</span></div>`;
+}
+
+function drawCompCanvas() {
+    const canvas = document.getElementById('comp-canvas');
+    const ctx = canvas.getContext('2d');
+    const W=canvas.width, H=canvas.height;
+    ctx.clearRect(0,0,W,H); ctx.fillStyle='#060a14'; ctx.fillRect(0,0,W,H);
+    const metrics = [
+        {key:'Wh', label:'Energía (Wh)', scale: b => b.Wh},
+        {key:'mAh', label:'Capacidad (mAh÷10)', scale: b => b.mAh/10},
+        {key:'dens', label:'Dens. (Wh/kg)', scale: b => b.Wh/(b.peso/1000)},
+        {key:'ciclos', label:'Ciclos (÷100)', scale: b => b.ciclos===1?0:b.ciclos/100},
+    ];
+    const bats = selBats.map(id => BAT_DB.find(x=>x.id===id)||BAT_DB[0]);
+    const n = metrics.length;
+    const barW = 50, groupW = (bats.length*barW + 20);
+    const totalW = n * groupW;
+    const px = (W - totalW) / 2;
+    const py = 20, ph = H - py - 50;
+
+    metrics.forEach((m, mi) => {
+        const vals = bats.map(b => m.scale(b));
+        const maxV = Math.max(...vals, 1);
+        const gx = px + mi * groupW;
+        bats.forEach((b, bi) => {
+            const val = vals[bi];
+            const barH = (val/maxV) * ph;
+            const x = gx + bi * barW + 5;
+            const y = py + ph - barH;
+            ctx.fillStyle = b.color + '44';
+            ctx.fillRect(x, py, barW-8, ph);
+            ctx.fillStyle = b.color;
+            ctx.fillRect(x, y, barW-8, barH);
+            ctx.fillStyle = b.color;
+            ctx.font = 'bold 9px monospace';
+            ctx.textAlign = 'center';
+            const dispVal = m.key==='mAh'?b.mAh:m.key==='ciclos'?b.ciclos:m.scale(b).toFixed(1);
+            ctx.fillText(dispVal, x+(barW-8)/2, y-4);
+            // bat name
+            ctx.fillStyle = '#475569';
+            ctx.font = '8px monospace';
+            ctx.fillText(b.nombre.split(' ')[0], x+(barW-8)/2, py+ph+12);
+        });
+        ctx.fillStyle = '#64748b';
+        ctx.font = '9px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(m.label, gx + groupW/2 - 5, py+ph+28);
+    });
+}
+
+function renderCompTabla() {
+    const tabla = document.getElementById('comp-tabla');
+    tabla.innerHTML = '';
+    const bats = selBats.map(id => BAT_DB.find(x=>x.id===id)||BAT_DB[0]);
+    const metrics = [
+        {label:'Mejor Wh/kg', fn:b=>b.Wh/(b.peso/1000), fmt:v=>v.toFixed(0)+' Wh/kg'},
+        {label:'Más mAh', fn:b=>b.mAh, fmt:v=>v+' mAh'},
+        {label:'Más ciclos', fn:b=>b.ciclos, fmt:v=>v===1?'Primaria':v+' ciclos'},
+        {label:'Menos peso', fn:b=>-b.peso, fmt:(v,b)=>b.peso+' g'},
+    ];
+    metrics.forEach(m => {
+        const vals = bats.map(b=>m.fn(b));
+        const best = vals.indexOf(Math.max(...vals));
+        const b = bats[best];
+        const d = document.createElement('div');
+        d.className = 'bg-slate-950 rounded-xl p-3 text-center';
+        d.innerHTML = `<div class="text-[10px] text-slate-500 uppercase mb-1">${m.label}</div>
+            <div class="font-bold" style="color:${b.color}">${b.nombre}</div>
+            <div class="text-[10px] font-mono" style="color:${b.color}aa">${m.fmt(m.fn(b),b)}</div>`;
+        tabla.appendChild(d);
+    });
+}
+
+// ===== AUTONOMIA =====
+let consumers = [];
+function addConsumer(nombre='Dispositivo', mA=50, duty=100) {
+    consumers.push({ nombre, mA, duty });
+    renderConsumers();
+    calcAutonomia();
+}
+function removeConsumer(i) { consumers.splice(i,1); renderConsumers(); calcAutonomia(); }
+function renderConsumers() {
+    const c = document.getElementById('consumers-list');
+    c.innerHTML = '';
+    consumers.forEach((con,i) => {
+        const d = document.createElement('div');
+        d.style.cssText='border:1px solid #1e293b;border-radius:8px;padding:8px;';
+        d.innerHTML=`<div class="flex gap-1 mb-1 items-center">
+            <input value="${con.nombre}" style="background:#0d1117;border:1px solid #1e293b;color:#e2e8f0;border-radius:5px;padding:3px 6px;width:100%;font-size:11px;outline:none;"
+                oninput="consumers[${i}].nombre=this.value; calcAutonomia()">
+            <button onclick="removeConsumer(${i})" style="color:#ef4444;font-size:14px;padding:0 4px;background:none;border:none;cursor:pointer;">×</button>
+        </div>
+        <div class="flex gap-2">
+            <input type="number" value="${con.mA}" step="1" min="0"
+                style="background:#0d1117;border:1px solid #1e293b;color:#e2e8f0;border-radius:5px;padding:3px 6px;width:65px;font-family:monospace;font-size:11px;outline:none;"
+                oninput="consumers[${i}].mA=parseFloat(this.value)||0; calcAutonomia()">
+            <span style="color:#64748b;font-size:10px;align-self:center;">mA</span>
+            <input type="number" value="${con.duty}" step="5" min="0" max="100"
+                style="background:#0d1117;border:1px solid #1e293b;color:#e2e8f0;border-radius:5px;padding:3px 6px;width:50px;font-family:monospace;font-size:11px;outline:none;"
+                oninput="consumers[${i}].duty=parseFloat(this.value)||0; calcAutonomia()">
+            <span style="color:#64748b;font-size:10px;align-self:center;">% duty</span>
+        </div>`;
+        c.appendChild(d);
+    });
+}
+function presetArduino() {
+    consumers = [
+        {nombre:'Arduino Uno',mA:50,duty:100},
+        {nombre:'Sensor DHT22',mA:2.5,duty:5},
+        {nombre:'WiFi ESP8266',mA:80,duty:15},
+        {nombre:'OLED 128x64',mA:15,duty:100},
+    ];
+    document.getElementById('aut-mAh').value=3000;
+    document.getElementById('aut-V').value=5;
+    renderConsumers(); calcAutonomia();
+}
+function presetESP() {
+    consumers = [
+        {nombre:'ESP32 activo',mA:240,duty:5},
+        {nombre:'ESP32 deep sleep',mA:0.01,duty:95},
+        {nombre:'Sensor',mA:3,duty:5},
+    ];
+    document.getElementById('aut-mAh').value=2500;
+    document.getElementById('aut-V').value=3.7;
+    renderConsumers(); calcAutonomia();
+}
+function presetLed() {
+    consumers = [];
+    for(let i=0;i<20;i++) consumers.push({nombre:`LED ${i+1}`,mA:10,duty:100});
+    document.getElementById('aut-mAh').value=5000;
+    document.getElementById('aut-V').value=12;
+    renderConsumers(); calcAutonomia();
+}
+
+function calcAutonomia() {
+    const mAh = parseFloat(document.getElementById('aut-mAh').value)||2500;
+    const V   = parseFloat(document.getElementById('aut-V').value)||3.7;
+    const eff = (parseFloat(document.getElementById('aut-eff').value)||85)/100;
+    const Itotal = consumers.reduce((s,c)=>s+c.mA*c.duty/100, 0);
+    const Ptotal = Itotal * V / 1000;
+    const Wh_util = mAh * V / 1000 * eff;
+    const horas = Itotal > 0 ? mAh * eff / Itotal : Infinity;
+
+    document.getElementById('aut-Itotal').textContent = Itotal.toFixed(2)+' mA';
+    document.getElementById('aut-Ptotal').textContent = Ptotal < 1 ? (Ptotal*1000).toFixed(2)+' mW' : Ptotal.toFixed(3)+' W';
+    document.getElementById('aut-horas').textContent  = Itotal===0 ? '∞' : horas>=24 ? (horas/24).toFixed(1)+' días' : horas.toFixed(1)+' h';
+    document.getElementById('aut-Wh').textContent     = Wh_util.toFixed(3)+' Wh';
+
+    // Barras por dispositivo
+    const wrap = document.getElementById('aut-barra-wrap');
+    wrap.innerHTML = '';
+    if (consumers.length > 0) {
+        consumers.forEach(c => {
+            const eff_mA = c.mA * c.duty/100;
+            const pct = Itotal > 0 ? eff_mA/Itotal*100 : 0;
+            const d = document.createElement('div');
+            d.innerHTML = `<div class="flex justify-between text-[10px] mb-0.5"><span class="text-slate-400">${c.nombre}</span><span class="font-mono text-green-400">${eff_mA.toFixed(1)}mA (${pct.toFixed(0)}%)</span></div>
+                <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%;background:#22c55e;"></div></div>`;
+            wrap.appendChild(d);
+        });
+    }
+    drawAutCanvas(mAh,eff,Itotal);
+}
+
+function drawAutCanvas(mAh,eff,Itotal) {
+    const canvas = document.getElementById('aut-canvas');
+    const ctx = canvas.getContext('2d');
+    const W=canvas.width,H=canvas.height;
+    ctx.clearRect(0,0,W,H); ctx.fillStyle='#060a14'; ctx.fillRect(0,0,W,H);
+    const px=50,py=15,pw=W-px-20,ph=H-py-35;
+    if (Itotal === 0) { ctx.fillStyle='#334155';ctx.font='14px monospace';ctx.textAlign='center';ctx.fillText('Sin consumidores',W/2,H/2);return; }
+    const horas_total = mAh*eff/Itotal;
+    const tmax = horas_total;
+    const toX = t=>px+(t/tmax)*pw;
+    const toY = cap=>py+ph-(cap/mAh)*ph;
+    ctx.strokeStyle='#1e293b';ctx.lineWidth=0.5;
+    for(let i=0;i<=5;i++){const y=py+ph*i/5;ctx.beginPath();ctx.moveTo(px,y);ctx.lineTo(px+pw,y);ctx.stroke();}
+    for(let i=0;i<=5;i++){const x=px+pw*i/5;ctx.beginPath();ctx.moveTo(x,py);ctx.lineTo(x,py+ph);ctx.stroke();}
+    ctx.beginPath();ctx.strokeStyle='#22c55e';ctx.lineWidth=2.5;
+    ctx.moveTo(toX(0),toY(mAh));ctx.lineTo(toX(tmax),toY(0));ctx.stroke();
+    // Area fill
+    ctx.beginPath();ctx.moveTo(toX(0),toY(mAh));ctx.lineTo(toX(tmax),toY(0));ctx.lineTo(toX(tmax),py+ph);ctx.lineTo(toX(0),py+ph);ctx.closePath();
+    ctx.fillStyle='rgba(34,197,94,.06)';ctx.fill();
+    ctx.fillStyle='#64748b';ctx.font='10px monospace';ctx.textAlign='right';
+    for(let i=0;i<=5;i++) ctx.fillText((mAh*i/5).toFixed(0)+'mAh',px-4,toY(mAh*i/5)+4);
+    ctx.textAlign='center';
+    ctx.fillText('0h',px,py+ph+14);
+    ctx.fillText((tmax/2).toFixed(1)+'h',px+pw/2,py+ph+14);
+    ctx.fillText(tmax.toFixed(1)+'h',px+pw,py+ph+14);
+}
+
+// ===== SERIE / PARALELO =====
+function calcSP() {
+    const V  = parseFloat(document.getElementById('sp-V').value)||3.7;
+    const mAh= parseFloat(document.getElementById('sp-mAh').value)||3000;
+    const Ri = parseFloat(document.getElementById('sp-Ri').value)||50;
+    const S  = parseInt(document.getElementById('sp-S').value)||3;
+    const P  = parseInt(document.getElementById('sp-P').value)||1;
+    const Vpack  = V*S;
+    const mAhpack= mAh*P;
+    const Wh     = Vpack*mAhpack/1000;
+    const Ripack = Ri*S/P;
+    document.getElementById('sp-config').textContent  = `${S}S${P}P`;
+    document.getElementById('sp-Vpack').textContent   = Vpack.toFixed(2)+' V';
+    document.getElementById('sp-mAhpack').textContent = mAhpack+' mAh';
+    document.getElementById('sp-Wh').textContent      = Wh.toFixed(2)+' Wh';
+    document.getElementById('sp-Ripack').textContent  = Ripack.toFixed(0)+' mΩ';
+    document.getElementById('sp-total').textContent   = (S*P)+' celdas';
+    drawSPSVG(S,P,V,mAh);
+}
+
+function drawSPSVG(S,P,V,mAh) {
+    const svg = document.getElementById('sp-svg');
+    const ns='http://www.w3.org/2000/svg';svg.innerHTML='';
+    const el=(tag,attrs,txt)=>{const e=document.createElementNS(ns,tag);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));if(txt!==undefined)e.textContent=txt;return e;};
+    const W=580,H=280;
+    const sS=Math.min(S,10), sP=Math.min(P,8);
+    const cellW=Math.min(50,(W-60)/sS-6);
+    const cellH=Math.min(35,(H-60)/sP-6);
+    const totalW=sS*(cellW+6);
+    const totalH=sP*(cellH+6);
+    const ox=(W-totalW)/2, oy=(H-totalH)/2;
+    for(let p=0;p<sP;p++){
+        for(let s=0;s<sS;s++){
+            const x=ox+s*(cellW+6), y=oy+p*(cellH+6);
+            svg.appendChild(el('rect',{x,y,width:cellW,height:cellH,rx:4,fill:'#0a1a14',stroke:'#22c55e','stroke-width':1.5}));
+            svg.appendChild(el('text',{x:x+cellW/2,y:y+cellH/2+3,'text-anchor':'middle',fill:'#22c55e','font-size':Math.min(9,cellH/3),'font-weight':'bold'},`${V}V`));
+            // + terminal
+            if(s===0) svg.appendChild(el('rect',{x:x-4,y:y+cellH/2-3,width:4,height:6,rx:1,fill:'#ef4444'}));
+            // - terminal
+            if(s===sS-1) svg.appendChild(el('rect',{x:x+cellW,y:y+cellH/2-3,width:4,height:6,rx:1,fill:'#374151'}));
+            // series wires
+            if(s<sS-1) svg.appendChild(el('line',{x1:x+cellW,y1:y+cellH/2,x2:x+cellW+6,y2:y+cellH/2,stroke:'#64748b','stroke-width':1.5}));
+        }
+        // parallel wires (left bus)
+        if(p<sP-1){
+            svg.appendChild(el('line',{x1:ox-8,y1:oy+p*(cellH+6)+cellH/2,x2:ox-8,y2:oy+(p+1)*(cellH+6)+cellH/2,stroke:'#64748b','stroke-width':1}));
+            svg.appendChild(el('line',{x1:ox-8,y1:oy+p*(cellH+6)+cellH/2,x2:ox,y2:oy+p*(cellH+6)+cellH/2,stroke:'#64748b','stroke-width':1}));
+            svg.appendChild(el('line',{x1:ox-8,y1:oy+(p+1)*(cellH+6)+cellH/2,x2:ox,y2:oy+(p+1)*(cellH+6)+cellH/2,stroke:'#64748b','stroke-width':1}));
+        }
+    }
+    // Labels
+    svg.appendChild(el('text',{x:W/2,y:H-8,'text-anchor':'middle',fill:'#475569','font-size':11},`${S}S${P}P — ${(V*S).toFixed(1)}V | ${mAh*P}mAh | ${(V*S*mAh*P/1000).toFixed(2)}Wh`));
+    if(S>10||P>8) svg.appendChild(el('text',{x:W/2,y:22,'text-anchor':'middle',fill:'#f59e0b','font-size':10},'(Diagrama muestra máx 10S×8P)'));
+}
+
+// ===== INIT =====
+addConsumer('MCU',50,100);
+addConsumer('Sensor',5,20);
+renderComparar();
+calcSP();
+</script>
+</body>
+</html>

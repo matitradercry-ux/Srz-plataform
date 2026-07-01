@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sr. Z — Campo Eléctrico</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: radial-gradient(ellipse at 50% 20%, #1a2744 0%, #0a0f1e 55%, #060a14 100%); min-height:100vh; user-select:none; }
+        .card { background:rgba(13,19,33,.85); border:1px solid #1e293b; border-radius:14px; }
+        #campo-canvas { cursor:crosshair; }
+        .tool-btn { padding:5px 10px; border-radius:7px; font-size:11px; font-weight:700; cursor:pointer; border:1px solid #1e293b; background:transparent; color:#64748b; transition:all .15s; }
+        .tool-btn.active { border-color:#f59e0b; color:#f59e0b; background:#1a1400; }
+        .tool-btn:hover:not(.active) { border-color:#334155; color:#94a3b8; }
+        .formula { font-family:monospace; font-size:11px; color:#94a3b8; background:#0d1117; padding:7px 11px; border-radius:7px; border-left:2px solid #f59e0b; }
+    </style>
+</head>
+<body class="text-slate-100 font-sans">
+
+<div class="flex items-center gap-4 px-5 py-2 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-sm sticky top-0 z-50">
+    <a href="index.html" class="text-xs text-slate-500 hover:text-yellow-400 transition">← Panel</a>
+    <span class="text-sm font-black uppercase tracking-wide text-slate-200">⚡ Simulador Campo Eléctrico</span>
+    <span class="text-[10px] text-slate-600">Cargas puntuales — líneas de campo y equipotenciales</span>
+</div>
+
+<div class="max-w-full mx-auto p-4 flex gap-4 flex-col lg:flex-row">
+
+<!-- TOOLBAR -->
+<div class="card p-4 flex flex-col gap-3 lg:w-52 flex-shrink-0">
+    <div class="text-[10px] font-bold text-yellow-400 uppercase tracking-wider">Herramienta</div>
+    <div class="flex flex-col gap-1.5">
+        <button class="tool-btn active" onclick="setTool('pos')" id="btn-pos">⊕ Carga positiva</button>
+        <button class="tool-btn"        onclick="setTool('neg')" id="btn-neg">⊖ Carga negativa</button>
+        <button class="tool-btn"        onclick="setTool('move')"id="btn-move">✥ Mover carga</button>
+        <button class="tool-btn"        onclick="setTool('del')" id="btn-del">✕ Eliminar</button>
+    </div>
+
+    <div class="border-t border-slate-800 pt-3 space-y-2">
+        <div class="text-[10px] font-bold text-slate-500 uppercase">Magnitud carga</div>
+        <input type="range" id="charge-mag" min="1" max="10" step="1" value="3"
+            style="-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;background:#1e293b;outline:none;"
+            oninput="document.getElementById('charge-mag-val').textContent=this.value+'q'">
+        <div class="text-[10px] text-yellow-400 font-mono text-center" id="charge-mag-val">3q</div>
+    </div>
+
+    <div class="border-t border-slate-800 pt-3 space-y-2">
+        <div class="text-[10px] font-bold text-slate-500 uppercase">Visualización</div>
+        <label class="flex items-center gap-2 text-[11px] text-slate-400 cursor-pointer">
+            <input type="checkbox" id="show-field" checked onchange="redraw()" class="accent-yellow-500"> Líneas de campo
+        </label>
+        <label class="flex items-center gap-2 text-[11px] text-slate-400 cursor-pointer">
+            <input type="checkbox" id="show-equip" checked onchange="redraw()" class="accent-yellow-500"> Equipotenciales
+        </label>
+        <label class="flex items-center gap-2 text-[11px] text-slate-400 cursor-pointer">
+            <input type="checkbox" id="show-arrows" checked onchange="redraw()" class="accent-yellow-500"> Flechas de campo
+        </label>
+        <label class="flex items-center gap-2 text-[11px] text-slate-400 cursor-pointer">
+            <input type="checkbox" id="show-heat" onchange="redraw()" class="accent-yellow-500"> Mapa de potencial
+        </label>
+    </div>
+
+    <div class="border-t border-slate-800 pt-3 space-y-1.5">
+        <div class="text-[10px] font-bold text-slate-500 uppercase mb-1">Ejemplos</div>
+        <button onclick="loadExample('dipolo')"   class="tool-btn w-full">Dipolo eléctrico</button>
+        <button onclick="loadExample('igual')"    class="tool-btn w-full">Cargas iguales +/+</button>
+        <button onclick="loadExample('opuesto')"  class="tool-btn w-full">Cargas opuestas</button>
+        <button onclick="loadExample('cuadro')"   class="tool-btn w-full">Cuadrado 4 cargas</button>
+    </div>
+
+    <div class="border-t border-slate-800 pt-3 space-y-1.5">
+        <button onclick="clearCharges()" class="tool-btn w-full">🗑 Limpiar</button>
+    </div>
+
+    <div class="space-y-1.5">
+        <div class="formula">E = kq/r²</div>
+        <div class="formula">V = kq/r</div>
+        <div class="text-[9px] text-slate-600">k = 8.99×10⁹ N·m²/C²</div>
+    </div>
+
+    <div id="info-panel" class="text-[10px] text-slate-500 min-h-12 bg-slate-950 rounded-lg p-2"></div>
+</div>
+
+<!-- CANVAS -->
+<div class="flex-1 card p-2 overflow-hidden">
+    <canvas id="campo-canvas" width="780" height="580"></canvas>
+</div>
+
+</div>
+
+<script>
+const canvas = document.getElementById('campo-canvas');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+const k = 8.99e9;
+const SCALE = 1e-9; // 1 unit = 1nm effective, cargas en "q" relativas
+
+let tool = 'pos';
+let charges = []; // {x,y,q}  q in relative units
+let dragging = null;
+let mouseX=0,mouseY=0;
+
+function setTool(t) {
+    tool=t;
+    document.querySelectorAll('.tool-btn[id^=btn-]').forEach(b=>b.classList.remove('active'));
+    document.getElementById('btn-'+t)?.classList.add('active');
+}
+
+function getE(px,py) {
+    let ex=0,ey=0;
+    charges.forEach(c=>{
+        const dx=px-c.x, dy=py-c.y;
+        const r2=dx*dx+dy*dy;
+        if(r2<1) return;
+        const r=Math.sqrt(r2);
+        const mag=c.q/(r2*r);
+        ex+=mag*dx; ey+=mag*dy;
+    });
+    return {ex,ey};
+}
+
+function getV(px,py) {
+    return charges.reduce((s,c)=>{
+        const r=Math.sqrt((px-c.x)**2+(py-c.y)**2);
+        return r<1?s:s+c.q/r;
+    },0);
+}
+
+function redraw() {
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#020810'; ctx.fillRect(0,0,W,H);
+
+    if(document.getElementById('show-heat').checked) drawHeat();
+    if(document.getElementById('show-equip').checked) drawEquipotenciales();
+    if(document.getElementById('show-field').checked) drawFieldLines();
+    drawCharges();
+}
+
+function drawHeat() {
+    const step=6;
+    for(let y=0;y<H;y+=step){
+        for(let x=0;x<W;x+=step){
+            const v=getV(x,y);
+            const norm=Math.tanh(v/50)*0.5+0.5;
+            const r=Math.floor(norm*200);
+            const b=Math.floor((1-norm)*200);
+            ctx.fillStyle=`rgba(${r},0,${b},0.6)`;
+            ctx.fillRect(x,y,step,step);
+        }
+    }
+}
+
+function drawEquipotenciales() {
+    if(charges.length===0) return;
+    const vals=[...new Set(charges.map(c=>Math.abs(c.q)))].flatMap(q=>{
+        return [-3,-2,-1.5,-1,-0.5,0.5,1,1.5,2,3].map(m=>m*q*15);
+    });
+    ctx.strokeStyle='#a855f733';ctx.lineWidth=0.8;
+    vals.forEach(v=>{
+        // Marching squares simplified — just scan for crossings
+        const step=8;
+        for(let y=0;y<H-step;y+=step){
+            for(let x=0;x<W-step;x+=step){
+                const v00=getV(x,y)-v, v10=getV(x+step,y)-v;
+                const v01=getV(x,y+step)-v, v11=getV(x+step,y+step)-v;
+                if((v00>0)!==(v10>0)){
+                    const t=v00/(v00-v10);
+                    ctx.beginPath();ctx.arc(x+t*step,y,1,0,Math.PI*2);ctx.fillStyle='#a855f766';ctx.fill();
+                }
+                if((v00>0)!==(v01>0)){
+                    const t=v00/(v00-v01);
+                    ctx.beginPath();ctx.arc(x,y+t*step,1,0,Math.PI*2);ctx.fillStyle='#a855f766';ctx.fill();
+                }
+            }
+        }
+    });
+}
+
+function drawFieldLines() {
+    if(charges.length===0) return;
+    const showArrows=document.getElementById('show-arrows').checked;
+    const numLines=12;
+    charges.forEach(c=>{
+        if(c.q===0) return;
+        for(let a=0;a<numLines;a++){
+            const angle=2*Math.PI*a/numLines;
+            let x=c.x+14*Math.cos(angle);
+            let y=c.y+14*Math.sin(angle);
+            const dir=c.q>0?1:-1;
+            ctx.beginPath();ctx.moveTo(x,y);
+            let prevX=x,prevY=y;
+            for(let step=0;step<600;step++){
+                const {ex,ey}=getE(x,y);
+                const mag=Math.sqrt(ex*ex+ey*ey);
+                if(mag<1e-6) break;
+                const nx=ex/mag*3*dir, ny=ey/mag*3*dir;
+                x+=nx; y+=ny;
+                if(x<0||x>W||y<0||y>H) break;
+                let onCharge=false;
+                for(const oc of charges){
+                    if(Math.hypot(x-oc.x,y-oc.y)<12&&oc!==c){onCharge=true;break;}
+                }
+                ctx.lineTo(x,y);
+                // Arrow
+                if(showArrows && step%60===30){
+                    const ang=Math.atan2(ny,nx);
+                    const ax=x,ay=y;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    const col=c.q>0?'#ef4444':'#3b82f6';
+                    ctx.strokeStyle=col;ctx.lineWidth=1;
+                    ctx.moveTo(ax,ay);
+                    ctx.lineTo(ax-6*Math.cos(ang-0.4),ay-6*Math.sin(ang-0.4));
+                    ctx.moveTo(ax,ay);
+                    ctx.lineTo(ax-6*Math.cos(ang+0.4),ay-6*Math.sin(ang+0.4));
+                    ctx.stroke();
+                    ctx.beginPath();ctx.moveTo(x,y);
+                }
+                if(onCharge) break;
+                prevX=x;prevY=y;
+            }
+            const col=c.q>0?'#ef444466':'#3b82f666';
+            ctx.strokeStyle=col;ctx.lineWidth=1.2;ctx.stroke();
+        }
+    });
+}
+
+function drawCharges() {
+    charges.forEach((c,i)=>{
+        const pos=c.q>0;
+        const grad=ctx.createRadialGradient(c.x,c.y,2,c.x,c.y,18);
+        grad.addColorStop(0,pos?'#ef4444':'#3b82f6');
+        grad.addColorStop(1,pos?'#ef444400':'#3b82f600');
+        ctx.beginPath();ctx.arc(c.x,c.y,18,0,Math.PI*2);ctx.fillStyle=grad;ctx.fill();
+        ctx.beginPath();ctx.arc(c.x,c.y,12,0,Math.PI*2);
+        ctx.fillStyle=pos?'#ef4444':'#3b82f6';ctx.fill();
+        ctx.strokeStyle=pos?'#fca5a5':'#93c5fd';ctx.lineWidth=2;ctx.stroke();
+        ctx.fillStyle='#fff';ctx.font='bold 13px monospace';ctx.textAlign='center';
+        ctx.fillText(pos?'+':'−',c.x,c.y+5);
+        ctx.fillStyle='#94a3b8';ctx.font='8px monospace';
+        ctx.fillText(`${Math.abs(c.q)}q`,c.x,c.y+24);
+    });
+    // Mouse cursor hint
+    if(tool==='pos'||tool==='neg'){
+        ctx.beginPath();ctx.arc(mouseX,mouseY,12,0,Math.PI*2);
+        ctx.strokeStyle=tool==='pos'?'#ef444444':'#3b82f644';ctx.lineWidth=2;ctx.setLineDash([4,4]);ctx.stroke();ctx.setLineDash([]);
+    }
+}
+
+// Events
+canvas.addEventListener('click',e=>{
+    const r=canvas.getBoundingClientRect();
+    const mx=e.clientX-r.left, my=e.clientY-r.top;
+    if(tool==='pos'||tool==='neg'){
+        const mag=parseInt(document.getElementById('charge-mag').value)||3;
+        charges.push({x:mx,y:my,q:tool==='pos'?mag:-mag});
+        redraw(); updateInfo(mx,my);
+    } else if(tool==='del'){
+        const before=charges.length;
+        charges=charges.filter(c=>Math.hypot(mx-c.x,my-c.y)>14);
+        if(charges.length<before) redraw();
+    }
+});
+
+canvas.addEventListener('mousedown',e=>{
+    if(tool!=='move') return;
+    const r=canvas.getBoundingClientRect();
+    const mx=e.clientX-r.left, my=e.clientY-r.top;
+    dragging=charges.find(c=>Math.hypot(mx-c.x,my-c.y)<14)||null;
+});
+canvas.addEventListener('mousemove',e=>{
+    const r=canvas.getBoundingClientRect();
+    mouseX=e.clientX-r.left; mouseY=e.clientY-r.top;
+    if(dragging){dragging.x=mouseX;dragging.y=mouseY;redraw();}
+    else{ updateInfo(mouseX,mouseY); if(tool==='pos'||tool==='neg') redraw(); }
+});
+canvas.addEventListener('mouseup',()=>{if(dragging){redraw();dragging=null;}});
+
+function updateInfo(mx,my) {
+    const v=getV(mx,my);
+    const {ex,ey}=getE(mx,my);
+    const emag=Math.sqrt(ex*ex+ey*ey);
+    document.getElementById('info-panel').innerHTML=
+        `<div class="text-yellow-400 font-bold mb-1">Cursor (${Math.round(mx)}, ${Math.round(my)})</div>
+        <div>V = ${v.toFixed(1)} u.a.</div>
+        <div>|E| = ${emag.toFixed(1)} u.a.</div>
+        <div class="mt-1 text-slate-600">Cargas: ${charges.length}</div>`;
+}
+
+function clearCharges(){ charges=[]; redraw(); }
+
+function loadExample(name){
+    charges=[];
+    const cx=W/2,cy=H/2,d=120;
+    if(name==='dipolo'){
+        charges=[{x:cx-d,y:cy,q:5},{x:cx+d,y:cy,q:-5}];
+    } else if(name==='igual'){
+        charges=[{x:cx-d,y:cy,q:5},{x:cx+d,y:cy,q:5}];
+    } else if(name==='opuesto'){
+        charges=[{x:cx-d,y:cy-d,q:4},{x:cx+d,y:cy-d,q:-4},{x:cx,y:cy+d,q:4}];
+    } else if(name==='cuadro'){
+        charges=[{x:cx-d,y:cy-d,q:3},{x:cx+d,y:cy-d,q:-3},{x:cx-d,y:cy+d,q:-3},{x:cx+d,y:cy+d,q:3}];
+    }
+    redraw();
+}
+
+loadExample('dipolo');
+</script>
+</body>
+</html>

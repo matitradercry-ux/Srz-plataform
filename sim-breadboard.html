@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sr. Z — Protoboard Virtual</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0f172a;color:#e2e8f0;font-family:system-ui,sans-serif;min-height:100vh;}
+.nav{display:flex;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid #1e293b;background:rgba(7,11,20,.97);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.nav a{font-size:12px;color:#475569;text-decoration:none;}.nav a:hover{color:#e2e8f0;}
+.brand{font-size:16px;font-weight:900;background:linear-gradient(90deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.wrap{max-width:860px;margin:0 auto;padding:24px 20px;}
+h1{font-size:20px;font-weight:900;margin-bottom:4px;}
+.sub{font-size:13px;color:#64748b;margin-bottom:20px;}
+.steps{display:flex;flex-direction:column;gap:8px;margin-bottom:22px;}
+.step{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:#94a3b8;}
+.snum{width:24px;height:24px;border-radius:50%;background:#06b6d4;color:#0f172a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;}
+.ctrl{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
+.tabs{display:flex;gap:4px;}
+.tab{padding:6px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;background:#1e293b;color:#64748b;transition:all .15s;}
+.tab.on{background:#f59e0b;color:#0f172a;}
+.tab:hover:not(.on){background:#334155;color:#94a3b8;}
+.xwrap{display:flex;align-items:center;gap:8px;font-size:13px;color:#94a3b8;}
+.tgl{position:relative;width:46px;height:26px;}
+.tgl input{opacity:0;width:0;height:0;}
+.tgl-s{position:absolute;inset:0;background:#334155;border-radius:13px;cursor:pointer;transition:.2s;}
+.tgl-s:before{content:'';position:absolute;height:20px;width:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;}
+.tgl input:checked+.tgl-s{background:#f59e0b;}
+.tgl input:checked+.tgl-s:before{transform:translateX(20px);}
+.bb-wrap{background:#1e293b;border-radius:14px;padding:20px;display:flex;justify-content:center;overflow-x:auto;margin-bottom:14px;}
+canvas{cursor:pointer;display:block;}
+.group-label{min-height:24px;font-size:13px;font-weight:700;color:#f59e0b;padding:4px 0 10px;}
+.infobox{background:#0c1a2e;border:1px solid #1e3a5f;border-radius:10px;padding:14px 16px;font-size:13px;color:#7dd3fc;line-height:1.6;}
+.tipbox{margin-top:12px;background:#0c1a0c;border:1px solid #166534;border-radius:10px;padding:12px 16px;font-size:12px;color:#4ade80;display:flex;gap:8px;}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <span class="brand">Sr.Z</span>
+  <a href="index.html">Inicio</a>
+  <a href="laboratorio.html">← Laboratorio</a>
+</nav>
+<div class="wrap">
+  <h1>🟩 Protoboard Virtual</h1>
+  <p class="sub">Explorá las conexiones internas de una protoboard.</p>
+  <div class="steps">
+    <div class="step"><div class="snum">1</div><span>Hacé clic en cualquier agujero para ver qué otros agujeros están conectados internamente.</span></div>
+    <div class="step"><div class="snum">2</div><span>Comprobá qué filas y columnas están conectadas internamente.</span></div>
+    <div class="step"><div class="snum">3</div><span>Activá <strong style="color:#f59e0b">Rayos-X</strong> para ver las tiras metálicas internas tal como están en la realidad.</span></div>
+  </div>
+  <div class="ctrl">
+    <div class="tabs">
+      <button class="tab" onclick="setSize('mini')">Mini (170)</button>
+      <button class="tab on" onclick="setSize('half')">Half (400)</button>
+      <button class="tab" onclick="setSize('full')">Full (830)</button>
+    </div>
+    <div class="xwrap">
+      <span>Rayos-X</span>
+      <label class="tgl"><input type="checkbox" id="xray" onchange="render()"><span class="tgl-s"></span></label>
+    </div>
+  </div>
+  <div class="bb-wrap"><canvas id="bb"></canvas></div>
+  <div class="group-label" id="glabel">Hacé clic en un agujero para ver su conexión.</div>
+  <div class="infobox"><strong>¿Cómo funciona?</strong><br>
+    Zona central: cada <strong>columna</strong> (A–E o F–J) tiene 5 agujeros unidos por una tira metálica vertical.<br>
+    Rieles de alimentación: la fila <strong style="color:#ef4444">+ (rojo)</strong> y <strong style="color:#3b82f6">− (azul)</strong> están conectadas horizontalmente a lo largo de toda la placa.
+  </div>
+  <div class="tipbox">ℹ️ <span>Las breadboards parecen sencillas, pero muchas averías vienen de conectar una pata en la fila equivocada. Practicar la geometría de la placa ayuda muchísimo.</span></div>
+</div>
+
+<script>
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
+const SIZES = { mini:17, half:30, full:63 };
+let curSize = 'half';
+let selGroup = null;
+
+// Layout constants
+const HD = 9;      // hole diameter
+const ST = 14;     // step between holes
+const LP = 34;     // left pad (for +/- labels and row letters)
+const RP = 20;     // right pad
+const TP = 12;     // top pad
+const BP = 12;     // bottom pad
+const EXTRA = 14;  // space for column numbers
+
+// ─── Y positions (computed from top) ─────────────────────────────────────────
+function layout(cols) {
+  const TM_Y = TP + HD/2;            // top minus rail center
+  const TP_Y = TM_Y + ST;            // top plus rail center
+  const CN_TOP_Y = TP_Y + ST + 4;    // column numbers top
+  const A_Y = CN_TOP_Y + EXTRA;      // row A
+  const CTR_Y = A_Y + 5*ST - ST/2 + 6;  // center gap center
+  const F_Y = CTR_Y + 10;            // row F
+  const CN_BOT_Y = F_Y + 5*ST + 2;  // column numbers bottom
+  const BP_Y = CN_BOT_Y + EXTRA;     // bottom plus rail center
+  const BM_Y = BP_Y + ST;            // bottom minus rail center
+  const H = BM_Y + HD/2 + BP;
+  const W = LP + cols*ST + RP;
+  return { TM_Y, TP_Y, CN_TOP_Y, A_Y, CTR_Y, F_Y, CN_BOT_Y, BP_Y, BM_Y, H, W, cols };
+}
+
+function colX(c, L) { return LP + (c-1)*ST + HD/2; }
+
+// ─── GROUP SYSTEM ─────────────────────────────────────────────────────────────
+function getGroup(section, c, cols) {
+  const half = Math.ceil(cols/2);
+  const side = c <= half ? 'L' : 'R';
+  if (section === 'TM') return `TM_${side}`;
+  if (section === 'TP') return `TP_${side}`;
+  if (section === 'BP') return `BP_${side}`;
+  if (section === 'BM') return `BM_${side}`;
+  if (section === 'TOP') return `COL_T_${c}`;
+  if (section === 'BOT') return `COL_B_${c}`;
+  return 'none';
+}
+
+function groupLabel(g) {
+  if (!g) return '';
+  if (g.startsWith('TM')) return 'Riel − superior: Conexión horizontal (GND)';
+  if (g.startsWith('TP')) return 'Riel + superior: Conexión horizontal (VCC)';
+  if (g.startsWith('BP')) return 'Riel + inferior: Conexión horizontal (VCC)';
+  if (g.startsWith('BM')) return 'Riel − inferior: Conexión horizontal (GND)';
+  const m = g.match(/COL_([TB])_(\d+)/);
+  if (m) return `Columna ${m[2]}: Conexión vertical (${m[1]==='T'?'filas A·B·C·D·E':'filas F·G·H·I·J'}).`;
+  return g;
+}
+
+// ─── HIT TEST ────────────────────────────────────────────────────────────────
+function hitTest(mx, my, L) {
+  const cols = SIZES[curSize];
+  const { TM_Y, TP_Y, A_Y, F_Y, BP_Y, BM_Y } = L;
+  const rows_top = [A_Y, A_Y+ST, A_Y+2*ST, A_Y+3*ST, A_Y+4*ST];
+  const rows_bot = [F_Y, F_Y+ST, F_Y+2*ST, F_Y+3*ST, F_Y+4*ST];
+
+  function nearHole(hx, hy) {
+    const dx = mx - hx, dy = my - hy;
+    return Math.sqrt(dx*dx + dy*dy) < HD;
+  }
+
+  for (let c = 1; c <= cols; c++) {
+    const x = colX(c, L);
+    if (nearHole(x, TM_Y)) return getGroup('TM', c, cols);
+    if (nearHole(x, TP_Y)) return getGroup('TP', c, cols);
+    if (nearHole(x, BP_Y)) return getGroup('BP', c, cols);
+    if (nearHole(x, BM_Y)) return getGroup('BM', c, cols);
+    for (const ry of rows_top) { if (nearHole(x, ry)) return getGroup('TOP', c, cols); }
+    for (const ry of rows_bot) { if (nearHole(x, ry)) return getGroup('BOT', c, cols); }
+  }
+  return null;
+}
+
+// ─── DRAW ────────────────────────────────────────────────────────────────────
+function render() {
+  const cols = SIZES[curSize];
+  const xray = document.getElementById('xray').checked;
+  const L = layout(cols);
+  const canvas = document.getElementById('bb');
+  canvas.width = L.W;
+  canvas.height = L.H;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, L.W, L.H);
+
+  if (xray) drawXray(ctx, L, cols);
+  else drawNormal(ctx, L, cols);
+}
+
+// ─── NORMAL MODE ─────────────────────────────────────────────────────────────
+function drawNormal(ctx, L, cols) {
+  const { TM_Y, TP_Y, A_Y, F_Y, BP_Y, BM_Y, CTR_Y, CN_TOP_Y, CN_BOT_Y, H, W } = L;
+
+  // Body
+  ctx.fillStyle = '#f5f3ee';
+  rr(ctx, 0, 0, W, H, 8); ctx.fill();
+  ctx.strokeStyle = '#d1cbbe'; ctx.lineWidth = 1;
+  rr(ctx, 0, 0, W, H, 8); ctx.stroke();
+
+  // Center gap
+  ctx.fillStyle = '#c9c5b8';
+  ctx.fillRect(LP - 4, CTR_Y - 4, cols*ST + 8, 8);
+
+  // Rail lines
+  const RAIL_X1 = LP, RAIL_X2 = LP + cols*ST;
+  line(ctx, RAIL_X1, TM_Y, RAIL_X2, TM_Y, '#3b82f6', 1.5);
+  line(ctx, RAIL_X1, TP_Y, RAIL_X2, TP_Y, '#ef4444', 1.5);
+  line(ctx, RAIL_X1, BP_Y, RAIL_X2, BP_Y, '#ef4444', 1.5);
+  line(ctx, RAIL_X1, BM_Y, RAIL_X2, BM_Y, '#3b82f6', 1.5);
+
+  // +/- labels
+  const lx = LP - 6;
+  lbl(ctx, '−', lx, TM_Y, '#3b82f6', 'right', 9);
+  lbl(ctx, '+', lx, TP_Y, '#ef4444', 'right', 9);
+  lbl(ctx, '+', lx, BP_Y, '#ef4444', 'right', 9);
+  lbl(ctx, '−', lx, BM_Y, '#3b82f6', 'right', 9);
+  const rx = LP + cols*ST + 6;
+  lbl(ctx, '−', rx, TM_Y, '#3b82f6', 'left', 9);
+  lbl(ctx, '+', rx, TP_Y, '#ef4444', 'left', 9);
+  lbl(ctx, '+', rx, BP_Y, '#ef4444', 'left', 9);
+  lbl(ctx, '−', rx, BM_Y, '#3b82f6', 'left', 9);
+
+  // Column numbers
+  ctx.font = '8px system-ui'; ctx.fillStyle = '#9ca3af'; ctx.textAlign = 'center';
+  for (let c = 1; c <= cols; c++) {
+    if (c === 1 || c % 5 === 0) {
+      ctx.fillText(c, colX(c, L), CN_TOP_Y + 8);
+      ctx.fillText(c, colX(c, L), CN_BOT_Y + 8);
+    }
+  }
+
+  // Row letters
+  ctx.font = 'bold 8px system-ui'; ctx.fillStyle = '#9ca3af'; ctx.textAlign = 'right';
+  ['A','B','C','D','E'].forEach((r,i) => ctx.fillText(r, LP - 8, A_Y + i*ST + 3));
+  ['F','G','H','I','J'].forEach((r,i) => ctx.fillText(r, LP - 8, F_Y + i*ST + 3));
+
+  // Holes
+  for (let c = 1; c <= cols; c++) {
+    const x = colX(c, L);
+    drawHole(ctx, x, TM_Y, getGroup('TM',c,cols));
+    drawHole(ctx, x, TP_Y, getGroup('TP',c,cols));
+    drawHole(ctx, x, BP_Y, getGroup('BP',c,cols));
+    drawHole(ctx, x, BM_Y, getGroup('BM',c,cols));
+    for (let i=0;i<5;i++) {
+      drawHole(ctx, x, A_Y+i*ST, getGroup('TOP',c,cols));
+      drawHole(ctx, x, F_Y+i*ST, getGroup('BOT',c,cols));
+    }
+  }
+}
+
+function drawHole(ctx, x, y, group) {
+  const r = HD/2;
+  const sel = selGroup && selGroup === group;
+
+  if (sel) {
+    // Outer glow
+    ctx.beginPath(); ctx.arc(x, y, r+3, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(6,182,212,0.25)'; ctx.fill();
+    // Hole
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2);
+    ctx.fillStyle = '#06b6d4'; ctx.fill();
+  } else {
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2);
+    ctx.fillStyle = '#1e1010'; ctx.fill();
+    ctx.strokeStyle = '#3a2020'; ctx.lineWidth = 0.5; ctx.stroke();
+  }
+}
+
+// ─── XRAY MODE ───────────────────────────────────────────────────────────────
+function drawXray(ctx, L, cols) {
+  const { TM_Y, TP_Y, A_Y, F_Y, BP_Y, BM_Y, CTR_Y, H, W } = L;
+
+  // Dark body
+  ctx.fillStyle = '#111827';
+  rr(ctx, 0, 0, W, H, 8); ctx.fill();
+  ctx.strokeStyle = '#334155'; ctx.lineWidth = 1;
+  rr(ctx, 0, 0, W, H, 8); ctx.stroke();
+
+  const GOLD = 'rgba(202,148,0,0.88)';
+  const SW = cols * ST + 6;   // strip width
+  const SX = LP - 3;          // strip x start
+
+  // Power rail strips (horizontal)
+  const RS = HD + 8;  // rail strip height
+  ctx.fillStyle = GOLD;
+  ctx.fillRect(SX, TM_Y - RS/2, SW, RS);
+  ctx.fillRect(SX, TP_Y - RS/2, SW, RS);
+  ctx.fillRect(SX, BP_Y - RS/2, SW, RS);
+  ctx.fillRect(SX, BM_Y - RS/2, SW, RS);
+
+  // Rail lines ON TOP of strips
+  line(ctx, SX, TP_Y, SX+SW, TP_Y, '#ef4444', 2);
+  line(ctx, SX, BP_Y, SX+SW, BP_Y, '#ef4444', 2);
+  line(ctx, SX, TM_Y, SX+SW, TM_Y, '#3b82f6', 2);
+  line(ctx, SX, BM_Y, SX+SW, BM_Y, '#3b82f6', 2);
+
+  // +/- labels
+  lbl(ctx, '+', SX - 4, TP_Y, '#ef4444', 'right', 10);
+  lbl(ctx, '+', SX + SW + 4, TP_Y, '#ef4444', 'left', 10);
+  lbl(ctx, '−', SX - 4, TM_Y, '#3b82f6', 'right', 10);
+  lbl(ctx, '−', SX + SW + 4, TM_Y, '#3b82f6', 'left', 10);
+  lbl(ctx, '+', SX - 4, BP_Y, '#ef4444', 'right', 10);
+  lbl(ctx, '+', SX + SW + 4, BP_Y, '#ef4444', 'left', 10);
+  lbl(ctx, '−', SX - 4, BM_Y, '#3b82f6', 'right', 10);
+  lbl(ctx, '−', SX + SW + 4, BM_Y, '#3b82f6', 'left', 10);
+
+  // Column strips (vertical)
+  const VS = HD - 1;  // strip width
+  const TOP_SY = A_Y - HD/2;
+  const TOP_SH = 5*ST - ST + HD;
+  const BOT_SY = F_Y - HD/2;
+
+  for (let c = 1; c <= cols; c++) {
+    const x = colX(c, L) - VS/2;
+    ctx.fillStyle = GOLD;
+    ctx.fillRect(x, TOP_SY, VS, TOP_SH);
+    ctx.fillRect(x, BOT_SY, VS, TOP_SH);
+  }
+
+  // Center separator (white bar)
+  ctx.fillStyle = '#d1d5db';
+  ctx.fillRect(SX, CTR_Y - 5, SW, 10);
+}
+
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+function rr(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r); ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h); ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r); ctx.arcTo(x,y,x+r,y,r); ctx.closePath();
+}
+function line(ctx, x1,y1,x2,y2,col,lw) {
+  ctx.strokeStyle=col; ctx.lineWidth=lw;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+}
+function lbl(ctx, txt, x, y, col, align, sz) {
+  ctx.font = `bold ${sz}px system-ui`; ctx.fillStyle = col; ctx.textAlign = align; ctx.textBaseline = 'middle';
+  ctx.fillText(txt, x, y);
+}
+
+// ─── INTERACTION ─────────────────────────────────────────────────────────────
+function setupCanvas() {
+  const canvas = document.getElementById('bb');
+  canvas.addEventListener('click', (e) => {
+    const cols = SIZES[curSize];
+    const rect = canvas.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
+    const my = (e.clientY - rect.top) * (canvas.height / rect.height);
+    const L = layout(cols);
+    const g = hitTest(mx, my, L);
+    if (g) {
+      selGroup = selGroup === g ? null : g;
+    } else {
+      selGroup = null;
+    }
+    document.getElementById('glabel').textContent = selGroup ? groupLabel(selGroup) : 'Hacé clic en un agujero para ver su conexión.';
+    render();
+  });
+}
+
+function setSize(sz) {
+  curSize = sz; selGroup = null;
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    t.classList.toggle('on', ['mini','half','full'][i] === sz);
+  });
+  document.getElementById('glabel').textContent = 'Hacé clic en un agujero para ver su conexión.';
+  render();
+}
+
+setupCanvas();
+render();
+</script>
+</body>
+</html>

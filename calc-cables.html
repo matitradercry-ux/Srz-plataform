@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sr. Z — Calculadora Sección de Cables</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: radial-gradient(ellipse at 50% 20%, #1a2744 0%, #0a0f1e 55%, #060a14 100%); min-height:100vh; }
+        .card { background:rgba(13,19,33,.85); border:1px solid #1e293b; border-radius:14px; }
+        input[type=number], select { background:#0d1117; border:1px solid #1e293b; color:#e2e8f0; border-radius:8px; padding:6px 10px; width:100%; font-family:monospace; font-size:13px; outline:none; transition:border .2s; }
+        input[type=number]:focus, select:focus { border-color:#06b6d4; }
+        select option { background:#0d1117; }
+        .result-val { font-family:'Courier New',monospace; color:#00ff41; text-shadow:0 0 6px #00ff41; }
+        .formula { font-family:monospace; font-size:11px; color:#94a3b8; background:#0d1117; padding:8px 12px; border-radius:8px; border-left:2px solid #06b6d4; }
+        .warn { background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.3); border-radius:8px; padding:8px 12px; font-size:11px; color:#fca5a5; }
+        .ok   { background:rgba(34,197,94,.08);  border:1px solid rgba(34,197,94,.3);  border-radius:8px; padding:8px 12px; font-size:11px; color:#86efac; }
+        .table-row { display:flex; justify-content:space-between; padding:5px 8px; border-radius:6px; }
+        .table-row:hover { background:#0d1117; }
+    </style>
+</head>
+<body class="text-slate-100 font-sans">
+
+<div class="flex items-center gap-4 px-5 py-2 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-sm sticky top-0 z-50">
+    <a href="index.html" class="text-xs text-slate-500 hover:text-cyan-400 transition">← Panel</a>
+    <span class="text-sm font-black uppercase tracking-wide text-slate-200">🔌 Calculadora Sección de Cables</span>
+    <span class="text-[10px] text-slate-600">mm², AWG, caída de tensión</span>
+</div>
+
+<div class="max-w-5xl mx-auto p-5 grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+<!-- INPUTS -->
+<div class="card p-5 space-y-4">
+    <div class="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-2">Parámetros</div>
+
+    <div>
+        <label class="text-[11px] text-slate-500 uppercase tracking-wider">Corriente (A)</label>
+        <input type="number" id="I" value="10" step="0.5" min="0.1" oninput="calcular()">
+    </div>
+
+    <div>
+        <label class="text-[11px] text-slate-500 uppercase tracking-wider">Longitud del cable (m)</label>
+        <input type="number" id="L" value="5" step="0.5" min="0.1" oninput="calcular()">
+        <div class="text-[10px] text-slate-600 mt-1">Longitud total (ida + vuelta si aplica).</div>
+    </div>
+
+    <div>
+        <label class="text-[11px] text-slate-500 uppercase tracking-wider">Tensión del sistema (V)</label>
+        <input type="number" id="V" value="12" step="0.1" min="1" oninput="calcular()">
+    </div>
+
+    <div>
+        <label class="text-[11px] text-slate-500 uppercase tracking-wider">Caída máxima permitida (%)</label>
+        <input type="number" id="caidaMax" value="3" step="0.5" min="0.1" max="10" oninput="calcular()">
+        <div class="text-[10px] text-slate-600 mt-1">≤3% domiciliario | ≤5% industrial | ≤10% automotriz.</div>
+    </div>
+
+    <div>
+        <label class="text-[11px] text-slate-500 uppercase tracking-wider">Material del conductor</label>
+        <select id="material" onchange="calcular()">
+            <option value="56">Cobre (ρ = 56 m/Ω·mm²)</option>
+            <option value="35">Aluminio (ρ = 35 m/Ω·mm²)</option>
+            <option value="12">Acero inox (ρ = 12)</option>
+        </select>
+    </div>
+
+    <div>
+        <label class="text-[11px] text-slate-500 uppercase tracking-wider">Factor de temperatura</label>
+        <select id="tempFactor" onchange="calcular()">
+            <option value="1.0">25°C (nominal)</option>
+            <option value="0.87">40°C (−13%)</option>
+            <option value="0.75">60°C (−25%)</option>
+            <option value="0.65">80°C (−35%)</option>
+        </select>
+    </div>
+
+    <div>
+        <label class="text-[11px] text-slate-500 uppercase tracking-wider">Circuito</label>
+        <select id="circuito" onchange="calcular()">
+            <option value="dc-2">DC — 2 conductores (ida+vuelta)</option>
+            <option value="dc-1">DC — 1 conductor (retorno por chasis)</option>
+            <option value="ac-mono">AC monofásico</option>
+            <option value="ac-tri">AC trifásico</option>
+        </select>
+    </div>
+</div>
+
+<!-- RESULTADOS -->
+<div class="card p-5 space-y-4">
+    <div class="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-2">Resultados</div>
+
+    <div class="bg-slate-950 rounded-xl p-4 space-y-3">
+        <div class="flex justify-between">
+            <span class="text-[11px] text-slate-500">Sección mínima requerida</span>
+            <span id="r-S" class="result-val text-2xl">—</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-[11px] text-slate-500">Sección normalizada</span>
+            <span id="r-Snorm" class="text-yellow-400 font-mono font-bold text-xl">—</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-[11px] text-slate-500">AWG equivalente</span>
+            <span id="r-AWG" class="result-val">—</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-[11px] text-slate-500">Resistencia del cable</span>
+            <span id="r-R" class="result-val">—</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-[11px] text-slate-500">Caída de tensión</span>
+            <span id="r-dV" class="result-val">—</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-[11px] text-slate-500">Caída (%)</span>
+            <span id="r-dVpct" class="font-mono font-bold text-lg">—</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-[11px] text-slate-500">Potencia disipada en cable</span>
+            <span id="r-Pcable" class="result-val">—</span>
+        </div>
+    </div>
+
+    <div id="r-status" class="ok">Completá los parámetros</div>
+
+    <div class="space-y-1.5">
+        <div class="formula">S = (2×L×I) / (σ×ΔV)</div>
+        <div class="formula">R = (2×L) / (σ×S)</div>
+        <div class="formula">ΔV = I × R</div>
+    </div>
+</div>
+
+<!-- TABLA SECCIONES -->
+<div class="card p-5">
+    <div class="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-3">Tabla de referencia</div>
+    <div class="text-[10px] text-slate-600 mb-3">Corriente máxima admisible (cobre, temperatura 40°C, cable agrupado)</div>
+    <div class="space-y-0.5" id="tabla-secciones"></div>
+
+    <div class="mt-4 border-t border-slate-800 pt-3">
+        <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-2 font-bold">Equivalencias AWG</div>
+        <div class="space-y-0.5" id="tabla-awg"></div>
+    </div>
+</div>
+
+</div>
+
+<script>
+// Secciones normalizadas mm² → [Imax_A, AWG_aprox]
+const SECCIONES = [
+    [0.5,   6,   '20 AWG'],
+    [0.75,  10,  '18 AWG'],
+    [1.0,   13,  '17 AWG'],
+    [1.5,   16,  '15 AWG'],
+    [2.5,   25,  '13 AWG'],
+    [4.0,   32,  '11 AWG'],
+    [6.0,   40,  '9 AWG'],
+    [10,    57,  '7 AWG'],
+    [16,    73,  '5 AWG'],
+    [25,    95,  '3 AWG'],
+    [35,    115, '2 AWG'],
+    [50,    141, '1 AWG'],
+    [70,    175, '2/0 AWG'],
+    [95,    212, '3/0 AWG'],
+    [120,   245, '4/0 AWG'],
+];
+
+const AWG_TABLE = [
+    [10,5.26,'2.588'],
+    [12,3.31,'2.053'],
+    [14,2.08,'1.628'],
+    [16,1.31,'1.291'],
+    [18,0.82,'1.024'],
+    [20,0.52,'0.812'],
+    [22,0.33,'0.644'],
+    [24,0.21,'0.511'],
+    [26,0.13,'0.405'],
+    [28,0.08,'0.321'],
+];
+
+function renderTablas() {
+    const tbl = document.getElementById('tabla-secciones');
+    SECCIONES.forEach(([s,i,awg]) => {
+        const d = document.createElement('div');
+        d.className = 'table-row text-[10px]';
+        d.innerHTML = `<span class="text-slate-300 font-mono">${s} mm²</span><span class="text-slate-500">${awg}</span><span class="text-green-400 font-mono">${i} A</span>`;
+        tbl.appendChild(d);
+    });
+    const ta = document.getElementById('tabla-awg');
+    AWG_TABLE.forEach(([awg,mm2,d]) => {
+        const div = document.createElement('div');
+        div.className = 'table-row text-[10px]';
+        div.innerHTML = `<span class="text-slate-300 font-mono">${awg} AWG</span><span class="text-slate-500">${mm2} mm²</span><span class="text-slate-600">Ø${d}mm</span>`;
+        ta.appendChild(div);
+    });
+}
+
+function mmToAWG(mm2) {
+    const awgD = [0.0050,0.0063,0.0080,0.0100,0.0126,0.0159,0.0201,0.0253,0.0320,0.0403,
+                  0.0508,0.0641,0.0808,0.1019,0.1285,0.1620,0.2043,0.2576,0.3249,0.4096,
+                  0.5161,0.6500,0.8194,1.0328,1.3026,1.6422,2.0705,2.6114,3.2940,4.1503,5.2330];
+    const d = Math.sqrt(4*mm2/Math.PI);
+    let best=0, bestD=Infinity;
+    awgD.forEach((v,i)=>{const dd=Math.abs(v-d); if(dd<bestD){bestD=dd;best=i;}});
+    return 36-best;
+}
+
+function normalizar(mm2) {
+    for(const [s] of SECCIONES) { if(s>=mm2) return s; }
+    return SECCIONES[SECCIONES.length-1][0];
+}
+
+function calcular() {
+    const I       = parseFloat(document.getElementById('I').value)||10;
+    const L       = parseFloat(document.getElementById('L').value)||5;
+    const V       = parseFloat(document.getElementById('V').value)||12;
+    const caidaMaxPct = parseFloat(document.getElementById('caidaMax').value)||3;
+    const sigma   = parseFloat(document.getElementById('material').value)||56;
+    const tf      = parseFloat(document.getElementById('tempFactor').value)||1.0;
+    const circ    = document.getElementById('circuito').value;
+
+    const dVmax   = V * caidaMaxPct / 100;
+    const factor  = circ==='ac-tri' ? Math.sqrt(3) : circ==='dc-1' ? 1 : 2;
+    const Lef     = L * factor;
+
+    const S_min   = (Lef * I) / (sigma * dVmax);
+    const S_norm  = normalizar(S_min);
+    const R_cable = Lef / (sigma * S_norm);
+    const dV      = I * R_cable;
+    const dVpct   = dV / V * 100;
+    const Pcable  = I * I * R_cable;
+
+    const Imax = SECCIONES.find(([s])=>s===S_norm)?.[1] || 0;
+    const ImaxCorr = Imax * tf;
+    const awg  = mmToAWG(S_norm);
+
+    document.getElementById('r-S').textContent     = S_min.toFixed(3)+' mm²';
+    document.getElementById('r-Snorm').textContent = S_norm+' mm²';
+    document.getElementById('r-AWG').textContent   = awg+' AWG';
+    document.getElementById('r-R').textContent     = R_cable.toFixed(4)+' Ω';
+    document.getElementById('r-dV').textContent    = dV.toFixed(3)+' V';
+    document.getElementById('r-dVpct').textContent = dVpct.toFixed(2)+'%';
+    document.getElementById('r-Pcable').textContent= Pcable.toFixed(2)+' W';
+
+    document.getElementById('r-dVpct').className = 'font-mono font-bold text-lg '+(dVpct>caidaMaxPct?'text-red-400':dVpct>caidaMaxPct*0.8?'text-yellow-400':'text-green-400');
+
+    const sobrecarga = I > ImaxCorr;
+    const status = document.getElementById('r-status');
+    if (sobrecarga) {
+        status.className = 'warn';
+        status.textContent = `⚠ SOBRECARGA: ${S_norm}mm² soporta ${ImaxCorr.toFixed(0)}A máx (a esta temperatura). Usá sección mayor.`;
+    } else if (dVpct > caidaMaxPct) {
+        status.className = 'warn';
+        status.textContent = `⚠ Caída (${dVpct.toFixed(2)}%) supera el límite (${caidaMaxPct}%). Aumentá sección.`;
+    } else {
+        status.className = 'ok';
+        status.textContent = `✓ ${S_norm}mm² es válido: I_max=${ImaxCorr.toFixed(0)}A, caída=${dVpct.toFixed(2)}% < ${caidaMaxPct}%.`;
+    }
+
+    // Highlight tabla
+    document.querySelectorAll('.table-row').forEach(r=>{
+        const txt = r.querySelector('span')?.textContent;
+        r.style.background = txt === S_norm+' mm²' ? 'rgba(6,182,212,.08)' : '';
+    });
+}
+
+renderTablas();
+calcular();
+</script>
+</body>
+</html>

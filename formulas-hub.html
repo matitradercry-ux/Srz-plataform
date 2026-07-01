@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sr. Z — Fórmulas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: radial-gradient(ellipse at 50% 20%, #1a2744 0%, #0a0f1e 55%, #060a14 100%); min-height:100vh; }
+        .hub-card {
+            background: rgba(13,19,33,.85);
+            border: 1px solid #1e293b;
+            border-radius: 14px;
+            padding: 20px;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: border-color .2s, transform .15s, box-shadow .2s;
+        }
+        .hub-card:hover { transform: translateY(-2px); box-shadow: 0 8px 30px #00000055; }
+        .hub-icon { font-size: 28px; line-height:1; }
+        .hub-title { font-size: 14px; font-weight: 800; color: #e2e8f0; }
+        .hub-desc { font-size: 11px; color: #64748b; line-height: 1.5; }
+        .hub-tags { font-size: 10px; color: #475569; }
+        .search-input { background:#0d1117; border:1px solid #1e293b; color:#e2e8f0; border-radius:10px; padding:8px 14px; font-size:13px; outline:none; width:260px; }
+        .section-h { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.12em; padding-bottom:6px; margin-bottom:14px; border-bottom: 1px solid #1e293b; }
+    </style>
+</head>
+<body class="text-slate-100 font-sans">
+
+<div class="flex items-center gap-4 px-5 py-3 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-sm sticky top-0 z-50">
+    <a href="index.html" class="text-xs text-slate-500 hover:text-slate-300 transition">← Inicio</a>
+    <span class="text-sm font-black uppercase tracking-wide text-slate-200">📚 Fórmulas de Referencia</span>
+    <input class="search-input ml-auto" type="text" id="search" placeholder="Buscar tema..." oninput="filtrar()">
+</div>
+
+<div class="max-w-5xl mx-auto p-6 space-y-10">
+
+    <div>
+        <div class="section-h text-cyan-500">⚡ Electricidad y Electrónica</div>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="grid-elec">
+            <a href="formulas-electricidad.html" class="hub-card" data-tags="electricidad ohm kirchhoff ley corriente tension resistencia potencia AC DC circuito" style="border-color:#06b6d422;">
+                <div class="hub-icon">⚡</div>
+                <div class="hub-title" style="color:#06b6d4;">Electricidad</div>
+                <div class="hub-desc">Ohm, Kirchhoff, divisores, CA, magnetismo, resonancia.</div>
+                <div class="hub-tags">V=IR · P=VI · XL XC · Z</div>
+            </a>
+            <a href="formulas-electronica.html" class="hub-card" data-tags="electronica diodo BJT MOSFET opamp amplificador filtro transistor" style="border-color:#a855f722;">
+                <div class="hub-icon">🔬</div>
+                <div class="hub-title" style="color:#a855f7;">Electrónica</div>
+                <div class="hub-desc">Diodos, BJT, MOSFET, Op-Amp, filtros, ADC/PWM.</div>
+                <div class="hub-tags">β · gm · Av · fc · Vz</div>
+            </a>
+            <a href="formulas-transformadores.html" class="hub-card" data-tags="transformador espiras bobinado nucleo eficiencia SMPS" style="border-color:#22c55e22;">
+                <div class="hub-icon">🔄</div>
+                <div class="hub-title" style="color:#22c55e;">Transformadores</div>
+                <div class="hub-desc">Relaciones, núcleo (Faraday), pérdidas cobre/hierro, SMPS.</div>
+                <div class="hub-tags">a=N1/N2 · Bmax · Ap · VR%</div>
+            </a>
+            <a href="formulas-motores.html" class="hub-card" data-tags="motor electrico induccion DC stepper BLDC servo par velocidad" style="border-color:#f9731622;">
+                <div class="hub-icon">⚙</div>
+                <div class="hub-title" style="color:#f97316;">Motores</div>
+                <div class="hub-desc">Inducción, DC, stepper, BLDC, servo, selección y aislamiento.</div>
+                <div class="hub-tags">ns · s · T=Kφ·Ia · Kv</div>
+            </a>
+            <a href="formulas-pcbs.html" class="hub-card" data-tags="PCB pista traza ancho impedancia via corriente EMC clearance" style="border-color:#06b6d422;">
+                <div class="hub-icon">🖥</div>
+                <div class="hub-title" style="color:#06b6d4;">PCBs</div>
+                <div class="hub-desc">Ancho pistas IPC-2221, clearance, impedancia controlada, vías, EMC.</div>
+                <div class="hub-tags">IPC · Z0 · ΔV · Rth</div>
+            </a>
+            <a href="formulas-fotovoltaica.html" class="hub-card" data-tags="solar fotovoltaica panel bateria inversor MPPT string HSP" style="border-color:#eab30822;">
+                <div class="hub-icon">☀</div>
+                <div class="hub-title" style="color:#eab308;">Fotovoltaica</div>
+                <div class="hub-desc">Panel I-V, strings, inversor, banco baterías, cableado, HSP.</div>
+                <div class="hub-tags">P=η·A·G · FF · DOD · PR</div>
+            </a>
+        </div>
+    </div>
+
+    <div>
+        <div class="section-h text-purple-400">🔭 Física General</div>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="grid-fis">
+            <a href="formulas-electromagnetismo.html" class="hub-card" data-tags="electromagnetismo Maxwell ondas campo EM antena Poynting" style="border-color:#f59e0b22;">
+                <div class="hub-icon">📡</div>
+                <div class="hub-title" style="color:#f59e0b;">Electromagnetismo</div>
+                <div class="hub-desc">Ecuaciones de Maxwell, ondas EM, campos, antenas, Friis.</div>
+                <div class="hub-tags">∇×E · S=E×H · λ/2 · ROE</div>
+            </a>
+            <a href="formulas-termodinamica.html" class="hub-card" data-tags="termodinamica calor temperatura entropia gas ideal Carnot ciclo conduccion" style="border-color:#ef444422;">
+                <div class="hub-icon">🌡</div>
+                <div class="hub-title" style="color:#ef4444;">Termodinámica</div>
+                <div class="hub-desc">1ª y 2ª ley, gas ideal, procesos, Carnot, transferencia de calor.</div>
+                <div class="hub-tags">PV=nRT · ΔU=Q-W · η_Carnot</div>
+            </a>
+            <a href="formulas-hidrostatica.html" class="hub-card" data-tags="hidrostática fluidos Bernoulli aerodinamica aeronautica bomba Reynolds" style="border-color:#0ea5e922;">
+                <div class="hub-icon">💧</div>
+                <div class="hub-title" style="color:#0ea5e9;">Fluidos y Aerodinámica</div>
+                <div class="hub-desc">Hidrostática, Bernoulli, Reynolds, sustentación, atmósfera ISA.</div>
+                <div class="hub-tags">P=ρgh · Re · L=½ρv²SCL · Mach</div>
+            </a>
+        </div>
+    </div>
+
+    <div id="no-results" class="hidden text-center text-slate-600 py-10 text-sm">Sin resultados para esa búsqueda.</div>
+</div>
+
+<script>
+function filtrar(){
+    const q = document.getElementById('search').value.toLowerCase().trim();
+    let alguno = false;
+    document.querySelectorAll('.hub-card').forEach(c => {
+        const txt = (c.dataset.tags + ' ' + c.textContent).toLowerCase();
+        const vis = !q || txt.includes(q);
+        c.style.display = vis ? '' : 'none';
+        if(vis) alguno = true;
+    });
+    document.getElementById('no-results').classList.toggle('hidden', !q || alguno);
+}
+</script>
+</body>
+</html>

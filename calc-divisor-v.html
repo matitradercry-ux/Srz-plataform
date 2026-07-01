@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sr. Z — Divisor de Tensión</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: radial-gradient(ellipse at 50% 20%, #1a2744 0%, #0a0f1e 55%, #060a14 100%); min-height:100vh; }
+        .card { background:rgba(13,19,33,.85); border:1px solid #1e293b; border-radius:14px; }
+        input[type=number] { background:#0d1117; border:1px solid #1e293b; color:#e2e8f0; border-radius:8px; padding:6px 10px; width:100%; font-family:monospace; font-size:13px; outline:none; transition:border .2s; }
+        input[type=number]:focus { border-color:#06b6d4; }
+        input[type=range] { accent-color:#06b6d4; width:100%; }
+        .result-val { font-family:'Courier New',monospace; color:#00ff41; text-shadow:0 0 6px #00ff41; }
+        .formula { font-family:monospace; font-size:11px; color:#94a3b8; background:#0d1117; padding:8px 12px; border-radius:8px; border-left:2px solid #06b6d4; }
+        .tab-on  { background:rgba(6,182,212,.12); border-color:rgba(6,182,212,.4); color:#06b6d4; }
+        .tab-off { color:#4b5563; border-color:#1f2937; }
+    </style>
+</head>
+<body class="text-slate-100 font-sans">
+
+<div class="flex items-center gap-4 px-5 py-2 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-sm sticky top-0 z-50">
+    <a href="index.html" class="text-xs text-slate-500 hover:text-cyan-400 transition">← Panel</a>
+    <span class="text-sm font-black uppercase tracking-wide text-slate-200">⚡ Divisor de Tensión</span>
+    <span class="text-[10px] text-slate-600">Con y sin carga</span>
+</div>
+
+<!-- Tabs modo -->
+<div class="max-w-5xl mx-auto px-5 pt-4 flex gap-2">
+    <button onclick="setModo('calcR2')"   id="tab-calcR2"   class="tab-on   text-[11px] font-bold px-4 py-1.5 rounded-lg border transition">Calcular R2</button>
+    <button onclick="setModo('calcVout')" id="tab-calcVout" class="tab-off text-[11px] font-bold px-4 py-1.5 rounded-lg border transition">Calcular Vout</button>
+    <button onclick="setModo('calcR1')"   id="tab-calcR1"   class="tab-off text-[11px] font-bold px-4 py-1.5 rounded-lg border transition">Calcular R1</button>
+</div>
+
+<div class="max-w-5xl mx-auto p-5 grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+<!-- INPUTS -->
+<div class="card p-5 space-y-4">
+    <div class="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-2">Valores</div>
+
+    <div>
+        <label class="text-[11px] text-slate-500 uppercase tracking-wider">Vin (V)</label>
+        <input type="number" id="Vin" value="12" step="0.1" min="0" oninput="calcular()">
+    </div>
+
+    <div id="wrap-Vout">
+        <label class="text-[11px] text-slate-500 uppercase tracking-wider">Vout deseado (V)</label>
+        <input type="number" id="Vout" value="5" step="0.1" min="0" oninput="calcular()">
+    </div>
+
+    <div id="wrap-R1">
+        <label class="text-[11px] text-slate-500 uppercase tracking-wider">R1 (Ω)</label>
+        <input type="number" id="R1" value="10000" step="100" min="1" oninput="calcular()">
+    </div>
+
+    <div id="wrap-R2">
+        <label class="text-[11px] text-slate-500 uppercase tracking-wider">R2 (Ω)</label>
+        <input type="number" id="R2" value="4700" step="100" min="1" oninput="calcular()">
+    </div>
+
+    <div class="border-t border-slate-800 pt-3">
+        <label class="text-[11px] text-slate-500 uppercase tracking-wider">Carga Rl (Ω) — 0 = sin carga</label>
+        <input type="number" id="Rl" value="0" step="100" min="0" oninput="calcular()">
+        <div class="text-[10px] text-slate-600 mt-1">La carga afecta Vout real.</div>
+    </div>
+
+    <div class="border-t border-slate-800 pt-3">
+        <div class="text-[11px] text-slate-500 mb-2 uppercase tracking-wider">Valores E24 sugeridos</div>
+        <div class="text-[10px] text-slate-400">R1: <span id="e24-R1" class="text-yellow-400 font-mono">—</span></div>
+        <div class="text-[10px] text-slate-400">R2: <span id="e24-R2" class="text-yellow-400 font-mono">—</span></div>
+    </div>
+</div>
+
+<!-- RESULTADOS -->
+<div class="card p-5 space-y-4">
+    <div class="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-2">Resultados</div>
+
+    <div class="bg-slate-950 rounded-xl p-4 space-y-3">
+        <div class="flex justify-between">
+            <span class="text-[11px] text-slate-500">Vout (sin carga)</span>
+            <span id="r-Vout-noc" class="result-val text-2xl">—</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-[11px] text-slate-500">Vout (con carga)</span>
+            <span id="r-Vout-load" class="result-val">—</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-[11px] text-slate-500">Error por carga</span>
+            <span id="r-err" class="font-mono text-sm">—</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-[11px] text-slate-500">R1</span>
+            <span id="r-R1" class="result-val">—</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-[11px] text-slate-500">R2</span>
+            <span id="r-R2" class="result-val">—</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-[11px] text-slate-500">Corriente divisor (I)</span>
+            <span id="r-I" class="result-val">—</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-[11px] text-slate-500">Potencia total</span>
+            <span id="r-P" class="result-val">—</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-[11px] text-slate-500">Relación V = Vin ×</span>
+            <span id="r-ratio" class="font-mono text-cyan-400 text-sm">—</span>
+        </div>
+    </div>
+
+    <div class="space-y-2">
+        <div class="formula">Vout = Vin × R2 / (R1 + R2)</div>
+        <div class="formula">Con carga: R2ef = R2 ∥ Rl</div>
+        <div class="formula">I = Vin / (R1 + R2)</div>
+    </div>
+
+    <!-- Regla del 10x -->
+    <div id="regla10x" class="formula border-l-yellow-400 text-yellow-300"></div>
+</div>
+
+<!-- DIAGRAMA -->
+<div class="card p-5 flex flex-col gap-3">
+    <div class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Diagrama</div>
+    <svg viewBox="0 0 200 360" class="w-full max-w-[220px] mx-auto">
+        <!-- Vin -->
+        <text x="100" y="18" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="bold" id="svg-Vin">Vin</text>
+        <line x1="100" y1="22" x2="100" y2="45" stroke="#ef4444" stroke-width="1.5"/>
+        <!-- R1 -->
+        <rect x="70" y="45" width="60" height="25" rx="4" fill="#1a1200" stroke="#ca8a04" stroke-width="1.5"/>
+        <text x="100" y="56" text-anchor="middle" fill="#fbbf24" font-size="9" font-weight="bold">R1</text>
+        <text x="100" y="65" text-anchor="middle" fill="#92400e" font-size="8" id="svg-R1">—</text>
+        <!-- Nodo -->
+        <line x1="100" y1="70" x2="100" y2="100" stroke="#94a3b8" stroke-width="1.5"/>
+        <circle cx="100" cy="100" r="4" fill="#06b6d4"/>
+        <!-- Vout label -->
+        <line x1="100" y1="100" x2="160" y2="100" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="4,2"/>
+        <text x="168" y="103" fill="#06b6d4" font-size="9" font-weight="bold">Vout</text>
+        <text x="168" y="114" fill="#06b6d4" font-size="8" id="svg-Vout">—</text>
+        <!-- Rl -->
+        <line x1="160" y1="117" x2="160" y2="130" stroke="#06b6d4" stroke-width="1" stroke-dasharray="3,2"/>
+        <rect x="143" y="130" width="34" height="22" rx="3" fill="#1a1a2e" stroke="#374151" stroke-width="1" id="svg-Rl-rect"/>
+        <text x="160" y="144" text-anchor="middle" fill="#475569" font-size="8" id="svg-Rl-txt">Rl</text>
+        <line x1="160" y1="152" x2="160" y2="165" stroke="#374151" stroke-width="1" stroke-dasharray="3,2"/>
+        <line x1="100" y1="165" x2="160" y2="165" stroke="#374151" stroke-width="1" stroke-dasharray="3,2"/>
+        <!-- R2 -->
+        <line x1="100" y1="100" x2="100" y2="120" stroke="#94a3b8" stroke-width="1.5"/>
+        <rect x="70" y="120" width="60" height="25" rx="4" fill="#1a1200" stroke="#ca8a04" stroke-width="1.5"/>
+        <text x="100" y="131" text-anchor="middle" fill="#fbbf24" font-size="9" font-weight="bold">R2</text>
+        <text x="100" y="140" text-anchor="middle" fill="#92400e" font-size="8" id="svg-R2">—</text>
+        <!-- GND -->
+        <line x1="100" y1="145" x2="100" y2="175" stroke="#374151" stroke-width="1.5"/>
+        <line x1="82"  y1="175" x2="118" y2="175" stroke="#374151" stroke-width="2"/>
+        <line x1="87"  y1="182" x2="113" y2="182" stroke="#374151" stroke-width="1.5"/>
+        <line x1="92"  y1="189" x2="108" y2="189" stroke="#374151" stroke-width="1"/>
+        <!-- Corriente arrows -->
+        <text x="115" y="82" fill="#64748b" font-size="8" font-family="monospace" id="svg-I">I=—</text>
+    </svg>
+
+    <!-- Slider visual -->
+    <div>
+        <label class="text-[10px] text-slate-500 uppercase tracking-wider">Ajuste rápido Vout / Vin</label>
+        <input type="range" min="1" max="99" value="42" id="ratio-slider" oninput="onRatioSlider(this.value)">
+        <div class="text-center text-[11px] text-cyan-400 font-mono" id="ratio-pct">42%</div>
+    </div>
+</div>
+
+</div>
+
+<script>
+let modo = 'calcR2';
+
+const E24 = [10,11,12,13,15,16,18,20,22,24,27,30,33,36,39,43,47,51,56,62,68,75,82,91];
+function e24val(val) {
+    if (val <= 0) return val;
+    const exp = Math.floor(Math.log10(val));
+    const base = val / Math.pow(10, exp);
+    let best = E24[0], bestDiff = Infinity;
+    E24.forEach(v => { const d = Math.abs(v - base*10); if(d<bestDiff){bestDiff=d; best=v;} });
+    return best * Math.pow(10, exp-1);
+}
+function fmtR(v) {
+    if (!isFinite(v)||v<=0) return '—';
+    if (v>=1e6) return (v/1e6).toFixed(2)+'MΩ';
+    if (v>=1e3) return (v/1e3).toFixed(2)+'kΩ';
+    return v.toFixed(0)+'Ω';
+}
+function fmtI(mA) {
+    if (!isFinite(mA)) return '—';
+    if (Math.abs(mA)>=1000) return (mA/1000).toFixed(2)+'A';
+    if (Math.abs(mA)>=1)    return mA.toFixed(3)+'mA';
+    return (mA*1000).toFixed(1)+'µA';
+}
+
+function setModo(m) {
+    modo = m;
+    ['calcR2','calcVout','calcR1'].forEach(id => {
+        const btn = document.getElementById('tab-'+id);
+        btn.className = (id===m ? 'tab-on' : 'tab-off') + ' text-[11px] font-bold px-4 py-1.5 rounded-lg border transition';
+    });
+    document.getElementById('wrap-R1').style.display   = m==='calcR1'   ? 'none' : '';
+    document.getElementById('wrap-R2').style.display   = m==='calcR2'   ? 'none' : '';
+    document.getElementById('wrap-Vout').style.display = m==='calcVout' ? 'none' : '';
+    calcular();
+}
+
+function calcular() {
+    const Vin  = parseFloat(document.getElementById('Vin').value)||12;
+    const Rl   = parseFloat(document.getElementById('Rl').value)||0;
+
+    let R1, R2, Vout;
+    if (modo === 'calcR2') {
+        R1   = parseFloat(document.getElementById('R1').value)||10000;
+        Vout = parseFloat(document.getElementById('Vout').value)||5;
+        if (Vout >= Vin) { document.getElementById('r-Vout-noc').textContent='Vout≥Vin'; return; }
+        R2 = R1 * Vout / (Vin - Vout);
+    } else if (modo === 'calcVout') {
+        R1   = parseFloat(document.getElementById('R1').value)||10000;
+        R2   = parseFloat(document.getElementById('R2').value)||4700;
+        Vout = Vin * R2 / (R1+R2);
+    } else { // calcR1
+        R2   = parseFloat(document.getElementById('R2').value)||4700;
+        Vout = parseFloat(document.getElementById('Vout').value)||5;
+        if (Vout >= Vin) { document.getElementById('r-Vout-noc').textContent='Vout≥Vin'; return; }
+        R1 = R2 * (Vin - Vout) / Vout;
+    }
+
+    const R2ef = Rl > 0 ? (R2*Rl)/(R2+Rl) : R2;
+    const VoutLoad = Rl > 0 ? Vin * R2ef / (R1+R2ef) : Vout;
+    const err = Rl > 0 ? Math.abs((VoutLoad-Vout)/Vout*100) : 0;
+    const I = Vin / (R1+R2) * 1000; // mA
+    const P = Vin * I; // mW
+
+    document.getElementById('r-Vout-noc').textContent  = Vout.toFixed(3)+' V';
+    document.getElementById('r-Vout-load').textContent = Rl>0 ? VoutLoad.toFixed(3)+' V' : '— (sin carga)';
+    document.getElementById('r-err').textContent       = Rl>0 ? err.toFixed(2)+'%' : '0%';
+    document.getElementById('r-err').className         = 'font-mono text-sm '+(err>5?'text-red-400': err>1?'text-yellow-400':'text-green-400');
+    document.getElementById('r-R1').textContent  = fmtR(R1);
+    document.getElementById('r-R2').textContent  = fmtR(R2);
+    document.getElementById('r-I').textContent   = fmtI(I);
+    document.getElementById('r-P').textContent   = P.toFixed(1)+' mW';
+    document.getElementById('r-ratio').textContent = (R2/(R1+R2)*100).toFixed(1)+'%';
+
+    // E24
+    document.getElementById('e24-R1').textContent = fmtR(e24val(R1));
+    document.getElementById('e24-R2').textContent = fmtR(e24val(R2));
+
+    // Regla 10x
+    const ok10x = R2 <= Rl/10;
+    document.getElementById('regla10x').textContent = Rl>0
+        ? (ok10x ? '✓ Regla 10x OK: R2 ≤ Rl/10 — carga no afecta.' : '⚠ Regla 10x: R2 debe ser < Rl/10 = '+fmtR(Rl/10)+'. Reducí R1/R2.')
+        : 'Regla 10x: Rt divisor ≤ Rl/10 para mínima interferencia.';
+    document.getElementById('regla10x').classList.toggle('border-l-yellow-400', !ok10x && Rl>0);
+    document.getElementById('regla10x').classList.toggle('border-l-cyan-400', ok10x || Rl===0);
+
+    // SVG
+    document.getElementById('svg-Vin').textContent = Vin+'V';
+    document.getElementById('svg-R1').textContent  = fmtR(R1);
+    document.getElementById('svg-R2').textContent  = fmtR(R2);
+    document.getElementById('svg-Vout').textContent= Vout.toFixed(2)+'V';
+    document.getElementById('svg-I').textContent   = 'I='+fmtI(I);
+    document.getElementById('svg-Rl-txt').textContent = Rl>0 ? fmtR(Rl) : 'Rl=∞';
+    document.getElementById('svg-Rl-rect').setAttribute('stroke', Rl>0 ? '#06b6d4' : '#374151');
+
+    // Slider
+    document.getElementById('ratio-slider').value = (R2/(R1+R2)*100).toFixed(0);
+    document.getElementById('ratio-pct').textContent = (R2/(R1+R2)*100).toFixed(1)+'%';
+}
+
+function onRatioSlider(pct) {
+    const Vin = parseFloat(document.getElementById('Vin').value)||12;
+    const Vout_target = Vin * pct/100;
+    document.getElementById('Vout').value = Vout_target.toFixed(2);
+    document.getElementById('ratio-pct').textContent = parseFloat(pct).toFixed(1)+'%';
+    if (modo==='calcVout') setModo('calcR2');
+    else calcular();
+}
+
+setModo('calcR2');
+</script>
+</body>
+</html>

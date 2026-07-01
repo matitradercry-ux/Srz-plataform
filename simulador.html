@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sr. Z — Simulador Multímetro</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0f172a;color:#e2e8f0;font-family:system-ui,sans-serif;min-height:100vh;}
+.nav{display:flex;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid #1e293b;background:rgba(7,11,20,.97);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.nav a{font-size:12px;color:#475569;text-decoration:none;}.nav a:hover{color:#e2e8f0;}
+.nav .brand{font-size:16px;font-weight:900;background:linear-gradient(90deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+
+/* Top config bar */
+.config-bar{background:#111827;border-bottom:1px solid #1e293b;padding:12px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.config-label{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;}
+select{background:#1e293b;border:1px solid #334155;color:#e2e8f0;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:600;outline:none;cursor:pointer;}
+select:focus{border-color:#06b6d4;}
+
+.wrap{max-width:960px;margin:0 auto;padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:24px;}
+
+/* ── METER BODY ───────────────────────────────────────────── */
+.meter{width:340px;background:linear-gradient(160deg,#2a2a2a,#1a1a1a,#222);border:4px solid #f59e0b;border-radius:18px;padding:18px;box-shadow:0 0 0 1px #b45309, 0 16px 48px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.06);position:relative;}
+
+.meter-brand{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.meter-brand-name{font-size:11px;font-weight:800;letter-spacing:.15em;color:#9ca3af;}
+.meter-badge{font-size:9px;font-weight:800;letter-spacing:.1em;background:#374151;color:#9ca3af;padding:3px 8px;border-radius:4px;}
+
+/* LCD */
+.lcd{background:#b8bfa8;border-radius:6px;padding:14px 16px 10px;margin-bottom:16px;border:2px solid #8a9070;box-shadow:inset 0 2px 8px rgba(0,0,0,.3);}
+.lcd-value{font-family:'Courier New',monospace;font-size:46px;font-weight:900;color:#1a2010;text-align:right;line-height:1;letter-spacing:2px;min-height:55px;display:flex;align-items:center;justify-content:flex-end;}
+.lcd-unit{font-size:18px;font-weight:700;margin-left:4px;}
+.lcd-mode{font-size:10px;font-weight:800;letter-spacing:.1em;color:#3a4a28;text-align:right;margin-top:4px;text-transform:uppercase;}
+.lcd-ol{color:#1a2010;}
+
+/* Dial + Range row */
+.dial-range-row{display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;}
+
+/* Dial */
+.dial-wrap{position:relative;width:150px;height:150px;flex-shrink:0;}
+.dial-ring{width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#4a4a4a,#1a1a1a);border:3px solid #444;box-shadow:0 4px 16px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.08);position:relative;}
+/* Dial mode labels */
+.dial-label{position:absolute;font-size:9px;font-weight:800;color:#9ca3af;transform:translate(-50%,-50%);cursor:pointer;padding:4px 5px;border-radius:4px;transition:color .15s,background .15s;user-select:none;text-align:center;line-height:1.2;}
+.dial-label:hover{color:#f59e0b;}
+.dial-label.active-mode{color:#f59e0b;background:rgba(245,158,11,.12);border-radius:4px;}
+/* Needle */
+.dial-needle{position:absolute;width:3px;border-radius:2px;background:linear-gradient(to top,#dc2626,#f87171);transform-origin:bottom center;left:50%;bottom:50%;transition:transform .35s cubic-bezier(.4,0,.2,1);box-shadow:0 0 4px #ef4444;}
+.dial-center{position:absolute;width:14px;height:14px;border-radius:50%;background:#dc2626;border:2px solid #fee2e2;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5;}
+
+/* Range panel */
+.range-panel{flex:1;}
+.range-title{font-size:9px;font-weight:800;letter-spacing:.1em;color:#6b7280;text-transform:uppercase;margin-bottom:6px;}
+.range-btn{display:block;width:100%;padding:6px 10px;background:#1e293b;border:1px solid #334155;color:#64748b;font-size:11px;font-weight:700;border-radius:6px;cursor:pointer;margin-bottom:4px;text-align:center;transition:all .15s;}
+.range-btn:hover{border-color:#475569;color:#94a3b8;}
+.range-btn.active{background:#f59e0b;border-color:#f59e0b;color:#0f172a;}
+
+/* Terminals */
+.terminals{display:flex;justify-content:space-around;align-items:flex-end;padding-top:8px;border-top:1px solid #333;}
+.terminal{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
+.terminal-jack{width:22px;height:22px;border-radius:50%;border:3px solid #555;display:flex;align-items:center;justify-content:center;transition:border-color .15s,box-shadow .15s;}
+.terminal-jack.red{border-color:#dc2626;}
+.terminal-jack.red.active-term{box-shadow:0 0 10px #ef4444;}
+.terminal-jack.black{border-color:#374151;}
+.terminal-jack.black.active-term{box-shadow:0 0 8px #6b7280;}
+.terminal-jack-inner{width:8px;height:8px;border-radius:50%;background:#444;}
+.terminal-jack.red .terminal-jack-inner{background:#dc2626;}
+.terminal-label{font-size:8px;font-weight:700;color:#6b7280;text-align:center;line-height:1.3;}
+
+/* ── INFO PANEL ───────────────────────────────────────────── */
+.info-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:700px;}
+.info-card{background:#111827;border:1px solid #1e293b;border-radius:10px;padding:16px;}
+.info-table{width:100%;border-collapse:collapse;}
+.info-table tr{border-bottom:1px solid #1e293b;}
+.info-table tr:last-child{border-bottom:none;}
+.info-table td{padding:8px 0;font-size:12px;}
+.info-table td:first-child{color:#6b7280;}
+.info-table td:last-child{text-align:right;font-weight:700;color:#e2e8f0;}
+
+.validation{border-radius:8px;padding:12px 14px;font-size:12px;font-weight:600;display:flex;align-items:flex-start;gap:8px;line-height:1.5;}
+.validation.ok{background:#052e16;border:1px solid #166534;color:#4ade80;}
+.validation.error{background:#1c0e0e;border:1px solid #991b1b;color:#f87171;}
+.validation.warn{background:#1c1400;border:1px solid #b45309;color:#fbbf24;}
+.val-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
+
+.tip-blue{background:#0c1a2e;border:1px solid #1e3a5f;border-radius:8px;padding:12px 14px;font-size:12px;color:#7dd3fc;display:flex;gap:10px;line-height:1.5;width:100%;max-width:700px;}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <span class="brand">Sr.Z</span>
+  <a href="index.html">Inicio</a>
+  <a href="laboratorio.html">← Laboratorio</a>
+</nav>
+
+<!-- Config bar -->
+<div class="config-bar">
+  <span class="config-label">¿Qué vas a medir?</span>
+  <select id="sel-magnitud" onchange="onMagnitudChange()">
+    <option value="vdc">Voltaje DC</option>
+    <option value="vac">Voltaje AC</option>
+    <option value="idc">Corriente DC</option>
+    <option value="iac">Corriente AC</option>
+    <option value="ohm">Resistencia</option>
+  </select>
+  <select id="sel-source" onchange="update()"></select>
+</div>
+
+<div class="wrap">
+
+  <!-- METER -->
+  <div class="meter">
+    <div class="meter-brand">
+      <span class="meter-brand-name">Sr.Z ELECTRÓNICA</span>
+      <span class="meter-badge">TRUE RMS MULTIMETER</span>
+    </div>
+
+    <!-- LCD -->
+    <div class="lcd">
+      <div class="lcd-value" id="lcd-value"><span id="lcd-num">---</span><span class="lcd-unit" id="lcd-unit"></span></div>
+      <div class="lcd-mode" id="lcd-mode">MODO: ---</div>
+    </div>
+
+    <div class="dial-range-row">
+
+      <!-- Dial -->
+      <div class="dial-wrap">
+        <div class="dial-ring" id="dial-ring">
+          <!-- Labels positioned by JS -->
+          <div class="dial-needle" id="dial-needle" style="height:52px;transform:rotate(0deg);"></div>
+          <div class="dial-center"></div>
+        </div>
+      </div>
+
+      <!-- Range panel -->
+      <div class="range-panel">
+        <div class="range-title">Rango</div>
+        <div id="range-buttons"><!-- por JS --></div>
+      </div>
+
+    </div><!-- /dial-range-row -->
+
+    <!-- Terminals -->
+    <div class="terminals">
+      <div class="terminal" onclick="setTerminal('10A')">
+        <div class="terminal-jack black" id="term-10A"><div class="terminal-jack-inner"></div></div>
+        <div class="terminal-label">10A<br>MAX UNFUSED</div>
+      </div>
+      <div class="terminal" onclick="setTerminal('COM')">
+        <div class="terminal-jack black" id="term-COM"><div class="terminal-jack-inner"></div></div>
+        <div class="terminal-label">COM<br>MAX 1000V</div>
+      </div>
+      <div class="terminal" onclick="setTerminal('VOMA')">
+        <div class="terminal-jack red" id="term-VOMA"><div class="terminal-jack-inner"></div></div>
+        <div class="terminal-label">VΩmA<br>FUSED 200mA MAX</div>
+      </div>
+    </div>
+  </div><!-- /meter -->
+
+  <!-- Info row -->
+  <div class="info-row">
+    <div class="info-card">
+      <table class="info-table">
+        <tr><td>Midiendo</td><td id="inf-mid">—</td></tr>
+        <tr><td>Valor Real</td><td id="inf-real">—</td></tr>
+        <tr><td>Modo Polímetro</td><td id="inf-modo">—</td></tr>
+        <tr><td>Rango Seleccionado</td><td id="inf-rango">—</td></tr>
+        <tr><td>Decimales Visibles</td><td id="inf-dec">—</td></tr>
+      </table>
+    </div>
+    <div class="info-card" style="display:flex;flex-direction:column;gap:10px;">
+      <div class="validation warn" id="val-box">
+        <span class="val-icon">⚠️</span>
+        <span id="val-text">Seleccioná el modo correcto en el selector rotativo.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip-blue">
+    <span>ℹ️</span>
+    <span>Medir tensión, corriente o resistencia requiere conectar el multímetro de forma distinta. Practicar esto evita errores muy comunes en el laboratorio.</span>
+  </div>
+
+</div><!-- /wrap -->
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────────────────────
+const SOURCES = {
+  vdc: [
+    { label:'Pila 1.5V',   value:1.5,   unit:'V' },
+    { label:'Pila 9V',     value:9,     unit:'V' },
+    { label:'Batería 12V', value:12,    unit:'V' },
+    { label:'Batería 4.2V',value:4.2,   unit:'V' },
+    { label:'Fuente 5V',   value:5,     unit:'V' },
+    { label:'Fuente 24V',  value:24,    unit:'V' },
+  ],
+  vac: [
+    { label:'Red 220V',    value:220,   unit:'V' },
+    { label:'Red 110V',    value:110,   unit:'V' },
+    { label:'Transformador 12V AC', value:12, unit:'V' },
+    { label:'Transformador 6V AC',  value:6,  unit:'V' },
+  ],
+  idc: [
+    { label:'50 mA',   value:0.05,  unit:'A' },
+    { label:'200 mA',  value:0.2,   unit:'A' },
+    { label:'1 A',     value:1,     unit:'A' },
+    { label:'5 A',     value:5,     unit:'A' },
+  ],
+  iac: [
+    { label:'2 A AC',  value:2,     unit:'A' },
+    { label:'8 A AC',  value:8,     unit:'A' },
+  ],
+  ohm: [
+    { label:'100 Ω',   value:100,   unit:'Ω' },
+    { label:'1 kΩ',    value:1000,  unit:'Ω' },
+    { label:'10 kΩ',   value:10000, unit:'Ω' },
+    { label:'1 MΩ',    value:1e6,   unit:'Ω' },
+  ],
+};
+
+// Dial modes with needle angle (degrees from 12 o'clock, clockwise)
+const MODES = [
+  { id:'off',  label:'OFF',    angle:-170, ranges:[], correctMag:[], terminal:'any' },
+  { id:'ac-a', label:'A~',     angle:-130, ranges:['200mA','2A'], correctMag:['iac'], terminal:'VOMA', termLabel:'VΩmA' },
+  { id:'dc-10a',label:'10A',   angle:-80,  ranges:['10A'], correctMag:['idc'], terminal:'10A', termLabel:'10A' },
+  { id:'ohm',  label:'Ω',      angle:-30,  ranges:['200Ω','2kΩ','20kΩ','200kΩ','2MΩ','20MΩ'], correctMag:['ohm'], terminal:'VOMA', termLabel:'VΩmA' },
+  { id:'ac-v', label:'V~',     angle:30,   ranges:['2V','20V','200V','1000V'], correctMag:['vac'], terminal:'VOMA', termLabel:'VΩmA' },
+  { id:'dc-v', label:'V—',     angle:80,   ranges:['200mV','2V','20V','200V','1000V'], correctMag:['vdc'], terminal:'VOMA', termLabel:'VΩmA' },
+  { id:'dc-a', label:'A—',     angle:130,  ranges:['200µA','2mA','20mA','200mA'], correctMag:['idc'], terminal:'VOMA', termLabel:'VΩmA' },
+  { id:'diode',label:'⊢|⊣',   angle:165,  ranges:['Diodo'], correctMag:[], terminal:'VOMA', termLabel:'VΩmA' },
+];
+
+// Range values (for validation: smallest range >= source value in that unit)
+const RANGE_VALUES = {
+  '200mV':0.2, '2V':2, '20V':20, '200V':200, '1000V':1000,
+  '200µA':0.0002, '2mA':0.002, '20mA':0.02, '200mA':0.2, '2A':2, '10A':10,
+  '200Ω':200, '2kΩ':2000, '20kΩ':20000, '200kΩ':200000, '2MΩ':2e6, '20MΩ':2e7,
+  'Diodo':0,
+};
+
+let state = {
+  magnitud: 'vdc',
+  sourceIdx: 0,
+  modeId: 'dc-v',
+  range: '20V',
+  terminal: 'VOMA',
+};
+
+// ─── DIAL SETUP ──────────────────────────────────────────────────────────────
+function buildDial() {
+  const ring = document.getElementById('dial-ring');
+  // Remove old labels
+  ring.querySelectorAll('.dial-label').forEach(el => el.remove());
+
+  const R = 54; // radius for label placement (px from center)
+  const CX = 75, CY = 75; // center of 150x150 dial
+
+  MODES.forEach(m => {
+    const rad = (m.angle - 90) * Math.PI / 180;
+    const x = CX + R * Math.cos(rad);
+    const y = CY + R * Math.sin(rad);
+
+    const el = document.createElement('div');
+    el.className = 'dial-label' + (m.id === state.modeId ? ' active-mode' : '');
+    el.textContent = m.label;
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    el.title = m.label;
+    el.onclick = () => setMode(m.id);
+    ring.appendChild(el);
+  });
+
+  updateNeedle();
+}
+
+function updateNeedle() {
+  const mode = MODES.find(m => m.id === state.modeId);
+  const needle = document.getElementById('dial-needle');
+  needle.style.transform = `rotate(${mode.angle}deg)`;
+  document.querySelectorAll('.dial-label').forEach(el => {
+    el.classList.remove('active-mode');
+    if (el.textContent === mode.label || el.textContent === mode.label) {
+      // match by onclick
+    }
+  });
+  document.querySelectorAll('.dial-label').forEach((el, i) => {
+    el.classList.toggle('active-mode', MODES[i].id === state.modeId);
+  });
+}
+
+function setMode(id) {
+  state.modeId = id;
+  const mode = MODES.find(m => m.id === id);
+  // Set first range of this mode
+  if (mode.ranges.length) state.range = mode.ranges[0];
+  updateNeedle();
+  buildRangeButtons();
+  update();
+}
+
+// ─── RANGE BUTTONS ───────────────────────────────────────────────────────────
+function buildRangeButtons() {
+  const mode = MODES.find(m => m.id === state.modeId);
+  const container = document.getElementById('range-buttons');
+  container.innerHTML = '';
+  if (!mode.ranges.length) {
+    container.innerHTML = '<div style="font-size:11px;color:#475569;padding:6px 0;">Sin rango</div>';
+    return;
+  }
+  mode.ranges.forEach(r => {
+    const btn = document.createElement('button');
+    btn.className = 'range-btn' + (r === state.range ? ' active' : '');
+    btn.textContent = r;
+    btn.onclick = () => { state.range = r; buildRangeButtons(); update(); };
+    container.appendChild(btn);
+  });
+}
+
+// ─── TERMINAL ────────────────────────────────────────────────────────────────
+function setTerminal(t) {
+  state.terminal = t;
+  ['10A','COM','VOMA'].forEach(id => {
+    document.getElementById('term-'+id).classList.remove('active-term');
+  });
+  document.getElementById('term-'+t).classList.add('active-term');
+  update();
+}
+
+// ─── SOURCES ─────────────────────────────────────────────────────────────────
+function onMagnitudChange() {
+  state.magnitud = document.getElementById('sel-magnitud').value;
+  state.sourceIdx = 0;
+  buildSourceSelect();
+  // auto-set recommended mode
+  const rec = {vdc:'dc-v', vac:'ac-v', idc:'dc-a', iac:'ac-a', ohm:'ohm'};
+  // don't auto-set — let user configure
+  update();
+}
+
+function buildSourceSelect() {
+  const sel = document.getElementById('sel-source');
+  sel.innerHTML = '';
+  SOURCES[state.magnitud].forEach((s,i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = s.label;
+    sel.appendChild(opt);
+  });
+  sel.onchange = () => { state.sourceIdx = parseInt(sel.value); update(); };
+}
+
+// ─── LCD DISPLAY ─────────────────────────────────────────────────────────────
+function formatLCD(value, rangeStr) {
+  const rv = RANGE_VALUES[rangeStr] || 0;
+  if (!rv) return { num:'---', unit:'', decimals:0 };
+
+  let decimals = 2;
+  let dispValue = value;
+  let unit = '';
+
+  // determine display unit and scale
+  if (rangeStr.includes('mV')) { unit='mV'; dispValue=value*1000; decimals=1; }
+  else if (rangeStr.includes('µA')) { unit='µA'; dispValue=value*1e6; decimals=1; }
+  else if (rangeStr.includes('mA') || rangeStr==='200mA') { unit='mA'; dispValue=value*1000; decimals=1; }
+  else if (rangeStr.includes('kΩ')) { unit='kΩ'; dispValue=value/1000; decimals=2; }
+  else if (rangeStr.includes('MΩ')) { unit='MΩ'; dispValue=value/1e6; decimals=3; }
+  else if (rangeStr==='10A' || rangeStr==='2A') { unit='A'; decimals=2; }
+  else if (rangeStr.includes('V')) { unit='V'; decimals=2; }
+  else if (rangeStr.includes('Ω')) { unit='Ω'; decimals=1; }
+
+  // check OL (over limit)
+  if (dispValue > rv * (unit.includes('m') || unit.includes('µ') ? 1 : 1) * 10 && rangeStr!=='10A') {
+    // need to check if value > range in the same unit
+  }
+
+  const numStr = dispValue.toFixed(decimals);
+  return { num: numStr, unit, decimals };
+}
+
+function getLCDDisplay(source, rangeStr, isCorrectMode, isCorrectRange) {
+  if (!isCorrectMode) return { num:'---', unit:'', mode:'MODO INCORRECTO' };
+  if (!isCorrectRange) return { num:'OL', unit:'', mode:'FUERA DE RANGO - RANGO INCORRECTO' };
+
+  const { num, unit, decimals } = formatLCD(source.value, rangeStr);
+  return { num, unit, mode: '' };
+}
+
+// ─── VALIDATION ──────────────────────────────────────────────────────────────
+function validate(source, mode, rangeStr, terminal) {
+  const issues = [];
+
+  // Check mode
+  const modeOk = mode.correctMag.includes(state.magnitud);
+  if (!modeOk) {
+    const needed = {vdc:'V— (Voltaje DC)',vac:'V~ (Voltaje AC)',idc:'A— (Corriente DC) o 10A',iac:'A~ (Corriente AC)',ohm:'Ω (Resistencia)'};
+    issues.push(`Modo incorrecto. Para ${getMagLabel(state.magnitud)} usá el selector en <strong>${needed[state.magnitud]}</strong>.`);
+  }
+
+  // Check range (only if mode is ok)
+  let rangeOk = false;
+  if (modeOk && rangeStr) {
+    const rv = RANGE_VALUES[rangeStr];
+    rangeOk = rv !== undefined && rv >= source.value;
+  }
+  if (modeOk && !rangeOk) {
+    issues.push(`Rango insuficiente. El valor real <strong>${source.value} ${source.unit}</strong> supera el rango <strong>${rangeStr}</strong>. Elegí un rango mayor.`);
+  }
+
+  // Check terminal
+  const termOk = terminal === 'COM' || terminal === mode.terminal || mode.terminal === 'any';
+  const needsCom = terminal === 'COM'; // COM is always needed as reference
+  if (!needsCom && terminal !== mode.terminal && mode.terminal !== 'any') {
+    issues.push(`Terminal incorrecta. Para este modo usá el terminal <strong>${mode.termLabel}</strong> (rojo). El negro va siempre en COM.`);
+  }
+
+  const allOk = modeOk && rangeOk;
+  return { ok: allOk, modeOk, rangeOk, issues };
+}
+
+function getMagLabel(m) {
+  return {vdc:'Voltaje DC',vac:'Voltaje AC',idc:'Corriente DC',iac:'Corriente AC',ohm:'Resistencia'}[m];
+}
+
+// ─── MAIN UPDATE ─────────────────────────────────────────────────────────────
+function update() {
+  const source = SOURCES[state.magnitud][state.sourceIdx || 0];
+  const mode = MODES.find(m => m.id === state.modeId);
+  const { ok, modeOk, rangeOk, issues } = validate(source, mode, state.range, state.terminal);
+
+  // LCD
+  const rv = RANGE_VALUES[state.range] || 0;
+  let lcdNum, lcdUnit, lcdModeStr;
+
+  if (!modeOk) {
+    lcdNum = '---'; lcdUnit = '';
+    lcdModeStr = mode.label + ' — ' + state.range;
+  } else if (!rangeOk && state.range) {
+    lcdNum = 'OL'; lcdUnit = '';
+    lcdModeStr = getMagLabel(state.magnitud).toUpperCase() + ' — ' + state.range;
+  } else {
+    const f = formatLCD(source.value, state.range);
+    lcdNum = f.num; lcdUnit = f.unit;
+    lcdModeStr = getMagLabel(state.magnitud).toUpperCase() + ' — ' + state.range;
+  }
+
+  document.getElementById('lcd-num').textContent = lcdNum;
+  document.getElementById('lcd-unit').textContent = lcdUnit;
+  document.getElementById('lcd-mode').textContent = 'MODO: ' + lcdModeStr;
+
+  // Info table
+  document.getElementById('inf-mid').textContent = getMagLabel(state.magnitud);
+  document.getElementById('inf-real').textContent = source.value + ' ' + source.unit;
+  document.getElementById('inf-modo').textContent = mode.label.replace('—','DC').replace('~','AC');
+  document.getElementById('inf-rango').textContent = state.range || '—';
+  document.getElementById('inf-dec').textContent = modeOk && rangeOk ? (formatLCD(source.value,state.range).decimals) : '—';
+
+  // Validation box
+  const vbox = document.getElementById('val-box');
+  const vtxt = document.getElementById('val-text');
+
+  if (ok) {
+    vbox.className = 'validation ok';
+    vtxt.innerHTML = 'El polímetro está configurado correctamente para esta medición.';
+  } else {
+    vbox.className = 'validation error';
+    vtxt.innerHTML = issues.map(i=>`• ${i}`).join('<br>');
+  }
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+function init() {
+  buildDial();
+  buildSourceSelect();
+  buildRangeButtons();
+  setTerminal('VOMA');
+  update();
+}
+
+init();
+</script>
+</body>
+</html>

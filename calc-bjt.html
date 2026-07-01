@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sr. Z — Calculadora BJT Switch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: radial-gradient(ellipse at 50% 20%, #1a2744 0%, #0a0f1e 55%, #060a14 100%); min-height:100vh; }
+        .card { background:rgba(13,19,33,.85); border:1px solid #1e293b; border-radius:14px; }
+        input[type=number] { background:#0d1117; border:1px solid #1e293b; color:#e2e8f0; border-radius:8px; padding:6px 10px; width:100%; font-family:monospace; font-size:13px; outline:none; transition:border .2s; }
+        input[type=number]:focus { border-color:#06b6d4; }
+        input[type=range] { accent-color:#06b6d4; width:100%; }
+        .result-val { font-family:'Courier New',monospace; color:#00ff41; text-shadow:0 0 8px #00ff41; }
+        .zone-badge { padding:3px 12px; border-radius:6px; font-size:11px; font-weight:bold; }
+        .z-corte { background:rgba(239,68,68,.15); color:#ef4444; border:1px solid #ef4444; }
+        .z-activa { background:rgba(34,197,94,.15); color:#22c55e; border:1px solid #22c55e; }
+        .z-sat    { background:rgba(6,182,212,.15);  color:#06b6d4; border:1px solid #06b6d4; }
+        .formula  { font-family:monospace; font-size:11px; color:#94a3b8; background:#0d1117; padding:8px 12px; border-radius:8px; border-left:2px solid #06b6d4; }
+    </style>
+</head>
+<body class="text-slate-100 font-sans">
+
+<!-- HEADER -->
+<div class="flex items-center gap-4 px-5 py-2 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-sm sticky top-0 z-50">
+    <a href="index.html" class="text-xs text-slate-500 hover:text-cyan-400 transition">← Panel</a>
+    <span class="text-sm font-black uppercase tracking-wide text-slate-200">📡 BJT Switch — Calculadora</span>
+    <span class="text-[10px] text-slate-600">NPN como interruptor</span>
+</div>
+
+<div class="max-w-5xl mx-auto p-5 grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+<!-- INPUTS -->
+<div class="card p-5 space-y-4">
+    <div class="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-3">Parámetros del circuito</div>
+
+    <div>
+        <label class="text-[11px] text-slate-500 uppercase tracking-wider">Vcc (V)</label>
+        <input type="number" id="Vcc" value="12" step="0.5" min="1" max="50" oninput="calcular()">
+    </div>
+    <div>
+        <label class="text-[11px] text-slate-500 uppercase tracking-wider">Vin — tensión entrada base (V)</label>
+        <input type="number" id="Vin" value="5" step="0.1" min="0" max="50" oninput="calcular()">
+    </div>
+    <div>
+        <label class="text-[11px] text-slate-500 uppercase tracking-wider">Ic requerido — carga (mA)</label>
+        <input type="number" id="Ic" value="100" step="1" min="0.1" max="5000" oninput="calcular()">
+    </div>
+    <div>
+        <label class="text-[11px] text-slate-500 uppercase tracking-wider">Rc — resistencia carga (Ω)</label>
+        <input type="number" id="Rc" value="120" step="1" min="1" max="100000" oninput="calcular()">
+    </div>
+    <div>
+        <label class="text-[11px] text-slate-500 uppercase tracking-wider">hFE mínimo del transistor</label>
+        <input type="number" id="hFE" value="100" step="10" min="10" max="1000" oninput="calcular()">
+    </div>
+    <div>
+        <label class="text-[11px] text-slate-500 uppercase tracking-wider">Factor de saturación (×)</label>
+        <input type="number" id="ks" value="10" step="1" min="1" max="20" oninput="calcular()">
+        <div class="text-[10px] text-slate-600 mt-1">Se fuerza Ib × ks para saturar seguro.</div>
+    </div>
+    <div>
+        <label class="text-[11px] text-slate-500 uppercase tracking-wider">Vbe (V)</label>
+        <input type="number" id="Vbe" value="0.7" step="0.05" min="0.5" max="1" oninput="calcular()">
+    </div>
+
+    <div class="pt-2 border-t border-slate-800">
+        <div class="text-[11px] text-slate-600 mb-2 uppercase tracking-wider">Transistor preset</div>
+        <div class="flex flex-wrap gap-2">
+            <button onclick="preset('BC548',200,0.65)" class="text-[10px] px-2 py-1 rounded border border-slate-700 text-slate-400 hover:border-cyan-500 hover:text-cyan-400 transition">BC548</button>
+            <button onclick="preset('BC337',100,0.7)"  class="text-[10px] px-2 py-1 rounded border border-slate-700 text-slate-400 hover:border-cyan-500 hover:text-cyan-400 transition">BC337</button>
+            <button onclick="preset('2N2222',100,0.7)" class="text-[10px] px-2 py-1 rounded border border-slate-700 text-slate-400 hover:border-cyan-500 hover:text-cyan-400 transition">2N2222</button>
+            <button onclick="preset('TIP31',25,0.7)"   class="text-[10px] px-2 py-1 rounded border border-slate-700 text-slate-400 hover:border-cyan-500 hover:text-cyan-400 transition">TIP31</button>
+            <button onclick="preset('BD139',40,0.7)"   class="text-[10px] px-2 py-1 rounded border border-slate-700 text-slate-400 hover:border-cyan-500 hover:text-cyan-400 transition">BD139</button>
+        </div>
+    </div>
+</div>
+
+<!-- RESULTADOS -->
+<div class="card p-5 space-y-4">
+    <div class="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-3">Resultados</div>
+
+    <div class="bg-slate-950 rounded-xl p-4 space-y-3">
+        <div class="flex justify-between items-center">
+            <span class="text-[11px] text-slate-500">Zona de operación</span>
+            <span id="zona-badge" class="zone-badge z-sat">SATURACIÓN</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-[11px] text-slate-500">Rb calculado</span>
+            <span id="r-Rb" class="result-val text-lg">—</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-[11px] text-slate-500">Rb normalizado (E24)</span>
+            <span id="r-Rb-e24" class="text-yellow-400 font-mono font-bold text-lg">—</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-[11px] text-slate-500">Ib real</span>
+            <span id="r-Ib" class="result-val">—</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-[11px] text-slate-500">Ic de saturación</span>
+            <span id="r-Icsat" class="result-val">—</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-[11px] text-slate-500">Ib mínimo requerido</span>
+            <span id="r-Ibmin" class="result-val">—</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-[11px] text-slate-500">Vce (sat)</span>
+            <span id="r-Vce" class="result-val">≈ 0.20 V</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-[11px] text-slate-500">Potencia disipada (Rb)</span>
+            <span id="r-Prb" class="result-val">—</span>
+        </div>
+    </div>
+
+    <div id="zona-desc" class="formula"></div>
+
+    <div class="space-y-2">
+        <div class="formula">Rb = (Vin − Vbe) / Ib_forzado</div>
+        <div class="formula">Ib_forzado = (Ic / hFE) × ks</div>
+        <div class="formula">Ic_sat = Vcc / Rc</div>
+    </div>
+
+    <div id="advertencia" class="hidden text-[11px] text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg p-3"></div>
+</div>
+
+<!-- DIAGRAMA SVG -->
+<div class="card p-5 flex flex-col gap-4">
+    <div class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Diagrama</div>
+    <svg viewBox="0 0 260 340" class="w-full">
+        <!-- Vcc -->
+        <text x="130" y="20" text-anchor="middle" fill="#ef4444" font-size="11" font-weight="bold">+Vcc</text>
+        <line x1="130" y1="24" x2="130" y2="50" stroke="#ef4444" stroke-width="1.5"/>
+        <!-- Rc -->
+        <rect x="100" y="50" width="60" height="25" rx="4" fill="#1a1200" stroke="#ca8a04" stroke-width="1.5"/>
+        <text x="130" y="60" text-anchor="middle" fill="#fbbf24" font-size="9" font-weight="bold">Rc</text>
+        <text x="130" y="70" text-anchor="middle" fill="#92400e" font-size="8" id="svg-Rc">—</text>
+        <!-- Colector -->
+        <line x1="130" y1="75" x2="130" y2="145" stroke="#60a5fa" stroke-width="1.5"/>
+        <text x="140" y="140" fill="#60a5fa" font-size="9">C</text>
+        <!-- BJT cuerpo -->
+        <circle cx="130" cy="175" r="30" fill="#111" stroke="#374151" stroke-width="2"/>
+        <text x="130" y="171" text-anchor="middle" fill="#6b7280" font-size="9" id="svg-tr-name">NPN</text>
+        <text x="130" y="182" text-anchor="middle" fill="#4b5563" font-size="8">BJT</text>
+        <!-- Base -->
+        <line x1="100" y1="175" x2="60" y2="175" stroke="#a855f7" stroke-width="1.5"/>
+        <text x="105" y="171" fill="#a855f7" font-size="9">B</text>
+        <!-- Rb -->
+        <rect x="15" y="163" width="45" height="24" rx="4" fill="#1a1200" stroke="#ca8a04" stroke-width="1.5"/>
+        <text x="37" y="173" text-anchor="middle" fill="#fbbf24" font-size="9" font-weight="bold">Rb</text>
+        <text x="37" y="182" text-anchor="middle" fill="#92400e" font-size="7" id="svg-Rb">—</text>
+        <!-- Vin -->
+        <line x1="15" y1="175" x2="2" y2="175" stroke="#ef4444" stroke-width="1.5"/>
+        <text x="0" y="172" fill="#ef4444" font-size="8" id="svg-Vin">Vin</text>
+        <!-- Emisor -->
+        <line x1="130" y1="205" x2="130" y2="260" stroke="#22c55e" stroke-width="1.5"/>
+        <text x="140" y="215" fill="#22c55e" font-size="9">E</text>
+        <!-- GND -->
+        <line x1="110" y1="260" x2="150" y2="260" stroke="#374151" stroke-width="2"/>
+        <line x1="115" y1="267" x2="145" y2="267" stroke="#374151" stroke-width="1.5"/>
+        <line x1="120" y1="274" x2="140" y2="274" stroke="#374151" stroke-width="1"/>
+        <!-- Carga (LED/relé/motor) -->
+        <rect x="100" y="290" width="60" height="22" rx="4" fill="#1a1a2e" stroke="#374151" stroke-width="1" stroke-dasharray="4,2"/>
+        <text x="130" y="304" text-anchor="middle" fill="#475569" font-size="9">Carga</text>
+        <line x1="130" y1="260" x2="130" y2="290" stroke="#374151" stroke-width="1" stroke-dasharray="4,2"/>
+        <!-- Labels dinámicos -->
+        <text id="svg-Ib" x="5" y="155" fill="#64748b" font-size="8" font-family="monospace">Ib=—</text>
+        <text id="svg-Ic" x="140" y="105" fill="#64748b" font-size="8" font-family="monospace">Ic=—</text>
+        <text id="svg-zona" x="168" y="175" fill="#06b6d4" font-size="9" font-weight="bold">—</text>
+    </svg>
+
+    <!-- Tabla de verificación -->
+    <div class="bg-slate-950 rounded-lg p-3 text-[10px] space-y-1.5">
+        <div class="text-slate-500 font-bold uppercase tracking-wider mb-2">Verificación</div>
+        <div class="flex justify-between"><span class="text-slate-600">Ib &gt; Ib_min</span><span id="chk1" class="font-bold">—</span></div>
+        <div class="flex justify-between"><span class="text-slate-600">Vin &gt; Vbe</span><span id="chk2" class="font-bold">—</span></div>
+        <div class="flex justify-between"><span class="text-slate-600">Rb válida (&gt;0)</span><span id="chk3" class="font-bold">—</span></div>
+    </div>
+</div>
+
+</div>
+
+<script>
+// Serie E24
+const E24 = [10,11,12,13,15,16,18,20,22,24,27,30,33,36,39,43,47,51,56,62,68,75,82,91];
+function e24(val) {
+    if (val <= 0) return '—';
+    const exp = Math.floor(Math.log10(val));
+    const base = val / Math.pow(10, exp);
+    let best = E24[0], bestDiff = Infinity;
+    E24.forEach(v => { const d = Math.abs(v - base*10); if(d<bestDiff){bestDiff=d; best=v;} });
+    const r = best * Math.pow(10, exp-1);
+    return fmtR(r);
+}
+
+function fmtR(v) {
+    if (v >= 1e6) return (v/1e6).toFixed(2)+'MΩ';
+    if (v >= 1e3) return (v/1e3).toFixed(2)+'kΩ';
+    return v.toFixed(0)+'Ω';
+}
+
+function fmtI(mA) {
+    if (Math.abs(mA) >= 1000) return (mA/1000).toFixed(2)+'A';
+    if (Math.abs(mA) >= 1)    return mA.toFixed(2)+'mA';
+    return (mA*1000).toFixed(1)+'µA';
+}
+
+function preset(name, hfe, vbe) {
+    document.getElementById('hFE').value = hfe;
+    document.getElementById('Vbe').value = vbe;
+    document.getElementById('svg-tr-name').textContent = name;
+    calcular();
+}
+
+function calcular() {
+    const Vcc = parseFloat(document.getElementById('Vcc').value)||12;
+    const Vin = parseFloat(document.getElementById('Vin').value)||5;
+    const IcReq = parseFloat(document.getElementById('Ic').value)||100;  // mA
+    const Rc   = parseFloat(document.getElementById('Rc').value)||120;
+    const hFE  = parseFloat(document.getElementById('hFE').value)||100;
+    const ks   = parseFloat(document.getElementById('ks').value)||10;
+    const Vbe  = parseFloat(document.getElementById('Vbe').value)||0.7;
+
+    const Ic_sat = (Vcc / Rc) * 1000; // mA
+    const Ib_min = Ic_sat / hFE;      // mA
+    const Ib_forzado = Ib_min * ks;   // mA
+    const Rb = (Vin - Vbe) / (Ib_forzado / 1000); // Ω
+    const Ib_real = (Vin - Vbe) / Rb * 1000;       // mA con Rb calculado
+    const P_Rb = Math.pow((Vin-Vbe),2) / Rb * 1000; // mW
+
+    // Zona
+    const conduce = Vin > Vbe;
+    const saturado = conduce && (Ib_real * hFE >= Ic_sat);
+    const zona = !conduce ? 'CORTE' : saturado ? 'SATURACIÓN' : 'ACTIVA';
+    const zonaDescs = {
+        'CORTE':      'Vin < Vbe — transistor apagado. Sin corriente de colector. Switch abierto.',
+        'SATURACIÓN': 'Ib × hFE ≥ Ic_sat — transistor encendido al máximo. Switch cerrado. Vce ≈ 0.2V.',
+        'ACTIVA':     'Transistor en zona lineal: Ic = hFE × Ib. Aumentá Ib o reducí Rc para saturar.'
+    };
+    const zonaClass = { 'CORTE':'z-corte', 'SATURACIÓN':'z-sat', 'ACTIVA':'z-activa' };
+
+    // Actualizar resultados
+    document.getElementById('r-Rb').textContent     = Rb > 0 ? fmtR(Rb) : '∞';
+    document.getElementById('r-Rb-e24').textContent = Rb > 0 ? e24(Rb) : '—';
+    document.getElementById('r-Ib').textContent     = fmtI(Ib_real);
+    document.getElementById('r-Icsat').textContent  = fmtI(Ic_sat);
+    document.getElementById('r-Ibmin').textContent  = fmtI(Ib_min);
+    document.getElementById('r-Vce').textContent    = zona==='CORTE'?`≈ ${Vcc}V`: zona==='SATURACIÓN'?'≈ 0.20V':'variable';
+    document.getElementById('r-Prb').textContent    = P_Rb.toFixed(1)+' mW';
+
+    const badge = document.getElementById('zona-badge');
+    badge.textContent = zona; badge.className = 'zone-badge '+zonaClass[zona];
+    document.getElementById('zona-desc').textContent = zonaDescs[zona];
+
+    // SVG
+    document.getElementById('svg-Rc').textContent = fmtR(Rc);
+    document.getElementById('svg-Rb').textContent = Rb>0?fmtR(Rb):'—';
+    document.getElementById('svg-Vin').textContent = Vin+'V';
+    document.getElementById('svg-Ib').textContent = 'Ib='+fmtI(Ib_real);
+    document.getElementById('svg-Ic').textContent = 'Ic='+fmtI(Ic_sat);
+    document.getElementById('svg-zona').textContent = zona;
+    document.getElementById('svg-zona').setAttribute('fill', zona==='CORTE'?'#ef4444': zona==='SATURACIÓN'?'#06b6d4':'#22c55e');
+
+    // Checks
+    const chk = (ok) => ok ? '<span class="text-green-400">✓ OK</span>' : '<span class="text-red-400">✗ FALLA</span>';
+    document.getElementById('chk1').innerHTML = chk(Ib_real >= Ib_min);
+    document.getElementById('chk2').innerHTML = chk(Vin > Vbe);
+    document.getElementById('chk3').innerHTML = chk(Rb > 0);
+
+    // Advertencia
+    const adv = document.getElementById('advertencia');
+    const warns = [];
+    if (Rb < 0) warns.push('⚠ Vin < Vbe — el transistor no puede conducir con esta tensión de entrada.');
+    if (Rb > 1e6) warns.push('⚠ Rb > 1MΩ — valor muy alto, susceptible a ruido. Revisá Ic o hFE.');
+    if (P_Rb > 250) warns.push(`⚠ Potencia en Rb: ${P_Rb.toFixed(0)}mW — usá resistor de al menos ${Math.ceil(P_Rb/250)*250}mW.`);
+    if (Ic_sat > IcReq * 1.5) warns.push(`⚠ Ic_sat (${fmtI(Ic_sat)}) es mucho mayor al Ic requerido (${fmtI(IcReq)}). Verificá Rc.`);
+    adv.innerHTML = warns.join('<br>');
+    adv.classList.toggle('hidden', warns.length===0);
+}
+
+calcular();
+</script>
+</body>
+</html>

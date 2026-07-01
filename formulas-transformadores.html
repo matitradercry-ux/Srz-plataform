@@ -1,0 +1,260 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sr. Z — Fórmulas Transformadores</title>
+<style>
+:root{--accent:#4ade80;--accent-b:#041a0a;--border:#0a2e14;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#070b14;color:#cbd5e1;font-family:system-ui,sans-serif;font-size:15px;line-height:1.7;}
+a{text-decoration:none;}
+.top-nav{position:fixed;top:0;left:0;right:0;height:52px;background:rgba(7,11,20,.97);backdrop-filter:blur(10px);border-bottom:1px solid #1e293b;z-index:50;display:flex;align-items:center;padding:0 20px;gap:12px;}
+.top-nav .brand{font-size:18px;font-weight:900;background:linear-gradient(90deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.top-nav a{font-size:12px;color:#475569;}.top-nav a:hover{color:#e2e8f0;}
+.search-box{margin-left:auto;background:#0f172a;border:1px solid #1e293b;color:#e2e8f0;border-radius:8px;padding:5px 12px;font-size:13px;outline:none;width:180px;}
+.layout{display:grid;grid-template-columns:220px 1fr;padding-top:52px;min-height:100vh;}
+@media(min-width:1200px){.layout{grid-template-columns:220px 1fr 220px;}}
+.left-nav{position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;border-right:1px solid #1e293b;padding:16px 0 40px;}
+.left-nav a{display:block;padding:5px 18px;font-size:13px;color:#475569;transition:color .15s,background .15s;}
+.left-nav a:hover{color:#e2e8f0;background:#0f172a;}
+.left-nav a.active{color:var(--accent);font-weight:700;background:var(--accent-b);border-left:2px solid var(--accent);padding-left:16px;}
+.nav-cat{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#1e293b;padding:14px 18px 4px;}
+.nav-back{font-size:12px;color:#334155;padding:6px 18px;display:block;}.nav-back:hover{color:#94a3b8!important;}
+.content{padding:40px 52px;max-width:860px;margin:0 auto;}
+@media(max-width:900px){.content{padding:24px 20px;}}
+.page-title{font-size:26px;font-weight:900;color:#e2e8f0;margin-bottom:4px;}
+.page-sub{font-size:13px;color:#64748b;margin-bottom:44px;}
+.section{margin-bottom:52px;scroll-margin-top:68px;}
+.section-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:22px;}
+.fgroup{margin-bottom:30px;}
+.fname{font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:10px;}
+.fblock{background:#0c1422;border:1px solid var(--border);border-radius:10px;padding:20px 28px;margin:8px 0;text-align:center;}
+.fl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#051a09;margin-bottom:8px;text-align:left;}
+.fm{font-size:22px;font-family:'Courier New',monospace;color:#f1f5f9;font-weight:700;line-height:1.5;}
+.fa{font-size:15px;font-family:'Courier New',monospace;color:#94a3b8;margin-top:7px;line-height:1.6;}
+.vars{list-style:none;margin-top:12px;}
+.vars li{font-size:14px;color:#475569;padding:2px 0;display:flex;gap:8px;align-items:baseline;line-height:1.6;}
+.vars li::before{content:'▸';color:#051a09;flex-shrink:0;font-size:11px;}
+.vars li code{color:#86efac;font-family:'Courier New',monospace;font-size:13px;background:#0f172a;padding:1px 6px;border-radius:3px;flex-shrink:0;}
+.note{font-size:15px;color:#64748b;background:#0c1422;border-left:3px solid var(--border);padding:10px 14px;border-radius:0 8px 8px 0;margin-top:12px;line-height:1.7;}
+.right-toc{display:none;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;padding:20px 18px;border-left:1px solid #1e293b;}
+@media(min-width:1200px){.right-toc{display:block;}}
+.toc-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#1e293b;margin-bottom:10px;}
+.right-toc a{display:block;font-size:12px;color:#334155;padding:4px 0 4px 10px;border-left:1px solid #1e293b;margin-bottom:2px;line-height:1.4;transition:color .15s,border-color .15s;}
+.right-toc a:hover{color:#e2e8f0;border-color:var(--accent);}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <span class="brand">Sr.Z</span>
+  <a href="index.html">Inicio</a>
+  <a href="formulas-hub.html">Fórmulas</a>
+  <a href="laboratorio.html">Laboratorio</a><a href="componentes.html">Componentes</a>
+  <input class="search-box" type="text" placeholder="Buscar..." oninput="buscar(this.value)">
+</nav>
+<div class="layout">
+<aside class="left-nav">
+  <a class="nav-back" href="index.html">← Inicio</a>
+  <a class="nav-back" href="formulas-hub.html">📚 Hub Fórmulas</a>
+  <div class="nav-cat">Electricidad</div>
+  <a href="formulas-electricidad.html">⚡ Electricidad</a>
+  <a href="formulas-electronica.html">🔬 Electrónica</a>
+  <a href="formulas-transformadores.html" class="active">🔄 Transformadores</a>
+  <a href="formulas-motores.html">⚙ Motores</a>
+  <a href="formulas-pcbs.html">🖥 PCBs</a>
+  <div class="nav-cat">Física</div>
+  <a href="formulas-electromagnetismo.html">📡 Electromagnetismo</a>
+  <a href="formulas-termodinamica.html">🌡 Termodinámica</a>
+  <a href="formulas-hidrostatica.html">💧 Fluidos</a>
+  <div class="nav-cat">Energía</div>
+  <a href="formulas-fotovoltaica.html">☀ Fotovoltaica</a>
+</aside>
+<main class="content">
+  <h1 class="page-title">🔄 Transformadores</h1>
+  <p class="page-sub">Relaciones de transformación · Núcleo · Pérdidas · Regulación · Tipos · Ensayos</p>
+
+  <section class="section" id="relaciones">
+    <div class="section-title">Relaciones de Transformación</div>
+    <div class="fgroup">
+      <div class="fname">Relación de transformación</div>
+      <div class="fblock">
+        <div class="fm">a = N₁/N₂ = V₁/V₂ = I₂/I₁</div>
+        <div class="fa">V₂ = V₁ · (N₂/N₁)  ·  I₂ = I₁ · (N₁/N₂)</div>
+      </div>
+      <ul class="vars">
+        <li><code>N₁, N₂</code> — Espiras primario y secundario</li>
+        <li><code>a &gt; 1</code> — Reductor · <code>a &lt; 1</code> — Elevador</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Transformación de impedancias</div>
+      <div class="fblock">
+        <div class="fm">Z₁ = a² · Z₂</div>
+        <div class="fa">Z₂' = Z₂ · (N₁/N₂)²  (referida al primario)</div>
+      </div>
+      <div class="note">Útil para adaptación de impedancias en audio (altavoz 8Ω visto desde etapa de potencia).</div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Potencia — ideal</div>
+      <div class="fblock">
+        <div class="fm">S₁ = S₂  →  V₁·I₁ = V₂·I₂</div>
+        <div class="fa">η = P_salida / P_entrada = 1 − (P_pérdidas/P_entrada)</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="diseno">
+    <div class="section-title">Diseño del Núcleo</div>
+    <div class="fgroup">
+      <div class="fname">Ecuación de diseño (Faraday)</div>
+      <div class="fblock">
+        <div class="fm">V = 4.44 · f · N · B_max · A_e</div>
+        <div class="fa">N = V / (4.44 · f · B_max · A_e)</div>
+      </div>
+      <ul class="vars">
+        <li><code>f</code> — Frecuencia [Hz]</li>
+        <li><code>B_max</code> — Densidad de flujo máxima [T]: núcleo Fe-Si ≈ 1.2–1.7 T</li>
+        <li><code>A_e</code> — Sección transversal del núcleo [m²]</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Densidad de corriente en bobinado</div>
+      <div class="fblock">
+        <div class="fm">J = I / A_conductor  [A/mm²]</div>
+        <div class="fa">J típico: 2–4 A/mm² (natural) · 4–6 A/mm² (forzado)</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Factor de relleno de ventana</div>
+      <div class="fblock">
+        <div class="fm">Ku = (N₁·A₁ + N₂·A₂) / A_ventana</div>
+        <div class="fa">Ku típico: 0.3–0.5 (con aislamiento y bobinado manual)</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="perdidas">
+    <div class="section-title">Pérdidas</div>
+    <div class="fgroup">
+      <div class="fname">Pérdidas en el hierro (core)</div>
+      <div class="fblock">
+        <div class="fl">Histéresis</div>
+        <div class="fm">P_h = k_h · f · B_max^n · Vol</div>
+        <div class="fl" style="margin-top:10px">Corrientes de Foucault</div>
+        <div class="fm">P_e = k_e · f² · B_max² · d² · Vol</div>
+        <div class="fa">P_hierro = P_h + P_e</div>
+      </div>
+      <ul class="vars">
+        <li><code>n</code> — Exponente Steinmetz ≈ 1.6–2.0 para Fe-Si</li>
+        <li><code>d</code> — Espesor de lámina (laminar reduce P_e)</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Pérdidas en el cobre (I²R)</div>
+      <div class="fblock">
+        <div class="fm">P_Cu = I₁²·R₁ + I₂²·R₂</div>
+        <div class="fa">P_Cu_total = I₂²·R_eq  (referido al secundario)</div>
+        <div class="fa">R_eq = R₂ + R₁/a²</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Eficiencia</div>
+      <div class="fblock">
+        <div class="fm">η = P₂ / (P₂ + P_Fe + P_Cu)</div>
+        <div class="fa">η_max cuando P_Fe = P_Cu (carga óptima)</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="regulacion">
+    <div class="section-title">Regulación de Tensión</div>
+    <div class="fgroup">
+      <div class="fname">Regulación de voltaje</div>
+      <div class="fblock">
+        <div class="fm">VR% = (V₂_vacío − V₂_carga) / V₂_carga × 100</div>
+      </div>
+      <div class="note">Transformadores de distribución: VR típico 2–5 %. Transformadores de potencia: 5–10 %.</div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Caída de tensión aproximada</div>
+      <div class="fblock">
+        <div class="fm">ΔV% ≈ ε_R · cos φ + ε_X · sin φ</div>
+        <div class="fa">ε_R = P_Cu/S_n × 100  ·  ε_X = P_reactiva/S_n × 100</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Impedancia de cortocircuito</div>
+      <div class="fblock">
+        <div class="fm">Z_cc% = V_cc / V_n × 100</div>
+        <div class="fa">I_cc = I_n / (Z_cc%/100)</div>
+      </div>
+      <ul class="vars"><li>Z_cc típica: 4–6 % en distribución · 10–15 % en grandes potencias</li></ul>
+    </div>
+  </section>
+
+  <section class="section" id="tipos">
+    <div class="section-title">Tipos de Transformadores</div>
+    <div class="fgroup">
+      <div class="fname">Autotransformador</div>
+      <div class="fblock">
+        <div class="fm">S_trans = S_carga · |1 − 1/a|</div>
+        <div class="fa">Ahorro de cobre cuando a ≈ 1 (transformaciones pequeñas)</div>
+      </div>
+      <div class="note">No aísla galvánicamente. No usar donde se requiera separación de red.</div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Transformador trifásico — grupos de conexión</div>
+      <div class="fblock">
+        <div class="fa">Yy0 · Yd1 · Dy11 · Dd0</div>
+        <div class="fm">V_línea = √3 · V_fase  (conexión Y)</div>
+        <div class="fa">V_línea = V_fase  (conexión D)</div>
+      </div>
+      <div class="note">Grupo Yd1 / Dy11 más común en distribución. El número indica desfase ×30°.</div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Transformador de medida</div>
+      <div class="fblock">
+        <div class="fl">TC (corriente)</div>
+        <div class="fm">I_secundario = I_primario / a_TC</div>
+        <div class="fl" style="margin-top:10px">TP (tensión)</div>
+        <div class="fm">V_secundario = V_primario / a_TP</div>
+      </div>
+      <ul class="vars"><li>TC típico → 5 A secundario · TP típico → 110 V secundario</li></ul>
+    </div>
+  </section>
+
+  <section class="section" id="ensayos">
+    <div class="section-title">Ensayos de Transformadores</div>
+    <div class="fgroup">
+      <div class="fname">Ensayo en vacío — pérdidas en hierro</div>
+      <div class="fblock">
+        <div class="fm">P_Fe = P_vacío  ·  cos φ₀ = P₀ / (V₁ · I₀)</div>
+        <div class="fa">I_Fe = I₀ · cos φ₀  ·  I_μ = I₀ · sin φ₀</div>
+      </div>
+      <ul class="vars"><li>Se aplica V_nominal al primario con secundario abierto</li></ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Ensayo en cortocircuito — pérdidas en cobre</div>
+      <div class="fblock">
+        <div class="fm">P_Cu = P_cc  ·  Z_cc = V_cc / I_cc</div>
+        <div class="fa">R_eq = P_cc / I_cc²  ·  X_eq = √(Z_cc² − R_eq²)</div>
+      </div>
+      <ul class="vars"><li>Secundario en CC, se sube V₁ hasta I_nominal → V_cc << V_nominal</li></ul>
+    </div>
+  </section>
+</main>
+<aside class="right-toc">
+  <div class="toc-title">En esta página</div>
+  <a href="#relaciones">Relaciones</a>
+  <a href="#diseno">Diseño del Núcleo</a>
+  <a href="#perdidas">Pérdidas</a>
+  <a href="#regulacion">Regulación</a>
+  <a href="#tipos">Tipos</a>
+  <a href="#ensayos">Ensayos</a>
+</aside>
+</div>
+<script>function buscar(q){q=q.toLowerCase().trim();document.querySelectorAll('.section').forEach(s=>{s.style.display=!q||(s.textContent.toLowerCase().includes(q))?'':'none';});}</script>
+</body>
+</html>
+

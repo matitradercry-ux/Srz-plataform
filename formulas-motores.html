@@ -1,0 +1,242 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sr. Z — Fórmulas Motores</title>
+<style>
+:root{--accent:#fb923c;--accent-b:#1a0a02;--border:#2e1505;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#070b14;color:#cbd5e1;font-family:system-ui,sans-serif;font-size:15px;line-height:1.7;}
+a{text-decoration:none;}
+.top-nav{position:fixed;top:0;left:0;right:0;height:52px;background:rgba(7,11,20,.97);backdrop-filter:blur(10px);border-bottom:1px solid #1e293b;z-index:50;display:flex;align-items:center;padding:0 20px;gap:12px;}
+.top-nav .brand{font-size:18px;font-weight:900;background:linear-gradient(90deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.top-nav a{font-size:12px;color:#475569;}.top-nav a:hover{color:#e2e8f0;}
+.search-box{margin-left:auto;background:#0f172a;border:1px solid #1e293b;color:#e2e8f0;border-radius:8px;padding:5px 12px;font-size:13px;outline:none;width:180px;}
+.layout{display:grid;grid-template-columns:220px 1fr;padding-top:52px;min-height:100vh;}
+@media(min-width:1200px){.layout{grid-template-columns:220px 1fr 220px;}}
+.left-nav{position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;border-right:1px solid #1e293b;padding:16px 0 40px;}
+.left-nav a{display:block;padding:5px 18px;font-size:13px;color:#475569;transition:color .15s,background .15s;}
+.left-nav a:hover{color:#e2e8f0;background:#0f172a;}
+.left-nav a.active{color:var(--accent);font-weight:700;background:var(--accent-b);border-left:2px solid var(--accent);padding-left:16px;}
+.nav-cat{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#1e293b;padding:14px 18px 4px;}
+.nav-back{font-size:12px;color:#334155;padding:6px 18px;display:block;}.nav-back:hover{color:#94a3b8!important;}
+.content{padding:40px 52px;max-width:860px;margin:0 auto;}
+@media(max-width:900px){.content{padding:24px 20px;}}
+.page-title{font-size:26px;font-weight:900;color:#e2e8f0;margin-bottom:4px;}
+.page-sub{font-size:13px;color:#64748b;margin-bottom:44px;}
+.section{margin-bottom:52px;scroll-margin-top:68px;}
+.section-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:22px;}
+.fgroup{margin-bottom:30px;}
+.fname{font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:10px;}
+.fblock{background:#0c1422;border:1px solid var(--border);border-radius:10px;padding:20px 28px;margin:8px 0;text-align:center;}
+.fl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#1a0902;margin-bottom:8px;text-align:left;}
+.fm{font-size:22px;font-family:'Courier New',monospace;color:#f1f5f9;font-weight:700;line-height:1.5;}
+.fa{font-size:15px;font-family:'Courier New',monospace;color:#94a3b8;margin-top:7px;line-height:1.6;}
+.vars{list-style:none;margin-top:12px;}
+.vars li{font-size:14px;color:#475569;padding:2px 0;display:flex;gap:8px;align-items:baseline;line-height:1.6;}
+.vars li::before{content:'▸';color:#1a0902;flex-shrink:0;font-size:11px;}
+.vars li code{color:#fdba74;font-family:'Courier New',monospace;font-size:13px;background:#0f172a;padding:1px 6px;border-radius:3px;flex-shrink:0;}
+.note{font-size:15px;color:#64748b;background:#0c1422;border-left:3px solid var(--border);padding:10px 14px;border-radius:0 8px 8px 0;margin-top:12px;line-height:1.7;}
+.right-toc{display:none;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;padding:20px 18px;border-left:1px solid #1e293b;}
+@media(min-width:1200px){.right-toc{display:block;}}
+.toc-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#1e293b;margin-bottom:10px;}
+.right-toc a{display:block;font-size:12px;color:#334155;padding:4px 0 4px 10px;border-left:1px solid #1e293b;margin-bottom:2px;line-height:1.4;transition:color .15s,border-color .15s;}
+.right-toc a:hover{color:#e2e8f0;border-color:var(--accent);}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <span class="brand">Sr.Z</span>
+  <a href="index.html">Inicio</a>
+  <a href="formulas-hub.html">Fórmulas</a>
+  <a href="laboratorio.html">Laboratorio</a><a href="componentes.html">Componentes</a>
+  <input class="search-box" type="text" placeholder="Buscar..." oninput="buscar(this.value)">
+</nav>
+<div class="layout">
+<aside class="left-nav">
+  <a class="nav-back" href="index.html">← Inicio</a>
+  <a class="nav-back" href="formulas-hub.html">📚 Hub Fórmulas</a>
+  <div class="nav-cat">Electricidad</div>
+  <a href="formulas-electricidad.html">⚡ Electricidad</a>
+  <a href="formulas-electronica.html">🔬 Electrónica</a>
+  <a href="formulas-transformadores.html">🔄 Transformadores</a>
+  <a href="formulas-motores.html" class="active">⚙ Motores</a>
+  <a href="formulas-pcbs.html">🖥 PCBs</a>
+  <div class="nav-cat">Física</div>
+  <a href="formulas-electromagnetismo.html">📡 Electromagnetismo</a>
+  <a href="formulas-termodinamica.html">🌡 Termodinámica</a>
+  <a href="formulas-hidrostatica.html">💧 Fluidos</a>
+  <div class="nav-cat">Energía</div>
+  <a href="formulas-fotovoltaica.html">☀ Fotovoltaica</a>
+</aside>
+<main class="content">
+  <h1 class="page-title">⚙ Motores Eléctricos</h1>
+  <p class="page-sub">Mecánica rotacional · Inducción · Motor DC · Motores especiales · Selección</p>
+
+  <section class="section" id="mecanica">
+    <div class="section-title">Mecánica Rotacional</div>
+    <div class="fgroup">
+      <div class="fname">Potencia, par y velocidad</div>
+      <div class="fblock">
+        <div class="fm">P = T · ω = T · 2πn/60</div>
+        <div class="fa">T [N·m] = P [W] / ω [rad/s]</div>
+        <div class="fa">P [W] = T · n · π / 30</div>
+      </div>
+      <ul class="vars">
+        <li><code>T</code> — Par [N·m] · <code>ω</code> — Velocidad angular [rad/s]</li>
+        <li><code>n</code> — RPM · <code>ω = 2πn/60</code></li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Inercia y aceleración</div>
+      <div class="fblock">
+        <div class="fm">T_neto = J · α = J · dω/dt</div>
+        <div class="fa">J_cilindro = ½ · m · r²  [kg·m²]</div>
+        <div class="fa">t_aceleración = J · Δω / T_medio</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Eficiencia mecánica</div>
+      <div class="fblock">
+        <div class="fm">η = P_salida / P_entrada = T_carga · ω / (V · I)</div>
+      </div>
+      <div class="note">Motor bien seleccionado opera a 75–100 % de carga nominal para η máxima.</div>
+    </div>
+  </section>
+
+  <section class="section" id="induccion">
+    <div class="section-title">Motor de Inducción (AC)</div>
+    <div class="fgroup">
+      <div class="fname">Velocidad sincrónica y deslizamiento</div>
+      <div class="fblock">
+        <div class="fm">n_s = 120 · f / p  [RPM]</div>
+        <div class="fa">s = (n_s − n) / n_s</div>
+        <div class="fa">n = n_s · (1 − s)</div>
+      </div>
+      <ul class="vars">
+        <li><code>p</code> — Número de polos · <code>f</code> — Frecuencia [Hz]</li>
+        <li>s nominal: 2–5 % · s_arranque: 100 % (rotor bloqueado)</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Par del motor de inducción</div>
+      <div class="fblock">
+        <div class="fm">T = (3 · V₁² · R₂/s) / (ω_s · [(R₁+R₂/s)² + X²])</div>
+        <div class="fa">T_max cuando s = R₂ / √(R₁² + X²)</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Corriente de arranque y factor de potencia</div>
+      <div class="fblock">
+        <div class="fm">I_arranque ≈ 5–8 · I_nominal</div>
+        <div class="fa">cos φ_nominal ≈ 0.8–0.9  ·  cos φ_vacío ≈ 0.1–0.3</div>
+        <div class="fa">Q_compensar = P · (tan φ₁ − tan φ₂) [VAR]</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Motor trifásico — potencia</div>
+      <div class="fblock">
+        <div class="fm">P = √3 · V_L · I_L · cos φ</div>
+        <div class="fa">S = √3 · V_L · I_L  [VA]  ·  Q = S · sin φ  [VAR]</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="dc">
+    <div class="section-title">Motor DC</div>
+    <div class="fgroup">
+      <div class="fname">Ecuación fundamental del motor DC</div>
+      <div class="fblock">
+        <div class="fm">V = E_b + I_a · R_a</div>
+        <div class="fa">E_b = K · φ · ω  (fuerza contra-electromotriz)</div>
+        <div class="fa">T = K · φ · I_a</div>
+      </div>
+      <ul class="vars">
+        <li><code>E_b</code> — FCEM [V] · <code>R_a</code> — Resistencia armadura [Ω]</li>
+        <li><code>K</code> — Constante constructiva · <code>φ</code> — Flujo [Wb]</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Velocidad del motor DC</div>
+      <div class="fblock">
+        <div class="fm">n = (V − I_a · R_a) / (K · φ)</div>
+        <div class="fa">Control de velocidad: variar V, variar R_a, variar φ</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Motor DC sin escobillas (BLDC)</div>
+      <div class="fblock">
+        <div class="fm">Kv = n / V  [RPM/V]</div>
+        <div class="fa">n = Kv · V_alimentación  (sin carga)</div>
+        <div class="fa">P = I · V · η</div>
+      </div>
+      <div class="note">Kv 1000 + V=12V → n≈12000 RPM sin carga. Con carga baja según par y I.</div>
+    </div>
+  </section>
+
+  <section class="section" id="especiales">
+    <div class="section-title">Motores Especiales</div>
+    <div class="fgroup">
+      <div class="fname">Motor paso a paso</div>
+      <div class="fblock">
+        <div class="fm">θ_paso = 360° / (N_polos · N_fases)</div>
+        <div class="fa">Paso típico: 1.8° (200 pasos/rev) · 0.9° (400 pasos/rev)</div>
+        <div class="fa">v_angular = pasos/s × θ_paso</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Servo motor — control PWM</div>
+      <div class="fblock">
+        <div class="fa">t_pulso: 1 ms = −90° · 1.5 ms = 0° · 2 ms = +90°</div>
+        <div class="fm">Período = 20 ms (50 Hz)</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Motor universal (AC/DC)</div>
+      <div class="fblock">
+        <div class="fm">T ∝ I²  ·  n ∝ V / √T</div>
+        <div class="fa">Control de velocidad por ángulo de disparo TRIAC (fase)</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="seleccion">
+    <div class="section-title">Selección de Motores</div>
+    <div class="fgroup">
+      <div class="fname">Potencia requerida</div>
+      <div class="fblock">
+        <div class="fm">P_motor = P_carga / (η_trans · η_motor)</div>
+        <div class="fa">Sobredimensionar 15–25 % para arranques frecuentes</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Clases de aislamiento y temperatura</div>
+      <div class="fblock">
+        <div class="fa">Clase A: 105°C · B: 130°C · F: 155°C · H: 180°C</div>
+        <div class="fm">T_bobinado = T_amb + ΔT_clase</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Grado de protección IP</div>
+      <div class="fblock">
+        <div class="fa">IP 2X — protección dedos · IP 5X — polvo · IP 6X — hermético</div>
+        <div class="fa">IP X4 — salpicaduras · IP X5 — chorro · IP X8 — sumersión</div>
+      </div>
+      <div class="note">Motor de bomba sumergible mínimo IP68. Motor exterior mínimo IP55.</div>
+    </div>
+  </section>
+</main>
+<aside class="right-toc">
+  <div class="toc-title">En esta página</div>
+  <a href="#mecanica">Mecánica rotacional</a>
+  <a href="#induccion">Motor Inducción AC</a>
+  <a href="#dc">Motor DC</a>
+  <a href="#especiales">Motores Especiales</a>
+  <a href="#seleccion">Selección</a>
+</aside>
+</div>
+<script>function buscar(q){q=q.toLowerCase().trim();document.querySelectorAll('.section').forEach(s=>{s.style.display=!q||(s.textContent.toLowerCase().includes(q))?'':'none';});}</script>
+</body>
+</html>
+

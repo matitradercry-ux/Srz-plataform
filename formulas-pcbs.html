@@ -1,0 +1,263 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sr. Z — Fórmulas PCBs</title>
+<style>
+:root{--accent:#60a5fa;--accent-b:#030d1e;--border:#081830;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#070b14;color:#cbd5e1;font-family:system-ui,sans-serif;font-size:15px;line-height:1.7;}
+a{text-decoration:none;}
+.top-nav{position:fixed;top:0;left:0;right:0;height:52px;background:rgba(7,11,20,.97);backdrop-filter:blur(10px);border-bottom:1px solid #1e293b;z-index:50;display:flex;align-items:center;padding:0 20px;gap:12px;}
+.top-nav .brand{font-size:18px;font-weight:900;background:linear-gradient(90deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.top-nav a{font-size:12px;color:#475569;}.top-nav a:hover{color:#e2e8f0;}
+.search-box{margin-left:auto;background:#0f172a;border:1px solid #1e293b;color:#e2e8f0;border-radius:8px;padding:5px 12px;font-size:13px;outline:none;width:180px;}
+.layout{display:grid;grid-template-columns:220px 1fr;padding-top:52px;min-height:100vh;}
+@media(min-width:1200px){.layout{grid-template-columns:220px 1fr 220px;}}
+.left-nav{position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;border-right:1px solid #1e293b;padding:16px 0 40px;}
+.left-nav a{display:block;padding:5px 18px;font-size:13px;color:#475569;transition:color .15s,background .15s;}
+.left-nav a:hover{color:#e2e8f0;background:#0f172a;}
+.left-nav a.active{color:var(--accent);font-weight:700;background:var(--accent-b);border-left:2px solid var(--accent);padding-left:16px;}
+.nav-cat{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#1e293b;padding:14px 18px 4px;}
+.nav-back{font-size:12px;color:#334155;padding:6px 18px;display:block;}.nav-back:hover{color:#94a3b8!important;}
+.content{padding:40px 52px;max-width:860px;margin:0 auto;}
+@media(max-width:900px){.content{padding:24px 20px;}}
+.page-title{font-size:26px;font-weight:900;color:#e2e8f0;margin-bottom:4px;}
+.page-sub{font-size:13px;color:#64748b;margin-bottom:44px;}
+.section{margin-bottom:52px;scroll-margin-top:68px;}
+.section-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:22px;}
+.fgroup{margin-bottom:30px;}
+.fname{font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:10px;}
+.fblock{background:#0c1422;border:1px solid var(--border);border-radius:10px;padding:20px 28px;margin:8px 0;text-align:center;}
+.fl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#030c1a;margin-bottom:8px;text-align:left;}
+.fm{font-size:22px;font-family:'Courier New',monospace;color:#f1f5f9;font-weight:700;line-height:1.5;}
+.fa{font-size:15px;font-family:'Courier New',monospace;color:#94a3b8;margin-top:7px;line-height:1.6;}
+.vars{list-style:none;margin-top:12px;}
+.vars li{font-size:14px;color:#475569;padding:2px 0;display:flex;gap:8px;align-items:baseline;line-height:1.6;}
+.vars li::before{content:'▸';color:#030c1a;flex-shrink:0;font-size:11px;}
+.vars li code{color:#93c5fd;font-family:'Courier New',monospace;font-size:13px;background:#0f172a;padding:1px 6px;border-radius:3px;flex-shrink:0;}
+.note{font-size:15px;color:#64748b;background:#0c1422;border-left:3px solid var(--border);padding:10px 14px;border-radius:0 8px 8px 0;margin-top:12px;line-height:1.7;}
+.right-toc{display:none;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;padding:20px 18px;border-left:1px solid #1e293b;}
+@media(min-width:1200px){.right-toc{display:block;}}
+.toc-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#1e293b;margin-bottom:10px;}
+.right-toc a{display:block;font-size:12px;color:#334155;padding:4px 0 4px 10px;border-left:1px solid #1e293b;margin-bottom:2px;line-height:1.4;transition:color .15s,border-color .15s;}
+.right-toc a:hover{color:#e2e8f0;border-color:var(--accent);}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <span class="brand">Sr.Z</span>
+  <a href="index.html">Inicio</a>
+  <a href="formulas-hub.html">Fórmulas</a>
+  <a href="laboratorio.html">Laboratorio</a><a href="componentes.html">Componentes</a>
+  <input class="search-box" type="text" placeholder="Buscar..." oninput="buscar(this.value)">
+</nav>
+<div class="layout">
+<aside class="left-nav">
+  <a class="nav-back" href="index.html">← Inicio</a>
+  <a class="nav-back" href="formulas-hub.html">📚 Hub Fórmulas</a>
+  <div class="nav-cat">Electricidad</div>
+  <a href="formulas-electricidad.html">⚡ Electricidad</a>
+  <a href="formulas-electronica.html">🔬 Electrónica</a>
+  <a href="formulas-transformadores.html">🔄 Transformadores</a>
+  <a href="formulas-motores.html">⚙ Motores</a>
+  <a href="formulas-pcbs.html" class="active">🖥 PCBs</a>
+  <div class="nav-cat">Física</div>
+  <a href="formulas-electromagnetismo.html">📡 Electromagnetismo</a>
+  <a href="formulas-termodinamica.html">🌡 Termodinámica</a>
+  <a href="formulas-hidrostatica.html">💧 Fluidos</a>
+  <div class="nav-cat">Energía</div>
+  <a href="formulas-fotovoltaica.html">☀ Fotovoltaica</a>
+</aside>
+<main class="content">
+  <h1 class="page-title">🖥 Diseño de PCBs</h1>
+  <p class="page-sub">Pistas · Clearance · Impedancia controlada · Vías · Planos · Disipación térmica</p>
+
+  <section class="section" id="pistas">
+    <div class="section-title">Ancho de Pistas</div>
+    <div class="fgroup">
+      <div class="fname">Ancho mínimo por corriente — IPC-2221</div>
+      <div class="fblock">
+        <div class="fl">Pista externa (aire libre)</div>
+        <div class="fm">W = I / (k · ΔT^0.44 · A^0.725)</div>
+        <div class="fa">Simplificado: W [mm] = I / (0.048 · ΔT^0.44 · t^0.725)</div>
+        <div class="fl" style="margin-top:10px">Pista interna (laminado)</div>
+        <div class="fa">W [mm] = I / (0.024 · ΔT^0.44 · t^0.725)</div>
+      </div>
+      <ul class="vars">
+        <li><code>I</code> — Corriente [A] · <code>ΔT</code> — Elevación térmica admisible [°C]</li>
+        <li><code>t</code> — Espesor de cobre [oz]: 1 oz = 35 µm</li>
+        <li>ΔT típico: 10°C (señal) · 20°C (potencia)</li>
+      </ul>
+      <div class="note">Referencia rápida: 1 mm de pista en Cu 1 oz soporta ~2 A con ΔT=10°C.</div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Resistencia de pista</div>
+      <div class="fblock">
+        <div class="fm">R = ρ · L / (W · t)</div>
+        <div class="fa">ρ_Cu = 1.72×10⁻⁸ Ω·m a 20°C</div>
+        <div class="fa">R(T) = R₀ · [1 + α·(T−20)]  α_Cu = 0.00393 /°C</div>
+      </div>
+      <ul class="vars">
+        <li><code>L</code> — Longitud pista [m] · <code>W</code> — Ancho [m] · <code>t</code> — Espesor [m]</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Caída de tensión en pista</div>
+      <div class="fblock">
+        <div class="fm">ΔV = I · R_pista = I · ρ · L / (W · t)</div>
+      </div>
+      <div class="note">En pistas de señal ΔV despreciable. En pistas de potencia mantener ΔV &lt; 3% de V_supply.</div>
+    </div>
+  </section>
+
+  <section class="section" id="clearance">
+    <div class="section-title">Clearance y Creepage</div>
+    <div class="fgroup">
+      <div class="fname">Clearance — distancia en aire</div>
+      <div class="fblock">
+        <div class="fa">50 V → 0.1 mm · 150 V → 0.5 mm · 250 V → 1.5 mm · 600 V → 3 mm</div>
+        <div class="fm">IPC-2221: clearance depende de V_pico y categoría</div>
+      </div>
+      <div class="note">Clearance mínimo IPC clase B (consumer): 0.13 mm para tensiones &lt;15 V.</div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Creepage — distancia superficial</div>
+      <div class="fblock">
+        <div class="fa">Creepage ≥ clearance (siempre mayor o igual)</div>
+        <div class="fa">IEC 60950: 230 Vac → 6.4 mm creepage mínimo (CTI 175–249)</div>
+      </div>
+      <div class="note">Para aislamiento galvánico (fuentes, variadores) respetar IEC 60664-1 o UL 840.</div>
+    </div>
+  </section>
+
+  <section class="section" id="impedancia">
+    <div class="section-title">Impedancia Controlada</div>
+    <div class="fgroup">
+      <div class="fname">Microstrip (pista externa)</div>
+      <div class="fblock">
+        <div class="fm">Z₀ = (87/√(ε_r+1.41)) · ln(5.98·h / (0.8·W+t))</div>
+      </div>
+      <ul class="vars">
+        <li><code>h</code> — Altura dieléctrico [mm] · <code>W</code> — Ancho pista [mm]</li>
+        <li><code>t</code> — Espesor Cu [mm] · <code>ε_r</code> — FR4 ≈ 4.2–4.5</li>
+        <li>50 Ω en FR4: W ≈ 2×h con Cu 1 oz</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Stripline (pista interna)</div>
+      <div class="fblock">
+        <div class="fm">Z₀ = (60/√ε_r) · ln(4·b / (0.67·π·(0.8W+t)))</div>
+      </div>
+      <ul class="vars"><li><code>b</code> — Separación entre planos [mm]</li></ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Pares diferenciales</div>
+      <div class="fblock">
+        <div class="fm">Z_diff ≈ 2 · Z₀ · (1 − 0.347·e^(−2.9·s/h))</div>
+        <div class="fa">USB2: 90 Ω · USB3/PCIe: 85 Ω · HDMI: 100 Ω</div>
+      </div>
+      <ul class="vars"><li><code>s</code> — Separación entre pistas del par [mm]</li></ul>
+    </div>
+  </section>
+
+  <section class="section" id="vias">
+    <div class="section-title">Vías</div>
+    <div class="fgroup">
+      <div class="fname">Corriente máxima en vía</div>
+      <div class="fblock">
+        <div class="fm">I_max = k · d · √(h · ΔT)</div>
+        <div class="fa">Aprox: I ≈ 1.5 A por vía de 0.3 mm (standard)</div>
+      </div>
+      <ul class="vars">
+        <li><code>d</code> — Diámetro de vía [mm] · <code>h</code> — Espesor PCB [mm]</li>
+        <li>Para potencia: usar múltiples vías en paralelo o vías rellenas de cobre</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Inductancia de vía</div>
+      <div class="fblock">
+        <div class="fm">L_via ≈ 5.08 · h · [ln(4h/d) + 1]  [nH]  (h, d en pulgadas)</div>
+        <div class="fa">Vía típica 0.3mm / 1.6mm PCB → L ≈ 0.8 nH</div>
+      </div>
+      <div class="note">Relevante en alta frecuencia (&gt;100 MHz). Reducir con vías de retorno adyacentes a plano GND.</div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Tipos de vías</div>
+      <div class="fblock">
+        <div class="fa">Through-hole: todas las capas · Blind: externa→interna · Buried: interna→interna</div>
+        <div class="fa">Micro-via (HDI): d &lt; 0.15 mm · Via-in-pad: rellena y planarizada</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="planos">
+    <div class="section-title">Planos de Tierra y Alimentación</div>
+    <div class="fgroup">
+      <div class="fname">Inductancia de plano — retorno de corriente</div>
+      <div class="fblock">
+        <div class="fm">L_plano ≈ μ₀ · h / W_pista  [H/m]</div>
+        <div class="fa">La corriente de retorno sigue el camino de mínima inductancia (justo debajo de la pista)</div>
+      </div>
+      <div class="note">Nunca cortar el plano GND bajo pistas de alta velocidad. Las ranuras fuerzan el retorno a rodear → EMI.</div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Capacitancia distribuida de planos</div>
+      <div class="fblock">
+        <div class="fm">C = ε₀ · ε_r · A / h</div>
+        <div class="fa">FR4 4 capas (0.1mm entre planos): C ≈ 400 pF/cm²</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Decoupling — capacitor de bypass</div>
+      <div class="fblock">
+        <div class="fm">f_resonancia = 1 / (2π · √(L·C))</div>
+        <div class="fa">L incluye inductancia de montaje ~1–3 nH · usar múltiples valores en paralelo</div>
+        <div class="fa">100 nF + 10 nF + 1 nF cubre 1 MHz – 500 MHz</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="termica">
+    <div class="section-title">Disipación Térmica en PCB</div>
+    <div class="fgroup">
+      <div class="fname">Resistencia térmica de pad térmico</div>
+      <div class="fblock">
+        <div class="fm">R_th_pcb = h_dielectrico / (k · A_pad)</div>
+        <div class="fa">k_FR4 = 0.3 W/m·K · k_cobre = 385 W/m·K</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Temperatura de unión con disipador en PCB</div>
+      <div class="fblock">
+        <div class="fm">T_j = T_amb + P · (R_jc + R_pad + R_pcb)</div>
+      </div>
+      <ul class="vars">
+        <li><code>R_jc</code> — Del datasheet · <code>R_pad</code> — Pasta térmica ~0.5–2 K/W</li>
+        <li>Vías de calor (thermal vias) reducen R_pcb en un 50–70 %</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Cobre de disipación</div>
+      <div class="fblock">
+        <div class="fm">P_max = (T_j_max − T_amb) / R_th_total</div>
+        <div class="fa">Regla práctica: 1 cm² de cobre exterior disipa ~1 W con ΔT=20°C</div>
+      </div>
+    </div>
+  </section>
+</main>
+<aside class="right-toc">
+  <div class="toc-title">En esta página</div>
+  <a href="#pistas">Ancho de Pistas</a>
+  <a href="#clearance">Clearance</a>
+  <a href="#impedancia">Impedancia Controlada</a>
+  <a href="#vias">Vías</a>
+  <a href="#planos">Planos GND/PWR</a>
+  <a href="#termica">Disipación Térmica</a>
+</aside>
+</div>
+<script>function buscar(q){q=q.toLowerCase().trim();document.querySelectorAll('.section').forEach(s=>{s.style.display=!q||(s.textContent.toLowerCase().includes(q))?'':'none';});}</script>
+</body>
+</html>
+

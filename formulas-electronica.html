@@ -1,0 +1,341 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sr. Z — Fórmulas Electrónica</title>
+<style>
+:root{--accent:#a78bfa;--accent-b:#1a0d30;--border:#2a1050;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#070b14;color:#cbd5e1;font-family:system-ui,sans-serif;font-size:15px;line-height:1.7;}
+a{text-decoration:none;}
+.top-nav{position:fixed;top:0;left:0;right:0;height:52px;background:rgba(7,11,20,.97);backdrop-filter:blur(10px);border-bottom:1px solid #1e293b;z-index:50;display:flex;align-items:center;padding:0 20px;gap:12px;}
+.top-nav .brand{font-size:18px;font-weight:900;background:linear-gradient(90deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.top-nav a{font-size:12px;color:#475569;}.top-nav a:hover{color:#e2e8f0;}
+.search-box{margin-left:auto;background:#0f172a;border:1px solid #1e293b;color:#e2e8f0;border-radius:8px;padding:5px 12px;font-size:13px;outline:none;width:180px;}
+.search-box:focus{border-color:var(--accent);}
+.layout{display:grid;grid-template-columns:220px 1fr;padding-top:52px;min-height:100vh;}
+@media(min-width:1200px){.layout{grid-template-columns:220px 1fr 220px;}}
+.left-nav{position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;border-right:1px solid #1e293b;padding:16px 0 40px;}
+.left-nav a{display:block;padding:5px 18px;font-size:13px;color:#475569;transition:color .15s,background .15s;}
+.left-nav a:hover{color:#e2e8f0;background:#0f172a;}
+.left-nav a.active{color:var(--accent);font-weight:700;background:var(--accent-b);border-left:2px solid var(--accent);padding-left:16px;}
+.nav-cat{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#1e293b;padding:14px 18px 4px;}
+.nav-back{font-size:12px;color:#334155;padding:6px 18px;display:block;}.nav-back:hover{color:#94a3b8!important;}
+.content{padding:40px 52px;max-width:860px;margin:0 auto;}
+@media(max-width:900px){.content{padding:24px 20px;}}
+.page-title{font-size:26px;font-weight:900;color:#e2e8f0;margin-bottom:4px;}
+.page-sub{font-size:13px;color:#64748b;margin-bottom:44px;}
+.section{margin-bottom:52px;scroll-margin-top:68px;}
+.section-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:22px;}
+.fgroup{margin-bottom:30px;}
+.fname{font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:10px;}
+.fblock{background:#0c1422;border:1px solid var(--border);border-radius:10px;padding:20px 28px;margin:8px 0;text-align:center;}
+.fl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#2a1050;margin-bottom:8px;text-align:left;}
+.fm{font-size:22px;font-family:'Courier New',monospace;color:#f1f5f9;font-weight:700;line-height:1.5;}
+.fa{font-size:15px;font-family:'Courier New',monospace;color:#94a3b8;margin-top:7px;line-height:1.6;}
+.vars{list-style:none;margin-top:12px;}
+.vars li{font-size:14px;color:#475569;padding:2px 0;display:flex;gap:8px;align-items:baseline;line-height:1.6;}
+.vars li::before{content:'▸';color:#2a1050;flex-shrink:0;font-size:11px;}
+.vars li code{color:#c4b5fd;font-family:'Courier New',monospace;font-size:13px;background:#0f172a;padding:1px 6px;border-radius:3px;flex-shrink:0;}
+.note{font-size:15px;color:#64748b;background:#0c1422;border-left:3px solid var(--border);padding:10px 14px;border-radius:0 8px 8px 0;margin-top:12px;line-height:1.7;}
+.right-toc{display:none;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;padding:20px 18px;border-left:1px solid #1e293b;}
+@media(min-width:1200px){.right-toc{display:block;}}
+.toc-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#1e293b;margin-bottom:10px;}
+.right-toc a{display:block;font-size:12px;color:#334155;padding:4px 0 4px 10px;border-left:1px solid #1e293b;margin-bottom:2px;line-height:1.4;transition:color .15s,border-color .15s;}
+.right-toc a:hover{color:#e2e8f0;border-color:var(--accent);}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <span class="brand">Sr.Z</span>
+  <a href="index.html">Inicio</a>
+  <a href="formulas-hub.html">Fórmulas</a>
+  <a href="laboratorio.html">Laboratorio</a><a href="componentes.html">Componentes</a>
+  <input class="search-box" type="text" placeholder="Buscar..." oninput="buscar(this.value)">
+</nav>
+<div class="layout">
+<aside class="left-nav">
+  <a class="nav-back" href="index.html">← Inicio</a>
+  <a class="nav-back" href="formulas-hub.html">📚 Hub Fórmulas</a>
+  <div class="nav-cat">Electricidad</div>
+  <a href="formulas-electricidad.html">⚡ Electricidad</a>
+  <a href="formulas-electronica.html" class="active">🔬 Electrónica</a>
+  <a href="formulas-transformadores.html">🔄 Transformadores</a>
+  <a href="formulas-motores.html">⚙ Motores</a>
+  <a href="formulas-pcbs.html">🖥 PCBs</a>
+  <div class="nav-cat">Física</div>
+  <a href="formulas-electromagnetismo.html">📡 Electromagnetismo</a>
+  <a href="formulas-termodinamica.html">🌡 Termodinámica</a>
+  <a href="formulas-hidrostatica.html">💧 Fluidos</a>
+  <div class="nav-cat">Energía</div>
+  <a href="formulas-fotovoltaica.html">☀ Fotovoltaica</a>
+</aside>
+<main class="content">
+  <h1 class="page-title">🔬 Electrónica</h1>
+  <p class="page-sub">Diodos · BJT · MOSFET · Op-Amp · Filtros · ADC/PWM</p>
+
+  <section class="section" id="diodos">
+    <div class="section-title">Diodos</div>
+    <div class="fgroup">
+      <div class="fname">Ecuación de Shockley</div>
+      <div class="fblock">
+        <div class="fm">I_D = I_s · (e^(V_D / n·V_T) − 1)</div>
+        <div class="fa">V_T = k·T/q ≈ 26 mV  (a 25°C)</div>
+      </div>
+      <ul class="vars">
+        <li><code>I_s</code> — Corriente de saturación inversa [A]</li>
+        <li><code>V_T</code> — Tensión térmica [V]</li>
+        <li><code>n</code> — Factor de idealidad (1–2)</li>
+        <li><code>k</code> = 1.38×10⁻²³ J/K · <code>q</code> = 1.6×10⁻¹⁹ C</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Caída de tensión directa (práctica)</div>
+      <div class="fblock">
+        <div class="fa">Silicio: V_D ≈ 0.6–0.7 V</div>
+        <div class="fa">Germanio: V_D ≈ 0.2–0.3 V</div>
+        <div class="fa">Schottky: V_D ≈ 0.2–0.4 V</div>
+        <div class="fa">LED rojo: V_D ≈ 1.8–2.2 V</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Resistencia limitadora para LED</div>
+      <div class="fblock">
+        <div class="fm">R = (V_cc − V_LED) / I_LED</div>
+      </div>
+      <ul class="vars">
+        <li><code>V_cc</code> — Tensión de alimentación [V]</li>
+        <li><code>V_LED</code> — Caída en el LED [V]</li>
+        <li><code>I_LED</code> — Corriente deseada [A] (típico 10–20 mA)</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Rectificadores</div>
+      <div class="fblock">
+        <div class="fl">Media onda</div>
+        <div class="fm">V_dc = V_pico / π = 0.318 · V_pico</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Onda completa (puente)</div>
+        <div class="fm">V_dc = 2·V_pico / π = 0.636 · V_pico</div>
+        <div class="fa">V_rizado = I_carga / (f · C)  [V_pp]</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Diodo Zener (regulación)</div>
+      <div class="fblock">
+        <div class="fm">V_salida = V_Z  (tensión de ruptura)</div>
+        <div class="fa">R_serie = (V_in − V_Z) / I_total</div>
+        <div class="fa">I_Z_min = I_carga_max · 0.1  (margen)</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="bjt">
+    <div class="section-title">Transistor BJT</div>
+    <div class="fgroup">
+      <div class="fname">Corrientes y ganancia</div>
+      <div class="fblock">
+        <div class="fm">I_C = β · I_B  =  α · I_E</div>
+        <div class="fa">I_E = I_B + I_C = I_B · (1 + β)</div>
+        <div class="fa">α = β / (1 + β)   β = α / (1 − α)</div>
+      </div>
+      <ul class="vars">
+        <li><code>β (hFE)</code> — Ganancia de corriente DC (20–500 típico)</li>
+        <li><code>α</code> — Ganancia en base común (≈0.95–0.999)</li>
+        <li><code>I_C, I_B, I_E</code> — Corrientes colector/base/emisor [A]</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Polarización divisor de tensión</div>
+      <div class="fblock">
+        <div class="fm">V_B = V_cc · R₂ / (R₁ + R₂)</div>
+        <div class="fa">V_E = V_B − V_BE  (V_BE ≈ 0.6–0.7 V)</div>
+        <div class="fa">I_C ≈ I_E = V_E / R_E</div>
+        <div class="fa">V_CE = V_cc − I_C·(R_C + R_E)</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Saturación (switch)</div>
+      <div class="fblock">
+        <div class="fm">I_B_min = I_C_sat / β</div>
+        <div class="fa">I_C_sat = (V_cc − V_CE_sat) / R_C</div>
+        <div class="fa">V_CE_sat ≈ 0.1–0.3 V</div>
+      </div>
+      <div class="note">Sobredimensionar I_B al doble o triple de I_B_min garantiza saturación completa.</div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Ganancia en frecuencia</div>
+      <div class="fblock">
+        <div class="fm">f_T = β · f_β = g_m / (2π · C_π)</div>
+        <div class="fa">g_m = I_C / V_T  [A/V]</div>
+      </div>
+      <ul class="vars">
+        <li><code>f_T</code> — Frecuencia de transición (unidad-gain)</li>
+        <li><code>g_m</code> — Transconductancia [S]</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="mosfet">
+    <div class="section-title">Transistor MOSFET</div>
+    <div class="fgroup">
+      <div class="fname">Zonas de operación (canal N, enriquecimiento)</div>
+      <div class="fblock">
+        <div class="fl">Corte</div>
+        <div class="fm">V_GS &lt; V_th  →  I_D = 0</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Lineal / Óhmica  (V_DS &lt; V_GS − V_th)</div>
+        <div class="fm">I_D = Kn·[(V_GS−V_th)·V_DS − V_DS²/2]</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Saturación  (V_DS ≥ V_GS − V_th)</div>
+        <div class="fm">I_D = (Kn/2) · (V_GS − V_th)²</div>
+      </div>
+      <ul class="vars">
+        <li><code>V_th</code> — Tensión de umbral [V]</li>
+        <li><code>Kn</code> — Parámetro de proceso [A/V²]</li>
+        <li><code>V_GS, V_DS</code> — Tensiones gate-source / drain-source [V]</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Transconductancia y resistencia en ON</div>
+      <div class="fblock">
+        <div class="fm">g_m = √(2 · Kn · I_D)  [A/V]</div>
+        <div class="fa">R_DS(on) = 1 / (Kn · (V_GS − V_th))  [Ω]</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Pérdidas en conmutación</div>
+      <div class="fblock">
+        <div class="fm">P_cond = I_D² · R_DS(on)</div>
+        <div class="fa">P_sw = ½ · V_DS · I_D · (t_on + t_off) · f_sw</div>
+        <div class="fa">P_total = P_cond + P_sw + P_gate</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="opamp">
+    <div class="section-title">Amplificador Operacional (Op-Amp)</div>
+    <div class="fgroup">
+      <div class="fname">Amplificador inversor</div>
+      <div class="fblock">
+        <div class="fm">A_v = −R_f / R₁</div>
+        <div class="fa">V_sal = −(R_f / R₁) · V_ent</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Amplificador no inversor</div>
+      <div class="fblock">
+        <div class="fm">A_v = 1 + R_f / R₁</div>
+        <div class="fa">Seguidor de tensión: A_v = 1 (R_f = 0, R₁ = ∞)</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Sumador inversor</div>
+      <div class="fblock">
+        <div class="fm">V_sal = −R_f · (V₁/R₁ + V₂/R₂ + V₃/R₃)</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Integrador y derivador</div>
+      <div class="fblock">
+        <div class="fl">Integrador</div>
+        <div class="fm">V_sal = −(1/RC) · ∫V_ent dt</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Derivador</div>
+        <div class="fm">V_sal = −R·C · dV_ent/dt</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Amplificador diferencial</div>
+      <div class="fblock">
+        <div class="fm">V_sal = (R_f/R₁) · (V₂ − V₁)</div>
+        <div class="fa">CMRR = A_dif / A_común  [dB]</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Slew rate y ancho de banda</div>
+      <div class="fblock">
+        <div class="fm">SR = dV/dt_max  [V/μs]</div>
+        <div class="fa">f_max = SR / (2π · V_pico)</div>
+        <div class="fa">GBW = A_v · BW = cte  (producto ganancia×ancho de banda)</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="filtros">
+    <div class="section-title">Filtros RC y RL</div>
+    <div class="fgroup">
+      <div class="fname">Filtro RC pasivo</div>
+      <div class="fblock">
+        <div class="fl">Frecuencia de corte (−3 dB)</div>
+        <div class="fm">f_c = 1 / (2π · R · C)</div>
+        <div class="fa">τ = R · C  (constante de tiempo)</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Ganancia a cualquier frecuencia</div>
+        <div class="fm">|A| = 1 / √(1 + (f/f_c)²)</div>
+        <div class="fa">|A|_dB = −20·log₁₀(f/f_c)  (por encima de f_c)</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Filtro RL</div>
+      <div class="fblock">
+        <div class="fm">f_c = R / (2π · L)</div>
+        <div class="fa">τ = L / R</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Filtro activo Sallen-Key (2º orden)</div>
+      <div class="fblock">
+        <div class="fm">f_c = 1 / (2π · √(R₁·R₂·C₁·C₂))</div>
+        <div class="fa">Q = √(R₁·R₂·C₁·C₂) / (C₂·(R₁+R₂))</div>
+        <div class="fa">Butterworth: Q = 0.707  →  pendiente −40 dB/década</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="adc">
+    <div class="section-title">ADC, DAC y PWM</div>
+    <div class="fgroup">
+      <div class="fname">Conversor ADC</div>
+      <div class="fblock">
+        <div class="fm">Resolución = V_ref / (2ⁿ − 1)</div>
+        <div class="fa">Código = V_entrada / Resolución</div>
+        <div class="fa">n bits → 2ⁿ niveles</div>
+      </div>
+      <ul class="vars">
+        <li><code>n</code> — Número de bits (8 bits → 256 niveles · 12 bits → 4096)</li>
+        <li>ADC 10 bits, 5 V_ref → resolución = 5/1023 ≈ 4.9 mV</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">PWM</div>
+      <div class="fblock">
+        <div class="fm">V_media = V_cc · D</div>
+        <div class="fa">D = t_on / T  (duty cycle, 0–1)</div>
+        <div class="fa">T = 1/f_pwm  (período)</div>
+      </div>
+      <div class="note">PWM + filtro RC → DAC simple: f_corte_filtro ≪ f_PWM para buen filtrado.</div>
+    </div>
+  </section>
+
+</main>
+<aside class="right-toc">
+  <div class="toc-title">En esta página</div>
+  <a href="#diodos">Diodos</a>
+  <a href="#bjt">Transistor BJT</a>
+  <a href="#mosfet">MOSFET</a>
+  <a href="#opamp">Op-Amp</a>
+  <a href="#filtros">Filtros RC y RL</a>
+  <a href="#adc">ADC / DAC / PWM</a>
+</aside>
+</div>
+<script>function buscar(q){q=q.toLowerCase().trim();document.querySelectorAll('.section').forEach(s=>{s.style.display=!q||(s.textContent.toLowerCase().includes(q))?'':'none';});}</script>
+</body>
+</html>
+

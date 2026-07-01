@@ -1,0 +1,256 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sr. Z — Fórmulas Fluidos</title>
+<style>
+:root{--accent:#22d3ee;--accent-b:#021a1e;--border:#063040;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#070b14;color:#cbd5e1;font-family:system-ui,sans-serif;font-size:15px;line-height:1.7;}
+a{text-decoration:none;}
+.top-nav{position:fixed;top:0;left:0;right:0;height:52px;background:rgba(7,11,20,.97);backdrop-filter:blur(10px);border-bottom:1px solid #1e293b;z-index:50;display:flex;align-items:center;padding:0 20px;gap:12px;}
+.top-nav .brand{font-size:18px;font-weight:900;background:linear-gradient(90deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.top-nav a{font-size:12px;color:#475569;}.top-nav a:hover{color:#e2e8f0;}
+.search-box{margin-left:auto;background:#0f172a;border:1px solid #1e293b;color:#e2e8f0;border-radius:8px;padding:5px 12px;font-size:13px;outline:none;width:180px;}
+.layout{display:grid;grid-template-columns:220px 1fr;padding-top:52px;min-height:100vh;}
+@media(min-width:1200px){.layout{grid-template-columns:220px 1fr 220px;}}
+.left-nav{position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;border-right:1px solid #1e293b;padding:16px 0 40px;}
+.left-nav a{display:block;padding:5px 18px;font-size:13px;color:#475569;transition:color .15s,background .15s;}
+.left-nav a:hover{color:#e2e8f0;background:#0f172a;}
+.left-nav a.active{color:var(--accent);font-weight:700;background:var(--accent-b);border-left:2px solid var(--accent);padding-left:16px;}
+.nav-cat{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#1e293b;padding:14px 18px 4px;}
+.nav-back{font-size:12px;color:#334155;padding:6px 18px;display:block;}.nav-back:hover{color:#94a3b8!important;}
+.content{padding:40px 52px;max-width:860px;margin:0 auto;}
+@media(max-width:900px){.content{padding:24px 20px;}}
+.page-title{font-size:26px;font-weight:900;color:#e2e8f0;margin-bottom:4px;}
+.page-sub{font-size:13px;color:#64748b;margin-bottom:44px;}
+.section{margin-bottom:52px;scroll-margin-top:68px;}
+.section-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:22px;}
+.fgroup{margin-bottom:30px;}
+.fname{font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:10px;}
+.fblock{background:#0c1422;border:1px solid var(--border);border-radius:10px;padding:20px 28px;margin:8px 0;text-align:center;}
+.fl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#031820;margin-bottom:8px;text-align:left;}
+.fm{font-size:22px;font-family:'Courier New',monospace;color:#f1f5f9;font-weight:700;line-height:1.5;}
+.fa{font-size:15px;font-family:'Courier New',monospace;color:#94a3b8;margin-top:7px;line-height:1.6;}
+.vars{list-style:none;margin-top:12px;}
+.vars li{font-size:14px;color:#475569;padding:2px 0;display:flex;gap:8px;align-items:baseline;line-height:1.6;}
+.vars li::before{content:'▸';color:#031820;flex-shrink:0;font-size:11px;}
+.vars li code{color:#67e8f9;font-family:'Courier New',monospace;font-size:13px;background:#0f172a;padding:1px 6px;border-radius:3px;flex-shrink:0;}
+.note{font-size:15px;color:#64748b;background:#0c1422;border-left:3px solid var(--border);padding:10px 14px;border-radius:0 8px 8px 0;margin-top:12px;line-height:1.7;}
+.right-toc{display:none;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;padding:20px 18px;border-left:1px solid #1e293b;}
+@media(min-width:1200px){.right-toc{display:block;}}
+.toc-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#1e293b;margin-bottom:10px;}
+.right-toc a{display:block;font-size:12px;color:#334155;padding:4px 0 4px 10px;border-left:1px solid #1e293b;margin-bottom:2px;line-height:1.4;transition:color .15s,border-color .15s;}
+.right-toc a:hover{color:#e2e8f0;border-color:var(--accent);}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <span class="brand">Sr.Z</span>
+  <a href="index.html">Inicio</a>
+  <a href="formulas-hub.html">Fórmulas</a>
+  <a href="laboratorio.html">Laboratorio</a><a href="componentes.html">Componentes</a>
+  <input class="search-box" type="text" placeholder="Buscar..." oninput="buscar(this.value)">
+</nav>
+<div class="layout">
+<aside class="left-nav">
+  <a class="nav-back" href="index.html">← Inicio</a>
+  <a class="nav-back" href="formulas-hub.html">📚 Hub Fórmulas</a>
+  <div class="nav-cat">Electricidad</div>
+  <a href="formulas-electricidad.html">⚡ Electricidad</a>
+  <a href="formulas-electronica.html">🔬 Electrónica</a>
+  <a href="formulas-transformadores.html">🔄 Transformadores</a>
+  <a href="formulas-motores.html">⚙ Motores</a>
+  <a href="formulas-pcbs.html">🖥 PCBs</a>
+  <div class="nav-cat">Física</div>
+  <a href="formulas-electromagnetismo.html">📡 Electromagnetismo</a>
+  <a href="formulas-termodinamica.html">🌡 Termodinámica</a>
+  <a href="formulas-hidrostatica.html" class="active">💧 Fluidos</a>
+  <div class="nav-cat">Energía</div>
+  <a href="formulas-fotovoltaica.html">☀ Fotovoltaica</a>
+</aside>
+<main class="content">
+  <h1 class="page-title">💧 Fluidos</h1>
+  <p class="page-sub">Hidrostática · Fluidodinámica · Aerodinámica · Bombas y caudal</p>
+
+  <section class="section" id="hidrostatica">
+    <div class="section-title">Hidrostática</div>
+    <div class="fgroup">
+      <div class="fname">Densidad y presión</div>
+      <div class="fblock">
+        <div class="fm">ρ = m / V</div>
+        <div class="fa">P = F / A  [Pa = N/m²]</div>
+        <div class="fa">1 atm = 101325 Pa ≈ 1 bar ≈ 10.33 mH₂O</div>
+      </div>
+      <ul class="vars">
+        <li><code>ρ</code> — Densidad [kg/m³]: agua=1000 · aire=1.225 · Hg=13600</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Presión hidrostática</div>
+      <div class="fblock"><div class="fm">P = P₀ + ρ · g · h</div></div>
+      <ul class="vars">
+        <li><code>h</code> — Profundidad [m] · <code>g</code> = 9.81 m/s²</li>
+        <li>Por cada 10 m de agua → +1 atm ≈ +100 kPa</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Principio de Arquímedes</div>
+      <div class="fblock">
+        <div class="fm">F_e = ρ_fluido · g · V_sumergido</div>
+        <div class="fa">Flota si ρ_objeto &lt; ρ_fluido</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Prensa hidráulica (Pascal)</div>
+      <div class="fblock">
+        <div class="fm">F₁/A₁ = F₂/A₂</div>
+        <div class="fa">F₂ = F₁ · (A₂/A₁)</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="fluidodinamica">
+    <div class="section-title">Fluidodinámica</div>
+    <div class="fgroup">
+      <div class="fname">Ecuación de continuidad (caudal)</div>
+      <div class="fblock">
+        <div class="fm">Q = A · v = cte</div>
+        <div class="fa">A₁ · v₁ = A₂ · v₂</div>
+        <div class="fa">Q [m³/s] · Q_másico = ρ · A · v [kg/s]</div>
+      </div>
+      <ul class="vars">
+        <li><code>Q</code> — Caudal volumétrico [m³/s · l/s]</li>
+        <li><code>v</code> — Velocidad del fluido [m/s]</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Bernoulli — conservación de energía en fluidos</div>
+      <div class="fblock">
+        <div class="fm">P + ½ρv² + ρgh = cte</div>
+        <div class="fa">P₁ + ½ρv₁² + ρgh₁ = P₂ + ½ρv₂² + ρgh₂</div>
+      </div>
+      <div class="note">Mayor velocidad → menor presión. Base del efecto Venturi y sustentación alar.</div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Efecto Venturi</div>
+      <div class="fblock">
+        <div class="fm">v₂ = v₁ · √(A₁/A₂)</div>
+        <div class="fa">ΔP = ½ · ρ · (v₂² − v₁²)</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Número de Reynolds</div>
+      <div class="fblock">
+        <div class="fm">Re = ρ · v · D / μ = v · D / ν</div>
+        <div class="fa">Re &lt; 2300 → laminar · Re &gt; 4000 → turbulento</div>
+      </div>
+      <ul class="vars">
+        <li><code>μ</code> — Viscosidad dinámica [Pa·s]: agua=0.001 · aceite≈0.1</li>
+        <li><code>ν</code> — Viscosidad cinemática [m²/s] = μ/ρ</li>
+        <li><code>D</code> — Diámetro de tubería [m]</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Pérdidas de carga — Darcy-Weisbach</div>
+      <div class="fblock">
+        <div class="fm">h_f = f · (L/D) · v²/(2g)</div>
+        <div class="fa">ΔP = f · (L/D) · ½ρv²</div>
+      </div>
+      <ul class="vars">
+        <li><code>f</code> — Factor de fricción: laminar f=64/Re · turbulento usar Moody</li>
+        <li><code>L</code> — Longitud tubo [m] · <code>D</code> — Diámetro [m]</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="aerodinamica">
+    <div class="section-title">Aerodinámica</div>
+    <div class="fgroup">
+      <div class="fname">Presión dinámica</div>
+      <div class="fblock"><div class="fm">q = ½ · ρ · v²</div></div>
+      <ul class="vars"><li>v=100 km/h=27.8 m/s → q ≈ 470 Pa (con ρ_aire=1.22 kg/m³)</li></ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Sustentación y arrastre</div>
+      <div class="fblock">
+        <div class="fl">Sustentación</div>
+        <div class="fm">L = CL · ½ρv² · S</div>
+        <div class="fl" style="margin-top:10px">Arrastre</div>
+        <div class="fm">D = CD · ½ρv² · S</div>
+      </div>
+      <ul class="vars">
+        <li><code>CL</code> — Coef. sustentación (perfil alar típico: 0.5–2.0)</li>
+        <li><code>CD</code> — Coef. arrastre (esfera=0.47 · streamline=0.04)</li>
+        <li><code>S</code> — Superficie de referencia [m²]</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Velocidad del sonido y Mach</div>
+      <div class="fblock">
+        <div class="fm">c = √(γ · R · T)  →  340 m/s en aire a 20°C</div>
+        <div class="fa">Ma = v / c</div>
+      </div>
+      <ul class="vars"><li>Ma &lt; 0.3 incompresible · Ma &lt; 1 subsónico · Ma &gt; 1 supersónico</li></ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Eficiencia aerodinámica</div>
+      <div class="fblock"><div class="fm">E = CL / CD = L / D</div></div>
+      <div class="note">Planeador moderno: E ≈ 40 · avión comercial: E ≈ 15–20 · dron: E ≈ 3–8</div>
+    </div>
+  </section>
+
+  <section class="section" id="bombas">
+    <div class="section-title">Bombas y Caudal</div>
+    <div class="fgroup">
+      <div class="fname">Potencia hidráulica</div>
+      <div class="fblock">
+        <div class="fm">P_hid = ρ · g · Q · H</div>
+        <div class="fa">P_eje = P_hid / η_bomba</div>
+      </div>
+      <ul class="vars">
+        <li><code>H</code> — Altura manométrica [m] · <code>Q</code> — Caudal [m³/s]</li>
+        <li><code>η</code> — Eficiencia bomba (0.5–0.9 típico)</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Altura total de la bomba</div>
+      <div class="fblock">
+        <div class="fm">H_t = h_z + h_f + (v²/2g) + ΔP/ρg</div>
+      </div>
+      <ul class="vars">
+        <li><code>h_z</code> — Altura geométrica · <code>h_f</code> — Pérdidas por fricción</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Leyes de semejanza de bombas</div>
+      <div class="fblock">
+        <div class="fa">Q ∝ n  ·  H ∝ n²  ·  P ∝ n³</div>
+        <div class="fm">Q₂/Q₁ = n₂/n₁</div>
+        <div class="fa">P₂/P₁ = (n₂/n₁)³</div>
+      </div>
+      <div class="note">Reducir velocidad bomba al 80 % → potencia cae al 51 %. Base del variador de frecuencia.</div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Golpe de ariete</div>
+      <div class="fblock">
+        <div class="fm">ΔP = ρ · a · Δv</div>
+        <div class="fa">a = √(K/ρ)  (velocidad onda de presión)</div>
+      </div>
+      <ul class="vars"><li><code>K</code> — Módulo de compresibilidad del fluido · agua: a ≈ 1400 m/s</li></ul>
+    </div>
+  </section>
+</main>
+<aside class="right-toc">
+  <div class="toc-title">En esta página</div>
+  <a href="#hidrostatica">Hidrostática</a>
+  <a href="#fluidodinamica">Fluidodinámica</a>
+  <a href="#aerodinamica">Aerodinámica</a>
+  <a href="#bombas">Bombas y Caudal</a>
+</aside>
+</div>
+<script>function buscar(q){q=q.toLowerCase().trim();document.querySelectorAll('.section').forEach(s=>{s.style.display=!q||(s.textContent.toLowerCase().includes(q))?'':'none';});}</script>
+</body>
+</html>
+
