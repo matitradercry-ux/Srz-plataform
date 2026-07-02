@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sr. Z — Amplificador Operacional</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0f172a;color:#e2e8f0;font-family:system-ui,sans-serif;min-height:100vh;}
+.nav{display:flex;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid #1e293b;background:rgba(7,11,20,.97);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.nav a{font-size:12px;color:#475569;text-decoration:none;}.nav a:hover{color:#e2e8f0;}
+.brand{font-size:16px;font-weight:900;background:linear-gradient(90deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.wrap{max-width:920px;margin:0 auto;padding:24px 20px;}
+h1{font-size:20px;font-weight:900;margin-bottom:4px;}
+.sub{font-size:13px;color:#64748b;margin-bottom:20px;}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;}
+.tab{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;background:#1e293b;color:#64748b;transition:all .15s;}
+.tab.on{background:#f59e0b;color:#0f172a;}
+.tab:hover:not(.on){background:#334155;color:#94a3b8;}
+.main{display:grid;grid-template-columns:1fr 340px;gap:16px;}
+@media(max-width:700px){.main{grid-template-columns:1fr;}}
+.schema-box{background:#1e293b;border-radius:14px;padding:20px;display:flex;align-items:center;justify-content:center;}
+svg#schem{width:100%;max-width:480px;height:280px;}
+.panel{display:flex;flex-direction:column;gap:12px;}
+.card{background:#0d1321;border:1px solid #1e293b;border-radius:12px;padding:16px;}
+.card-title{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;}
+.sliders{display:flex;flex-direction:column;gap:10px;}
+.sl-row{display:flex;flex-direction:column;gap:4px;}
+.sl-head{display:flex;justify-content:space-between;font-size:12px;}
+.sl-label{color:#94a3b8;}
+.sl-val{color:#f59e0b;font-weight:700;font-variant-numeric:tabular-nums;}
+input[type=range]{width:100%;accent-color:#f59e0b;height:4px;cursor:pointer;}
+.result-box{background:#0d1321;border:1px solid #1e293b;border-radius:12px;padding:16px;}
+.res-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #1e293b;}
+.res-row:last-child{border-bottom:none;}
+.res-label{font-size:12px;color:#64748b;}
+.res-val{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;}
+.vout-big{font-size:32px;font-weight:900;text-align:center;padding:16px 0 8px;font-variant-numeric:tabular-nums;}
+.vout-label{font-size:11px;color:#64748b;text-align:center;margin-bottom:4px;}
+.sat-warn{display:none;background:#7c2d12;border:1px solid #c2410c;border-radius:8px;padding:8px 12px;font-size:12px;color:#fdba74;margin-top:8px;}
+.sat-warn.show{display:block;}
+.infobox{background:#0c1a2e;border:1px solid #1e3a5f;border-radius:10px;padding:12px 14px;font-size:12px;color:#7dd3fc;line-height:1.6;margin-top:14px;}
+.formula{background:#0f0c1a;border:1px solid #312e81;border-radius:8px;padding:8px 14px;font-size:13px;color:#a5b4fc;font-family:monospace;text-align:center;margin:6px 0;}
+.tipbox{margin-top:12px;background:#0c1a0c;border:1px solid #166534;border-radius:10px;padding:10px 14px;font-size:12px;color:#4ade80;display:flex;gap:8px;}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <span class="brand">Sr.Z</span>
+  <a href="index.html">Inicio</a>
+  <span style="color:#334155">—</span>
+  <a href="laboratorio.html">Laboratorio</a>
+</nav>
+<div class="wrap">
+  <h1>〰️ Amplificador Operacional</h1>
+  <p class="sub">Simulador interactivo de op-amp. Configuraciones inversora, no inversora, comparador y seguidor.</p>
+
+  <div class="tabs">
+    <button class="tab on" onclick="setMode('inv')">Inversor</button>
+    <button class="tab" onclick="setMode('noinv')">No Inversor</button>
+    <button class="tab" onclick="setMode('seg')">Seguidor</button>
+    <button class="tab" onclick="setMode('comp')">Comparador</button>
+    <button class="tab" onclick="setMode('sum')">Sumador</button>
+  </div>
+
+  <div class="main">
+    <div class="schema-box">
+      <svg id="schem" viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+    <div class="panel">
+      <div class="card">
+        <div class="card-title">Parámetros</div>
+        <div class="sliders" id="sliders"></div>
+      </div>
+      <div class="result-box">
+        <div class="vout-label">TENSIÓN DE SALIDA</div>
+        <div class="vout-big" id="vout-display">0.00 V</div>
+        <div id="sat-warn" class="sat-warn">⚠ Saturación — Vout limitado por Vcc</div>
+        <div class="res-row"><span class="res-label">Ganancia</span><span class="res-val" id="gain-display">—</span></div>
+        <div class="res-row"><span class="res-label">Vin</span><span class="res-val" id="vin-display">—</span></div>
+        <div class="res-row"><span class="res-label">Vcc alimentación</span><span class="res-val" id="vcc-display">—</span></div>
+        <div class="formula" id="formula-display">Vout = —</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="infobox" id="info-desc"></div>
+  <div class="tipbox">💡 <span>El op-amp ideal tiene ganancia infinita, impedancia de entrada infinita y de salida cero. En la práctica usa LM741, LM324 o TL081.</span></div>
+</div>
+
+<script>
+const MODES = {
+  inv: {
+    label:'Inversor',
+    params:[
+      {id:'vin', label:'Vin', min:-12, max:12, step:0.1, def:1, unit:'V'},
+      {id:'r1',  label:'R1',  min:1,   max:100, step:1, def:10, unit:'kΩ'},
+      {id:'rf',  label:'Rf',  min:1,   max:200, step:1, def:47, unit:'kΩ'},
+      {id:'vcc', label:'Vcc', min:5,   max:15,  step:1, def:12, unit:'V'},
+    ],
+    calc(p){ const G=-(p.rf/p.r1); const vo=G*p.vin; return {vo, G, formula:`Vout = −(Rf/R1)·Vin = −(${p.rf}/${p.r1})·${p.vin} = ${vo.toFixed(2)} V`}; },
+    desc:'Invierte y amplifica la señal. La señal de salida está 180° desfasada respecto a la entrada. Ganancia = −Rf/R1.',
+    draw: drawInv
+  },
+  noinv: {
+    label:'No Inversor',
+    params:[
+      {id:'vin', label:'Vin', min:-12, max:12, step:0.1, def:1, unit:'V'},
+      {id:'r1',  label:'R1',  min:1,   max:100, step:1, def:10, unit:'kΩ'},
+      {id:'rf',  label:'Rf',  min:1,   max:200, step:1, def:47, unit:'kΩ'},
+      {id:'vcc', label:'Vcc', min:5,   max:15,  step:1, def:12, unit:'V'},
+    ],
+    calc(p){ const G=1+(p.rf/p.r1); const vo=G*p.vin; return {vo, G, formula:`Vout = (1+Rf/R1)·Vin = (1+${p.rf}/${p.r1})·${p.vin} = ${vo.toFixed(2)} V`}; },
+    desc:'Amplifica sin invertir. La señal de entrada va al terminal (+). Ganancia = 1 + Rf/R1. Siempre mayor o igual a 1.',
+    draw: drawNoInv
+  },
+  seg: {
+    label:'Seguidor',
+    params:[
+      {id:'vin', label:'Vin', min:-12, max:12, step:0.1, def:3.3, unit:'V'},
+      {id:'vcc', label:'Vcc', min:5,   max:15,  step:1, def:12, unit:'V'},
+    ],
+    calc(p){ return {vo:p.vin, G:1, formula:`Vout = Vin = ${p.vin} V (buffer)`}; },
+    desc:'Buffer de tensión (voltage follower). Ganancia = 1. Sirve para aislar etapas: altísima impedancia de entrada, bajísima de salida.',
+    draw: drawSeg
+  },
+  comp: {
+    label:'Comparador',
+    params:[
+      {id:'vin',  label:'Vin',  min:-12, max:12, step:0.1, def:2,  unit:'V'},
+      {id:'vref', label:'Vref', min:-12, max:12, step:0.1, def:1.5,unit:'V'},
+      {id:'vcc',  label:'Vcc',  min:5,   max:15,  step:1, def:12, unit:'V'},
+    ],
+    calc(p){ const vo=p.vin>p.vref?p.vcc:-p.vcc; return {vo, G:null, formula:`Vout = ${p.vin>p.vref?'+Vcc':'-Vcc'} (Vin ${p.vin>p.vref?'>':'≤'} Vref)`}; },
+    desc:'Compara dos tensiones. Si Vin > Vref → Vout = +Vcc. Si Vin ≤ Vref → Vout = −Vcc. No hay realimentación.',
+    draw: drawComp
+  },
+  sum: {
+    label:'Sumador Inversor',
+    params:[
+      {id:'v1',  label:'V1',  min:-12, max:12, step:0.1, def:1,  unit:'V'},
+      {id:'v2',  label:'V2',  min:-12, max:12, step:0.1, def:2,  unit:'V'},
+      {id:'r1',  label:'R1=R2', min:1, max:100, step:1, def:10, unit:'kΩ'},
+      {id:'rf',  label:'Rf',  min:1,   max:200, step:1, def:20, unit:'kΩ'},
+      {id:'vcc', label:'Vcc', min:5,   max:15,  step:1, def:12, unit:'V'},
+    ],
+    calc(p){ const G=-(p.rf/p.r1); const vo=G*(p.v1+p.v2); return {vo, G, formula:`Vout = −(Rf/R)·(V1+V2) = −${(p.rf/p.r1).toFixed(1)}·(${p.v1}+${p.v2}) = ${vo.toFixed(2)} V`}; },
+    desc:'Suma y amplifica varias señales. Con R1=R2=R: Vout = −(Rf/R)·(V1+V2). Señal de salida invertida.',
+    draw: drawSum
+  }
+};
+
+let mode='inv';
+let vals={};
+
+function setMode(m){
+  mode=m;
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    t.classList.toggle('on', Object.keys(MODES)[i]===m);
+  });
+  buildSliders();
+  update();
+}
+
+function buildSliders(){
+  const M=MODES[mode];
+  const box=document.getElementById('sliders');
+  box.innerHTML='';
+  vals={};
+  M.params.forEach(p=>{
+    vals[p.id]=p.def;
+    const div=document.createElement('div');
+    div.className='sl-row';
+    div.innerHTML=`
+      <div class="sl-head">
+        <span class="sl-label">${p.label}</span>
+        <span class="sl-val" id="sv-${p.id}">${p.def} ${p.unit}</span>
+      </div>
+      <input type="range" min="${p.min}" max="${p.max}" step="${p.step}" value="${p.def}"
+        oninput="vals['${p.id}']=parseFloat(this.value);document.getElementById('sv-${p.id}').textContent=this.value+' ${p.unit}';update()">
+    `;
+    box.appendChild(div);
+  });
+}
+
+function update(){
+  const M=MODES[mode];
+  const res=M.calc(vals);
+  const vcc=vals.vcc||12;
+  const sat=Math.abs(res.vo)>=vcc*0.98;
+  const clamped=Math.max(-vcc,Math.min(vcc,res.vo));
+
+  const col=sat?'#ef4444': clamped>=0?'#34d399':'#f87171';
+  const el=document.getElementById('vout-display');
+  el.textContent=clamped.toFixed(2)+' V';
+  el.style.color=col;
+
+  document.getElementById('sat-warn').classList.toggle('show',sat&&mode!=='comp');
+  document.getElementById('gain-display').textContent=
+    res.G===null?'N/A (modo comparador)': res.G.toFixed(2)+'×';
+  document.getElementById('vin-display').textContent=
+    (vals.vin!==undefined?vals.vin:(vals.v1!==undefined?`V1=${vals.v1}, V2=${vals.v2}`:'—'))+' V';
+  document.getElementById('vcc-display').textContent='±'+vcc+' V';
+  document.getElementById('formula-display').textContent=res.formula;
+  document.getElementById('info-desc').textContent=M.desc;
+
+  M.draw(vals, clamped, vcc);
+}
+
+/* ─── SVG helpers ─── */
+const NS='http://www.w3.org/2000/svg';
+function svg(){return document.getElementById('schem');}
+function clr(){while(svg().firstChild)svg().removeChild(svg().firstChild);}
+function line(x1,y1,x2,y2,col='#475569',w=1.5){
+  const l=document.createElementNS(NS,'line');
+  Object.assign(l,{});
+  l.setAttribute('x1',x1);l.setAttribute('y1',y1);l.setAttribute('x2',x2);l.setAttribute('y2',y2);
+  l.setAttribute('stroke',col);l.setAttribute('stroke-width',w);l.setAttribute('stroke-linecap','round');
+  svg().appendChild(l); return l;
+}
+function text(x,y,t,col='#94a3b8',sz=11,anchor='middle'){
+  const el=document.createElementNS(NS,'text');
+  el.setAttribute('x',x);el.setAttribute('y',y);el.setAttribute('fill',col);
+  el.setAttribute('font-size',sz);el.setAttribute('text-anchor',anchor);
+  el.setAttribute('font-family','system-ui,monospace');el.textContent=t;
+  svg().appendChild(el); return el;
+}
+function rect(x,y,w,h,fill='none',stroke='#475569',sw=1.5,rx=3){
+  const el=document.createElementNS(NS,'rect');
+  el.setAttribute('x',x);el.setAttribute('y',y);el.setAttribute('width',w);el.setAttribute('height',h);
+  el.setAttribute('fill',fill);el.setAttribute('stroke',stroke);el.setAttribute('stroke-width',sw);
+  el.setAttribute('rx',rx);svg().appendChild(el); return el;
+}
+function circle(cx,cy,r,fill='#1e293b',stroke='#475569'){
+  const el=document.createElementNS(NS,'circle');
+  el.setAttribute('cx',cx);el.setAttribute('cy',cy);el.setAttribute('r',r);
+  el.setAttribute('fill',fill);el.setAttribute('stroke',stroke);el.setAttribute('stroke-width',1.5);
+  svg().appendChild(el); return el;
+}
+function opamp(cx,cy,sz=60){
+  // Triangle pointing right
+  const pts=`${cx-sz},${cy-sz} ${cx-sz},${cy+sz} ${cx+sz},${cy}`;
+  const el=document.createElementNS(NS,'polygon');
+  el.setAttribute('points',pts);
+  el.setAttribute('fill','#0f172a');el.setAttribute('stroke','#f59e0b');el.setAttribute('stroke-width',2);
+  svg().appendChild(el);
+  // − input
+  text(cx-sz+14, cy-sz/2+4,'−','#f87171',13,'middle');
+  // + input
+  text(cx-sz+14, cy+sz/2+4,'+','#34d399',13,'middle');
+  // VCC labels
+  text(cx+2, cy-sz+16,'V+','#60a5fa',9,'middle');
+  text(cx+2, cy+sz-8,'V−','#60a5fa',9,'middle');
+}
+function resistor(x1,y1,x2,y2,label,col='#475569'){
+  // horizontal resistor between x1,y1 and x2,y1 (y1===y2 assumed horizontal)
+  const mx=(x1+x2)/2, len=x2-x1;
+  const rw=24,rh=10;
+  line(x1,y1,mx-rw/2,y1,col);
+  line(mx+rw/2,y1,x2,y1,col);
+  rect(mx-rw/2,y1-rh/2,rw,rh,'#1e293b',col);
+  text(mx,y1-rh/2-4,label,'#94a3b8',10,'middle');
+}
+function voltArrow(x,y,val,vcc){
+  const pct=val/vcc;
+  const col=val>=0?'#34d399':'#f87171';
+  const h=Math.abs(pct)*28;
+  const dir=val>=0?-1:1;
+  // bar
+  const el=document.createElementNS(NS,'rect');
+  el.setAttribute('x',x-6); el.setAttribute('y',val>=0?y-h:y);
+  el.setAttribute('width',12); el.setAttribute('height',h);
+  el.setAttribute('fill',col); el.setAttribute('opacity','0.7');
+  svg().appendChild(el);
+  text(x,val>=0?y-h-4:y+h+10,val.toFixed(1)+'V',col,10,'middle');
+}
+
+/* ─── Schematic drawers ─── */
+function drawInv(p,vo,vcc){
+  clr();
+  const ox=260,oy=140,sz=55;
+  opamp(ox,oy,sz);
+  // R1: input to inv terminal
+  const invY=oy-sz/2;
+  resistor(60,invY,160,invY,'R1='+p.r1+'k','#94a3b8');
+  line(160,invY,ox-sz,invY,'#94a3b8');
+  // Rf: feedback from output to inv
+  line(ox+sz,oy,ox+sz+20,oy,'#60a5fa');
+  line(ox+sz+20,oy,ox+sz+20,invY-30,'#60a5fa');
+  resistor(160,invY-30,ox+sz+20,invY-30,'Rf='+p.rf+'k','#60a5fa');
+  line(160,invY-30,160,invY,'#60a5fa');
+  // non-inv to GND
+  const ninvY=oy+sz/2;
+  line(ox-sz,ninvY,ox-sz-20,ninvY,'#34d399');
+  line(ox-sz-20,ninvY,ox-sz-20,ninvY+25,'#34d399');
+  text(ox-sz-20,ninvY+38,'GND','#4ade80',10,'middle');
+  // Vin label
+  text(40,invY-8,'Vin','#e2e8f0',11,'middle');
+  text(40,invY+10,p.vin+'V','#f59e0b',10,'middle');
+  circle(60,invY,4,'#f59e0b','#f59e0b');
+  // Vout
+  line(ox+sz,oy,ox+sz+60,oy,'#e2e8f0');
+  text(ox+sz+75,oy-8,'Vout','#e2e8f0',11,'middle');
+  text(ox+sz+75,oy+8,vo.toFixed(2)+'V',Math.abs(vo)>=vcc*0.98?'#ef4444':vo>=0?'#34d399':'#f87171',11,'middle');
+  circle(ox+sz+60,oy,4,'#34d399','#34d399');
+  // Vcc rails
+  line(ox,oy-sz,ox,oy-sz-18,'#60a5fa');
+  text(ox,oy-sz-22,'+'+vcc+'V','#60a5fa',9,'middle');
+  line(ox,oy+sz,ox,oy+sz+18,'#60a5fa');
+  text(ox,oy+sz+28,'−'+vcc+'V','#60a5fa',9,'middle');
+}
+
+function drawNoInv(p,vo,vcc){
+  clr();
+  const ox=250,oy=140,sz=55;
+  opamp(ox,oy,sz);
+  const invY=oy-sz/2, ninvY=oy+sz/2;
+  // Vin to non-inv
+  line(60,ninvY,ox-sz,ninvY,'#34d399');
+  text(35,ninvY-8,'Vin','#e2e8f0',11,'middle');
+  text(35,ninvY+10,p.vin+'V','#f59e0b',10,'middle');
+  circle(60,ninvY,4,'#f59e0b','#f59e0b');
+  // R1: inv to GND
+  line(ox-sz,invY,ox-sz-20,invY,'#94a3b8');
+  resistor(ox-sz-20,invY,ox-sz-70,invY,'R1='+p.r1+'k','#94a3b8');
+  line(ox-sz-70,invY,ox-sz-70,invY+30,'#94a3b8');
+  text(ox-sz-70,invY+42,'GND','#4ade80',10,'middle');
+  // Rf: feedback
+  line(ox+sz,oy,ox+sz+20,oy,'#60a5fa');
+  line(ox+sz+20,oy,ox+sz+20,invY-28,'#60a5fa');
+  resistor(ox-sz,invY-28,ox+sz+20,invY-28,'Rf='+p.rf+'k','#60a5fa');
+  line(ox-sz,invY-28,ox-sz,invY,'#60a5fa');
+  // Vout
+  line(ox+sz,oy,ox+sz+55,oy,'#e2e8f0');
+  text(ox+sz+70,oy-8,'Vout','#e2e8f0',11,'middle');
+  text(ox+sz+70,oy+8,vo.toFixed(2)+'V',Math.abs(vo)>=vcc*0.98?'#ef4444':vo>=0?'#34d399':'#f87171',11,'middle');
+  circle(ox+sz+55,oy,4,'#34d399','#34d399');
+  line(ox,oy-sz,ox,oy-sz-18,'#60a5fa');
+  text(ox,oy-sz-22,'+'+vcc+'V','#60a5fa',9,'middle');
+  line(ox,oy+sz,ox,oy+sz+18,'#60a5fa');
+  text(ox,oy+sz+28,'−'+vcc+'V','#60a5fa',9,'middle');
+}
+
+function drawSeg(p,vo,vcc){
+  clr();
+  const ox=230,oy=140,sz=55;
+  opamp(ox,oy,sz);
+  const invY=oy-sz/2, ninvY=oy+sz/2;
+  // Vin to non-inv
+  line(60,ninvY,ox-sz,ninvY,'#34d399');
+  text(35,ninvY-8,'Vin','#e2e8f0',11,'middle');
+  text(35,ninvY+10,p.vin+'V','#f59e0b',10,'middle');
+  circle(60,ninvY,4,'#f59e0b','#f59e0b');
+  // Direct feedback: out to inv
+  line(ox+sz,oy,ox+sz+30,oy,'#60a5fa');
+  line(ox+sz+30,oy,ox+sz+30,invY-20,'#60a5fa');
+  line(ox+sz+30,invY-20,ox-sz,invY-20,'#60a5fa');
+  line(ox-sz,invY-20,ox-sz,invY,'#60a5fa');
+  text(ox+sz/2,invY-30,'Realimentación directa','#60a5fa',9,'middle');
+  // Vout
+  line(ox+sz,oy,ox+sz+80,oy,'#e2e8f0');
+  text(ox+sz+95,oy-8,'Vout','#e2e8f0',11,'middle');
+  text(ox+sz+95,oy+8,vo.toFixed(2)+'V',vo>=0?'#34d399':'#f87171',11,'middle');
+  circle(ox+sz+80,oy,4,'#34d399','#34d399');
+  line(ox,oy-sz,ox,oy-sz-18,'#60a5fa');
+  text(ox,oy-sz-22,'+'+vcc+'V','#60a5fa',9,'middle');
+  line(ox,oy+sz,ox,oy+sz+18,'#60a5fa');
+  text(ox,oy+sz+28,'−'+vcc+'V','#60a5fa',9,'middle');
+  text(ox,oy,'G=1','#94a3b8',10,'middle');
+}
+
+function drawComp(p,vo,vcc){
+  clr();
+  const ox=240,oy=140,sz=55;
+  opamp(ox,oy,sz);
+  const invY=oy-sz/2, ninvY=oy+sz/2;
+  // Vin to inv (−)
+  line(60,invY,ox-sz,invY,'#f87171');
+  text(35,invY-8,'Vin','#e2e8f0',11,'middle');
+  text(35,invY+10,p.vin+'V','#f59e0b',10,'middle');
+  circle(60,invY,4,'#f59e0b','#f59e0b');
+  // Vref to non-inv (+)
+  line(60,ninvY,ox-sz,ninvY,'#34d399');
+  text(35,ninvY-8,'Vref','#e2e8f0',11,'middle');
+  text(35,ninvY+10,(p.vref||0)+'V','#60a5fa',10,'middle');
+  circle(60,ninvY,4,'#60a5fa','#60a5fa');
+  // No feedback (comparador)
+  text(ox,oy+sz+35,'Sin realimentación','#64748b',9,'middle');
+  // Vout
+  line(ox+sz,oy,ox+sz+75,oy,'#e2e8f0');
+  const vcol=vo>=0?'#34d399':'#f87171';
+  text(ox+sz+90,oy-8,'Vout','#e2e8f0',11,'middle');
+  text(ox+sz+90,oy+8,vo.toFixed(1)+'V',vcol,11,'middle');
+  circle(ox+sz+75,oy,4,vcol,vcol);
+  line(ox,oy-sz,ox,oy-sz-18,'#60a5fa');
+  text(ox,oy-sz-22,'+'+vcc+'V','#60a5fa',9,'middle');
+  line(ox,oy+sz,ox,oy+sz+18,'#60a5fa');
+  text(ox,oy+sz+28,'−'+vcc+'V','#60a5fa',9,'middle');
+}
+
+function drawSum(p,vo,vcc){
+  clr();
+  const ox=270,oy=140,sz=55;
+  opamp(ox,oy,sz);
+  const invY=oy-sz/2, ninvY=oy+sz/2;
+  // V1
+  resistor(50,invY-20,145,invY-20,'R1='+p.r1+'k','#94a3b8');
+  text(30,invY-20,'V1='+p.v1+'V','#f59e0b',10,'end');
+  circle(50,invY-20,4,'#f59e0b','#f59e0b');
+  line(145,invY-20,145,invY,'#94a3b8');
+  // V2
+  resistor(50,invY+20,145,invY+20,'R2='+p.r1+'k','#94a3b8');
+  text(30,invY+20,'V2='+p.v2+'V','#f59e0b',10,'end');
+  circle(50,invY+20,4,'#f59e0b','#f59e0b');
+  line(145,invY+20,145,invY,'#94a3b8');
+  line(145,invY,ox-sz,invY,'#94a3b8');
+  // Rf feedback
+  line(ox+sz,oy,ox+sz+20,oy,'#60a5fa');
+  line(ox+sz+20,oy,ox+sz+20,invY-30,'#60a5fa');
+  resistor(145,invY-30,ox+sz+20,invY-30,'Rf='+p.rf+'k','#60a5fa');
+  line(145,invY-30,145,invY,'#60a5fa');
+  // non-inv GND
+  line(ox-sz,ninvY,ox-sz-20,ninvY,'#34d399');
+  line(ox-sz-20,ninvY,ox-sz-20,ninvY+22,'#34d399');
+  text(ox-sz-20,ninvY+34,'GND','#4ade80',10,'middle');
+  // Vout
+  line(ox+sz,oy,ox+sz+60,oy,'#e2e8f0');
+  text(ox+sz+75,oy-8,'Vout','#e2e8f0',11,'middle');
+  text(ox+sz+75,oy+8,vo.toFixed(2)+'V',Math.abs(vo)>=vcc*0.98?'#ef4444':vo>=0?'#34d399':'#f87171',11,'middle');
+  circle(ox+sz+60,oy,4,'#34d399','#34d399');
+  line(ox,oy-sz,ox,oy-sz-18,'#60a5fa');
+  text(ox,oy-sz-22,'+'+vcc+'V','#60a5fa',9,'middle');
+  line(ox,oy+sz,ox,oy+sz+18,'#60a5fa');
+  text(ox,oy+sz+28,'−'+vcc+'V','#60a5fa',9,'middle');
+}
+
+// Init
+buildSliders();
+update();
+</script>
+</body>
+</html>
