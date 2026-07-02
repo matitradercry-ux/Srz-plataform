@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mr. Z — Referencia Arduino</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0f172a;color:#e2e8f0;font-family:system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;}
+.nav{display:flex;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid #1e293b;background:rgba(7,11,20,.97);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50;}
+.nav a{font-size:12px;color:#475569;text-decoration:none;}.nav a:hover{color:#e2e8f0;}
+.brand{font-size:16px;font-weight:900;background:linear-gradient(90deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.layout{display:flex;flex:1;max-width:1200px;margin:0 auto;width:100%;padding:0 16px;}
+/* Sidebar */
+.sidebar{width:220px;flex-shrink:0;padding:20px 0 40px;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;}
+.sidebar::-webkit-scrollbar{width:4px;}.sidebar::-webkit-scrollbar-track{background:transparent;}.sidebar::-webkit-scrollbar-thumb{background:#1e293b;border-radius:4px;}
+.s-title{font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.1em;padding:14px 0 6px;}
+.s-link{display:block;font-size:12px;color:#64748b;text-decoration:none;padding:4px 0 4px 10px;border-left:2px solid transparent;transition:all .12s;line-height:1.4;}
+.s-link:hover,.s-link.active{color:#f59e0b;border-left-color:#f59e0b;}
+/* Main */
+.main{flex:1;padding:24px 24px 60px;min-width:0;}
+.page-header{margin-bottom:24px;}
+.page-header h1{font-size:22px;font-weight:900;margin-bottom:4px;}
+.page-header p{font-size:13px;color:#64748b;}
+/* Filter */
+.filter-bar{display:flex;align-items:center;gap:10px;margin-bottom:24px;background:#1e293b;border-radius:10px;padding:8px 14px;}
+.filter-bar input{flex:1;background:transparent;border:none;outline:none;color:#e2e8f0;font-size:13px;}
+.filter-bar input::placeholder{color:#475569;}
+.filter-icon{color:#475569;font-size:14px;}
+/* Sections */
+.section{margin-bottom:36px;}
+.section-head{display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 0;border-bottom:1px solid #1e293b;margin-bottom:16px;user-select:none;}
+.section-head h2{font-size:15px;font-weight:800;color:#f59e0b;}
+.section-head .toggle{margin-left:auto;color:#475569;font-size:12px;transition:.2s;}
+.section-head.collapsed .toggle{transform:rotate(-90deg);}
+.section-body{display:flex;flex-direction:column;gap:12px;}
+.section-body.hidden{display:none;}
+/* Cards */
+.card{background:#1e293b;border-radius:10px;overflow:hidden;}
+.card-label{font-size:12px;font-weight:700;color:#94a3b8;padding:10px 14px 6px;border-bottom:1px solid #0f172a;}
+pre{background:#0d1321;padding:12px 14px;font-size:12px;line-height:1.6;overflow-x:auto;font-family:'Courier New',Courier,monospace;color:#e2e8f0;}
+pre::-webkit-scrollbar{height:4px;}.pre::-webkit-scrollbar-track{background:#0d1321;}
+/* Syntax colors */
+.kw{color:#818cf8;} /* keyword */
+.fn{color:#38bdf8;} /* function */
+.cm{color:#475569;font-style:italic;} /* comment */
+.st{color:#34d399;} /* string */
+.nm{color:#fb923c;} /* number */
+.tp{color:#f59e0b;} /* type */
+.pp{color:#c084fc;} /* preprocessor */
+/* Responsive */
+@media(max-width:700px){.sidebar{display:none;}.layout{padding:0 12px;}.main{padding:16px 0 40px;}}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <span class="brand">Mr.Z</span>
+  <a href="index.html">Inicio</a>
+  <span style="color:#334155">—</span>
+  <a href="laboratorio.html">Laboratorio</a>
+</nav>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="s-title">En esta página</div>
+    <a class="s-link" href="#estructura">Estructura programa</a>
+    <a class="s-link" href="#io">Entradas y salidas</a>
+    <a class="s-link" href="#tiempo">Control de tiempo</a>
+    <a class="s-link" href="#serial">Comunicación Serial</a>
+    <a class="s-link" href="#operadores">Operadores</a>
+    <a class="s-link" href="#tipos">Tipos de datos</a>
+    <a class="s-link" href="#arrays">Arrays</a>
+    <a class="s-link" href="#strings">Strings</a>
+    <a class="s-link" href="#condicionales">Condicionales</a>
+    <a class="s-link" href="#bucles">Bucles</a>
+    <a class="s-link" href="#math">Funciones matemáticas</a>
+    <a class="s-link" href="#funciones">Funciones de usuario</a>
+    <a class="s-link" href="#avanzado">Tipos avanzados</a>
+    <a class="s-link" href="#interrupciones">Interrupciones</a>
+    <a class="s-link" href="#eeprom">EEPROM</a>
+    <a class="s-link" href="#librerias">Librerías útiles</a>
+  </aside>
+  <main class="main">
+    <div class="page-header">
+      <h1>📋 Referencia del lenguaje Arduino</h1>
+      <p>Cheatsheet completa de funciones, estructuras y sentencias disponibles en el lenguaje.</p>
+    </div>
+    <div class="filter-bar">
+      <span class="filter-icon">⚡</span>
+      <input type="text" id="filterInput" placeholder="Filtrar cheatsheet..." oninput="filterSections(this.value)">
+    </div>
+
+    <!-- ESTRUCTURA -->
+    <div class="section" id="estructura" data-search="estructura programa setup loop comentarios funciones void">
+      <div class="section-head" onclick="toggleSection(this)">
+        <h2>Estructura programa</h2>
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="card">
+          <div class="card-label">Estructura básica</div>
+<pre><span class="cm">// Estructura de un programa básico</span>
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="cm">// Inicializaciones, se ejecuta una vez al iniciar</span>
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="cm">// Código principal, se ejecuta en bucle</span>
+}</pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Comentarios</div>
+<pre><span class="cm">// Comentario de línea</span>
+
+<span class="cm">/*
+  Bloque de comentarios
+  Puede ocupar varias líneas
+*/</span></pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Directivas del preprocesador</div>
+<pre><span class="pp">#define</span> LED_PIN 13
+<span class="pp">#define</span> MAX_VAL 255
+
+<span class="pp">#include</span> <span class="st">&lt;Wire.h&gt;</span>
+<span class="pp">#include</span> <span class="st">"MiLibreria.h"</span>
+
+<span class="pp">#ifdef</span> DEBUG
+  <span class="cm">// solo si DEBUG está definido</span>
+<span class="pp">#endif</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- IO -->
+    <div class="section" id="io" data-search="pinMode digitalRead digitalWrite analogRead analogWrite PWM pin modo entrada salida">
+      <div class="section-head" onclick="toggleSection(this)">
+        <h2>Entradas y salidas</h2>
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="card">
+          <div class="card-label">Configurar pines</div>
+<pre><span class="fn">pinMode</span>(pin, <span class="tp">INPUT</span>);          <span class="cm">// pin como entrada</span>
+<span class="fn">pinMode</span>(pin, <span class="tp">OUTPUT</span>);         <span class="cm">// pin como salida</span>
+<span class="fn">pinMode</span>(pin, <span class="tp">INPUT_PULLUP</span>);   <span class="cm">// entrada con pull-up interno</span></pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Digital</div>
+<pre><span class="fn">digitalWrite</span>(pin, <span class="tp">HIGH</span>);      <span class="cm">// pone el pin en HIGH (5V)</span>
+<span class="fn">digitalWrite</span>(pin, <span class="tp">LOW</span>);       <span class="cm">// pone el pin en LOW (0V)</span>
+
+<span class="tp">int</span> val = <span class="fn">digitalRead</span>(pin);   <span class="cm">// lee HIGH o LOW</span></pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Analógico</div>
+<pre><span class="tp">int</span> val = <span class="fn">analogRead</span>(pin);    <span class="cm">// 0-1023 (resolución 10 bits)</span>
+
+<span class="fn">analogWrite</span>(pin, val);        <span class="cm">// PWM: 0-255 (pines ~)</span>
+
+<span class="fn">analogReference</span>(<span class="tp">DEFAULT</span>);    <span class="cm">// referencia voltaje ADC</span>
+<span class="cm">// DEFAULT | INTERNAL | EXTERNAL</span></pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Tono</div>
+<pre><span class="fn">tone</span>(pin, frecuencia);        <span class="cm">// genera tono en Hz</span>
+<span class="fn">tone</span>(pin, frecuencia, durMs); <span class="cm">// tono con duración</span>
+<span class="fn">noTone</span>(pin);                  <span class="cm">// detiene tono</span></pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Pulsos</div>
+<pre><span class="tp">unsigned long</span> dur = <span class="fn">pulseIn</span>(pin, <span class="tp">HIGH</span>);
+<span class="cm">// mide duración de un pulso en microsegundos</span>
+<span class="fn">pulseIn</span>(pin, <span class="tp">HIGH</span>, timeout);  <span class="cm">// con timeout en µs</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIEMPO -->
+    <div class="section" id="tiempo" data-search="delay millis micros tiempo espera pausa temporizador">
+      <div class="section-head" onclick="toggleSection(this)">
+        <h2>Control de tiempo</h2>
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="card">
+          <div class="card-label">Funciones de tiempo</div>
+<pre><span class="fn">delay</span>(<span class="nm">1000</span>);                  <span class="cm">// pausa 1000 ms (bloqueante)</span>
+<span class="fn">delayMicroseconds</span>(<span class="nm">100</span>);       <span class="cm">// pausa 100 µs</span>
+
+<span class="tp">unsigned long</span> t = <span class="fn">millis</span>();  <span class="cm">// ms desde inicio (desborda ~49 días)</span>
+<span class="tp">unsigned long</span> t = <span class="fn">micros</span>();  <span class="cm">// µs desde inicio</span></pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Temporizador sin bloqueo (patrón)</div>
+<pre><span class="tp">unsigned long</span> anterior = <span class="nm">0</span>;
+<span class="tp">const long</span> intervalo = <span class="nm">1000</span>;  <span class="cm">// ms</span>
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="tp">unsigned long</span> ahora = <span class="fn">millis</span>();
+  <span class="kw">if</span> (ahora - anterior &gt;= intervalo) {
+    anterior = ahora;
+    <span class="cm">// código a ejecutar cada intervalo</span>
+  }
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- SERIAL -->
+    <div class="section" id="serial" data-search="serial print println comunicacion monitor begin read available">
+      <div class="section-head" onclick="toggleSection(this)">
+        <h2>Comunicación Serial</h2>
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="card">
+          <div class="card-label">Configurar e imprimir</div>
+<pre>Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);           <span class="cm">// inicia a 9600 bps</span>
+Serial.<span class="fn">print</span>(<span class="st">"Hola"</span>);         <span class="cm">// imprime sin salto</span>
+Serial.<span class="fn">println</span>(<span class="st">"Mundo"</span>);      <span class="cm">// imprime con salto de línea</span>
+Serial.<span class="fn">print</span>(val, <span class="tp">HEX</span>);      <span class="cm">// DEC | HEX | OCT | BIN</span>
+Serial.<span class="fn">println</span>(val, <span class="nm">4</span>);      <span class="cm">// 4 decimales (float)</span></pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Recibir datos</div>
+<pre><span class="kw">if</span> (Serial.<span class="fn">available</span>() &gt; <span class="nm">0</span>) {  <span class="cm">// bytes disponibles</span>
+  <span class="tp">char</span> c = Serial.<span class="fn">read</span>();      <span class="cm">// lee 1 byte</span>
+  String s = Serial.<span class="fn">readString</span>();
+  String s = Serial.<span class="fn">readStringUntil</span>(<span class="st">'\n'</span>);
+  <span class="tp">int</span> n = Serial.<span class="fn">parseInt</span>();    <span class="cm">// lee entero</span>
+  <span class="tp">float</span> f = Serial.<span class="fn">parseFloat</span>();
+}</pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Control y estado</div>
+<pre>Serial.<span class="fn">flush</span>();               <span class="cm">// espera fin de transmisión</span>
+Serial.<span class="fn">end</span>();                 <span class="cm">// cierra puerto</span>
+Serial.<span class="fn">setTimeout</span>(<span class="nm">500</span>);      <span class="cm">// timeout en ms para reads</span>
+
+<span class="cm">// Múltiples puertos (Mega/Leonardo)</span>
+Serial1.<span class="fn">begin</span>(<span class="nm">9600</span>);
+Serial2.<span class="fn">begin</span>(<span class="nm">9600</span>);</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- OPERADORES -->
+    <div class="section" id="operadores" data-search="operadores aritmeticos logicos bitwise comparacion asignacion AND OR NOT">
+      <div class="section-head" onclick="toggleSection(this)">
+        <h2>Operadores</h2>
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="card">
+          <div class="card-label">Aritméticos y asignación</div>
+<pre>x + y   x - y   x * y   x / y   x % y   <span class="cm">// módulo</span>
+x++     x--     ++x     --x
+x += y  x -= y  x *= y  x /= y  x %= y</pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Comparación y lógicos</div>
+<pre>== != &lt; &gt; &lt;= &gt;=                         <span class="cm">// comparación</span>
+&amp;&amp;  ||  !                               <span class="cm">// AND, OR, NOT lógicos</span></pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Bitwise (bit a bit)</div>
+<pre>&amp;    <span class="cm">// AND bit a bit:   0b1100 &amp; 0b1010 = 0b1000</span>
+|    <span class="cm">// OR bit a bit:    0b1100 | 0b1010 = 0b1110</span>
+^    <span class="cm">// XOR bit a bit:   0b1100 ^ 0b1010 = 0b0110</span>
+~    <span class="cm">// NOT bit a bit:   ~0b1100 = 0b0011</span>
+&lt;&lt;   <span class="cm">// shift izquierda: 1 &lt;&lt; 3 = 8</span>
+&gt;&gt;   <span class="cm">// shift derecha:   16 &gt;&gt; 2 = 4</span>
+
+x &amp;= mask;  x |= mask;  x ^= mask;</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIPOS -->
+    <div class="section" id="tipos" data-search="tipos datos int float long byte char boolean unsigned conversion cast">
+      <div class="section-head" onclick="toggleSection(this)">
+        <h2>Tipos de datos y conversión</h2>
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="card">
+          <div class="card-label">Tipos básicos</div>
+<pre><span class="tp">bool</span>            <span class="cm">// true / false (1 byte)</span>
+<span class="tp">byte</span>            <span class="cm">// 0–255 (8 bits sin signo)</span>
+<span class="tp">char</span>            <span class="cm">// -128–127 (1 byte)</span>
+<span class="tp">int</span>             <span class="cm">// -32768–32767 (2 bytes en Uno)</span>
+<span class="tp">unsigned int</span>    <span class="cm">// 0–65535</span>
+<span class="tp">long</span>            <span class="cm">// -2,147,483,648–2,147,483,647 (4 bytes)</span>
+<span class="tp">unsigned long</span>   <span class="cm">// 0–4,294,967,295</span>
+<span class="tp">float</span>           <span class="cm">// ±3.4×10³⁸ (4 bytes, 6-7 dígitos)</span>
+<span class="tp">double</span>          <span class="cm">// igual a float en AVR Uno</span>
+<span class="tp">String</span>          <span class="cm">// objeto cadena de texto</span>
+<span class="tp">void</span>            <span class="cm">// sin tipo (solo para funciones)</span></pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Conversión de tipos</div>
+<pre><span class="tp">int</span> n   = (<span class="tp">int</span>)  myFloat;        <span class="cm">// cast C</span>
+<span class="tp">float</span> f = (<span class="tp">float</span>) myInt;
+
+<span class="fn">int</span>(x)     <span class="fn">float</span>(x)     <span class="fn">char</span>(x)
+<span class="fn">byte</span>(x)    <span class="fn">long</span>(x)      <span class="fn">word</span>(x)</pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Constantes útiles</div>
+<pre><span class="tp">HIGH</span>  <span class="tp">LOW</span>            <span class="cm">// 1 / 0 digital</span>
+<span class="tp">INPUT</span> <span class="tp">OUTPUT</span> <span class="tp">INPUT_PULLUP</span>
+<span class="tp">true</span>  <span class="tp">false</span>
+<span class="tp">LED_BUILTIN</span>          <span class="cm">// pin del LED interno (13 en Uno)</span>
+<span class="tp">PI</span>   <span class="tp">TWO_PI</span>  <span class="tp">HALF_PI</span>  <span class="tp">EULER</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARRAYS -->
+    <div class="section" id="arrays" data-search="arrays arreglos vector indice lista declarar">
+      <div class="section-head" onclick="toggleSection(this)">
+        <h2>Arrays</h2>
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="card">
+          <div class="card-label">Declarar y acceder</div>
+<pre><span class="tp">int</span> nums[<span class="nm">5</span>];                     <span class="cm">// array de 5 enteros</span>
+<span class="tp">int</span> nums[<span class="nm">5</span>] = {<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>,<span class="nm">4</span>,<span class="nm">5</span>};
+<span class="tp">int</span> nums[] = {<span class="nm">10</span>,<span class="nm">20</span>,<span class="nm">30</span>};        <span class="cm">// tamaño automático</span>
+
+nums[<span class="nm">0</span>] = <span class="nm">42</span>;                   <span class="cm">// asignar (índice desde 0)</span>
+<span class="tp">int</span> x = nums[<span class="nm">2</span>];               <span class="cm">// leer</span>
+
+<span class="tp">int</span> tam = <span class="kw">sizeof</span>(nums) / <span class="kw">sizeof</span>(nums[<span class="nm">0</span>]); <span class="cm">// cantidad de elementos</span></pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Arrays multidimensionales</div>
+<pre><span class="tp">int</span> mat[<span class="nm">3</span>][<span class="nm">3</span>] = {
+  {<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>},
+  {<span class="nm">4</span>,<span class="nm">5</span>,<span class="nm">6</span>},
+  {<span class="nm">7</span>,<span class="nm">8</span>,<span class="nm">9</span>}
+};
+mat[<span class="nm">1</span>][<span class="nm">2</span>] = <span class="nm">6</span>;</pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Array en PROGMEM (Flash)</div>
+<pre><span class="kw">const</span> <span class="tp">byte</span> tabla[] <span class="tp">PROGMEM</span> = {<span class="nm">0</span>,<span class="nm">64</span>,<span class="nm">128</span>,<span class="nm">192</span>,<span class="nm">255</span>};
+<span class="tp">byte</span> val = <span class="fn">pgm_read_byte</span>(&amp;tabla[i]); <span class="cm">// leer de Flash</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- STRINGS -->
+    <div class="section" id="strings" data-search="string cadena texto length substring charAt toInt toUpperCase toLowerCase concat indexOf">
+      <div class="section-head" onclick="toggleSection(this)">
+        <h2>Strings (cadenas de texto)</h2>
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="card">
+          <div class="card-label">Crear y combinar</div>
+<pre>String s = <span class="st">"Hola mundo"</span>;
+String s2 = String(<span class="nm">42</span>);            <span class="cm">// número a String</span>
+String s3 = String(<span class="nm">3.14</span>, <span class="nm">2</span>);      <span class="cm">// float, 2 decimales</span>
+String s4 = s + <span class="st">" Arduino"</span>;       <span class="cm">// concatenar</span>
+s += <span class="st">"!"</span>;</pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Métodos útiles</div>
+<pre>s.<span class="fn">length</span>()                 <span class="cm">// cantidad de caracteres</span>
+s.<span class="fn">charAt</span>(<span class="nm">0</span>)               <span class="cm">// carácter en índice</span>
+s.<span class="fn">indexOf</span>(<span class="st">"ola"</span>)          <span class="cm">// posición (-1 si no existe)</span>
+s.<span class="fn">substring</span>(<span class="nm">2</span>, <span class="nm">5</span>)         <span class="cm">// subcadena [2,5)</span>
+s.<span class="fn">toUpperCase</span>()           <span class="cm">// a mayúsculas (modifica s)</span>
+s.<span class="fn">toLowerCase</span>()           <span class="cm">// a minúsculas</span>
+s.<span class="fn">trim</span>()                  <span class="cm">// elimina espacios extremos</span>
+s.<span class="fn">replace</span>(<span class="st">"a"</span>, <span class="st">"@"</span>)      <span class="cm">// reemplaza</span>
+s.<span class="fn">startsWith</span>(<span class="st">"Ho"</span>)       <span class="cm">// true/false</span>
+s.<span class="fn">endsWith</span>(<span class="st">"do"</span>)
+s.<span class="fn">equals</span>(s2)             <span class="cm">// comparar (no usar ==)</span>
+s.<span class="fn">equalsIgnoreCase</span>(s2)
+s.<span class="fn">toInt</span>()                <span class="cm">// String a int</span>
+s.<span class="fn">toFloat</span>()              <span class="cm">// String a float</span>
+s.<span class="fn">toCharArray</span>(buf, len)  <span class="cm">// a char[]</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONDICIONALES -->
+    <div class="section" id="condicionales" data-search="if else switch case condicional ternario">
+      <div class="section-head" onclick="toggleSection(this)">
+        <h2>Condicionales</h2>
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="card">
+          <div class="card-label">if / else if / else</div>
+<pre><span class="kw">if</span> (condicion) {
+  <span class="cm">// si se cumple</span>
+} <span class="kw">else if</span> (otraCondicion) {
+  <span class="cm">// si se cumple la segunda</span>
+} <span class="kw">else</span> {
+  <span class="cm">// si ninguna se cumple</span>
+}</pre>
+        </div>
+        <div class="card">
+          <div class="card-label">switch / case</div>
+<pre><span class="kw">switch</span> (variable) {
+  <span class="kw">case</span> <span class="nm">1</span>:
+    <span class="cm">// código para valor 1</span>
+    <span class="kw">break</span>;
+  <span class="kw">case</span> <span class="nm">2</span>:
+    <span class="cm">// código para valor 2</span>
+    <span class="kw">break</span>;
+  <span class="kw">default</span>:
+    <span class="cm">// si no coincide ninguno</span>
+}</pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Operador ternario</div>
+<pre><span class="tp">int</span> max = (a &gt; b) ? a : b;
+<span class="cm">// equivale a: if (a>b) max=a; else max=b;</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- BUCLES -->
+    <div class="section" id="bucles" data-search="for while do loop bucle iteracion break continue">
+      <div class="section-head" onclick="toggleSection(this)">
+        <h2>Bucles</h2>
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="card">
+          <div class="card-label">for</div>
+<pre><span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i &lt; <span class="nm">10</span>; i++) {
+  <span class="cm">// se ejecuta 10 veces (i: 0..9)</span>
+}
+
+<span class="cm">// Recorrer array</span>
+<span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i &lt; <span class="kw">sizeof</span>(arr)/<span class="kw">sizeof</span>(arr[<span class="nm">0</span>]); i++) {
+  Serial.<span class="fn">println</span>(arr[i]);
+}</pre>
+        </div>
+        <div class="card">
+          <div class="card-label">while y do-while</div>
+<pre><span class="kw">while</span> (condicion) {
+  <span class="cm">// repite mientras sea verdad</span>
+}
+
+<span class="kw">do</span> {
+  <span class="cm">// se ejecuta al menos una vez</span>
+} <span class="kw">while</span> (condicion);</pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Control de bucle</div>
+<pre><span class="kw">break</span>;     <span class="cm">// sale del bucle</span>
+<span class="kw">continue</span>; <span class="cm">// salta al siguiente ciclo</span>
+<span class="kw">return</span>;    <span class="cm">// sale de la función</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- MATH -->
+    <div class="section" id="math" data-search="math matematica abs min max map constrain pow sqrt sin cos tan random">
+      <div class="section-head" onclick="toggleSection(this)">
+        <h2>Funciones matemáticas</h2>
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="card">
+          <div class="card-label">Básicas</div>
+<pre><span class="fn">abs</span>(x)              <span class="cm">// valor absoluto</span>
+<span class="fn">min</span>(x, y)           <span class="cm">// mínimo entre x e y</span>
+<span class="fn">max</span>(x, y)           <span class="cm">// máximo entre x e y</span>
+<span class="fn">constrain</span>(x, a, b)  <span class="cm">// limita x al rango [a,b]</span>
+<span class="fn">map</span>(val,fMin,fMax,tMin,tMax) <span class="cm">// remapea valor de rango</span>
+<span class="fn">pow</span>(base, exp)      <span class="cm">// potencia</span>
+<span class="fn">sqrt</span>(x)             <span class="cm">// raíz cuadrada</span>
+<span class="fn">sq</span>(x)               <span class="cm">// x² (square)</span></pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Trigonometría y logaritmos</div>
+<pre><span class="fn">sin</span>(rad)   <span class="fn">cos</span>(rad)   <span class="fn">tan</span>(rad)   <span class="cm">// en radianes</span>
+<span class="fn">asin</span>(x)    <span class="fn">acos</span>(x)    <span class="fn">atan</span>(x)
+<span class="fn">atan2</span>(y, x)
+<span class="fn">log</span>(x)               <span class="cm">// logaritmo natural</span>
+<span class="fn">log10</span>(x)             <span class="cm">// logaritmo base 10</span>
+<span class="fn">exp</span>(x)               <span class="cm">// e^x</span></pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Números aleatorios</div>
+<pre><span class="fn">randomSeed</span>(<span class="fn">analogRead</span>(<span class="nm">0</span>)); <span class="cm">// semilla aleatoria</span>
+<span class="tp">long</span> r = <span class="fn">random</span>(<span class="nm">100</span>);      <span class="cm">// 0 a 99</span>
+<span class="tp">long</span> r = <span class="fn">random</span>(<span class="nm">10</span>, <span class="nm">50</span>);   <span class="cm">// 10 a 49</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- FUNCIONES -->
+    <div class="section" id="funciones" data-search="funciones usuario parametros return void puntero referencia">
+      <div class="section-head" onclick="toggleSection(this)">
+        <h2>Funciones de usuario</h2>
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="card">
+          <div class="card-label">Declarar y llamar</div>
+<pre><span class="tp">int</span> <span class="fn">suma</span>(<span class="tp">int</span> a, <span class="tp">int</span> b) {
+  <span class="kw">return</span> a + b;
+}
+
+<span class="kw">void</span> <span class="fn">parpadear</span>(<span class="tp">int</span> pin, <span class="tp">int</span> veces) {
+  <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i &lt; veces; i++) {
+    <span class="fn">digitalWrite</span>(pin, <span class="tp">HIGH</span>);
+    <span class="fn">delay</span>(<span class="nm">200</span>);
+    <span class="fn">digitalWrite</span>(pin, <span class="tp">LOW</span>);
+    <span class="fn">delay</span>(<span class="nm">200</span>);
+  }
+}
+
+<span class="cm">// Llamadas</span>
+<span class="tp">int</span> resultado = <span class="fn">suma</span>(<span class="nm">3</span>, <span class="nm">4</span>);
+<span class="fn">parpadear</span>(<span class="nm">13</span>, <span class="nm">5</span>);</pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Parámetros por referencia</div>
+<pre><span class="kw">void</span> <span class="fn">incrementar</span>(<span class="tp">int</span> &amp;valor) {
+  valor++;                <span class="cm">// modifica la variable original</span>
+}
+
+<span class="tp">int</span> n = <span class="nm">5</span>;
+<span class="fn">incrementar</span>(n);         <span class="cm">// n ahora es 6</span></pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Pasar array a función</div>
+<pre><span class="kw">void</span> <span class="fn">imprimirArray</span>(<span class="tp">int</span> arr[], <span class="tp">int</span> tam) {
+  <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i &lt; tam; i++) {
+    Serial.<span class="fn">println</span>(arr[i]);
+  }
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- AVANZADO -->
+    <div class="section" id="avanzado" data-search="enum struct typedef union avanzado">
+      <div class="section-head" onclick="toggleSection(this)">
+        <h2>Tipos avanzados</h2>
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="card">
+          <div class="card-label">enum</div>
+<pre><span class="kw">enum</span> Estado { <span class="tp">ESPERAR</span>, <span class="tp">ENCENDER</span>, <span class="tp">APAGAR</span> };
+Estado estadoActual = <span class="tp">ESPERAR</span>;
+
+<span class="kw">if</span> (estadoActual == <span class="tp">ENCENDER</span>) {
+  <span class="fn">digitalWrite</span>(<span class="nm">13</span>, <span class="tp">HIGH</span>);
+}</pre>
+        </div>
+        <div class="card">
+          <div class="card-label">struct</div>
+<pre><span class="kw">struct</span> Sensor {
+  <span class="tp">int</span> pin;
+  <span class="tp">float</span> valor;
+  <span class="tp">bool</span> activo;
+};
+
+Sensor temp = {<span class="nm">A0</span>, <span class="nm">0.0</span>, <span class="kw">true</span>};
+temp.valor = <span class="fn">analogRead</span>(temp.pin);</pre>
+        </div>
+        <div class="card">
+          <div class="card-label">typedef</div>
+<pre><span class="kw">typedef</span> <span class="tp">unsigned long</span> ulong;
+<span class="kw">typedef</span> <span class="kw">struct</span> { <span class="tp">byte</span> r, g, b; } Color;
+
+Color rojo = {<span class="nm">255</span>, <span class="nm">0</span>, <span class="nm">0</span>};</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- INTERRUPCIONES -->
+    <div class="section" id="interrupciones" data-search="interrupt interrupcion attachInterrupt ISR volatile RISING FALLING CHANGE">
+      <div class="section-head" onclick="toggleSection(this)">
+        <h2>Interrupciones</h2>
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="card">
+          <div class="card-label">Configurar interrupción externa</div>
+<pre><span class="kw">volatile</span> <span class="tp">bool</span> triggered = <span class="kw">false</span>;
+
+<span class="kw">void</span> <span class="fn">ISR_handler</span>() {
+  triggered = <span class="kw">true</span>;        <span class="cm">// corta, sin Serial ni delay</span>
+}
+
+<span class="fn">attachInterrupt</span>(
+  <span class="fn">digitalPinToInterrupt</span>(<span class="nm">2</span>),  <span class="cm">// pin (2 o 3 en Uno)</span>
+  ISR_handler,               <span class="cm">// función ISR</span>
+  <span class="tp">RISING</span>                    <span class="cm">// RISING|FALLING|CHANGE|LOW|HIGH</span>
+);
+
+<span class="fn">detachInterrupt</span>(<span class="fn">digitalPinToInterrupt</span>(<span class="nm">2</span>));</pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Reglas de las ISR</div>
+<pre><span class="cm">// ✅ Variables compartidas deben ser volatile</span>
+<span class="cm">// ✅ ISR debe ser corta y rápida</span>
+<span class="cm">// ❌ No usar delay() dentro de ISR</span>
+<span class="cm">// ❌ No usar Serial dentro de ISR</span>
+<span class="cm">// ❌ millis() no avanza dentro de ISR</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- EEPROM -->
+    <div class="section" id="eeprom" data-search="EEPROM memoria persistente read write update put get">
+      <div class="section-head" onclick="toggleSection(this)">
+        <h2>EEPROM</h2>
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="card">
+          <div class="card-label">Lectura y escritura básica</div>
+<pre><span class="pp">#include</span> <span class="st">&lt;EEPROM.h&gt;</span>
+
+<span class="tp">byte</span> val = EEPROM.<span class="fn">read</span>(<span class="nm">0</span>);    <span class="cm">// leer dirección 0</span>
+EEPROM.<span class="fn">write</span>(<span class="nm">0</span>, <span class="nm">42</span>);          <span class="cm">// escribir byte (lento, ~3.3ms)</span>
+EEPROM.<span class="fn">update</span>(<span class="nm">0</span>, <span class="nm">42</span>);         <span class="cm">// escribe solo si cambia (mejor)</span>
+
+<span class="tp">int</span> tamEEP = EEPROM.<span class="fn">length</span>(); <span class="cm">// 1024 en Uno, 4096 en Mega</span></pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Guardar y leer tipos complejos</div>
+<pre>EEPROM.<span class="fn">put</span>(<span class="nm">0</span>, myFloat);       <span class="cm">// guarda float (4 bytes)</span>
+EEPROM.<span class="fn">put</span>(<span class="nm">4</span>, myStruct);      <span class="cm">// guarda struct completo</span>
+
+<span class="tp">float</span> f;
+EEPROM.<span class="fn">get</span>(<span class="nm">0</span>, f);             <span class="cm">// recupera float</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIBRERIAS -->
+    <div class="section" id="librerias" data-search="librerias Wire I2C SPI Servo LiquidCrystal DHT11 OLED">
+      <div class="section-head" onclick="toggleSection(this)">
+        <h2>Librerías útiles</h2>
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="card">
+          <div class="card-label">Wire (I²C)</div>
+<pre><span class="pp">#include</span> <span class="st">&lt;Wire.h&gt;</span>
+Wire.<span class="fn">begin</span>();                     <span class="cm">// maestro</span>
+Wire.<span class="fn">begin</span>(<span class="nm">8</span>);                   <span class="cm">// esclavo dir 8</span>
+Wire.<span class="fn">beginTransmission</span>(<span class="nm">0x3C</span>);  <span class="cm">// dirección esclavo</span>
+Wire.<span class="fn">write</span>(dato);
+Wire.<span class="fn">endTransmission</span>();
+Wire.<span class="fn">requestFrom</span>(<span class="nm">0x3C</span>, <span class="nm">2</span>);    <span class="cm">// pide 2 bytes</span>
+<span class="tp">byte</span> b = Wire.<span class="fn">read</span>();</pre>
+        </div>
+        <div class="card">
+          <div class="card-label">SPI</div>
+<pre><span class="pp">#include</span> <span class="st">&lt;SPI.h&gt;</span>
+SPI.<span class="fn">begin</span>();
+SPI.<span class="fn">setClockDivider</span>(<span class="tp">SPI_CLOCK_DIV8</span>);
+<span class="tp">byte</span> resp = SPI.<span class="fn">transfer</span>(dato); <span class="cm">// envía y recibe</span></pre>
+        </div>
+        <div class="card">
+          <div class="card-label">Servo</div>
+<pre><span class="pp">#include</span> <span class="st">&lt;Servo.h&gt;</span>
+Servo miServo;
+miServo.<span class="fn">attach</span>(<span class="nm">9</span>);              <span class="cm">// pin PWM</span>
+miServo.<span class="fn">write</span>(<span class="nm">90</span>);             <span class="cm">// ángulo 0-180°</span>
+<span class="tp">int</span> pos = miServo.<span class="fn">read</span>();</pre>
+        </div>
+        <div class="card">
+          <div class="card-label">LiquidCrystal (LCD)</div>
+<pre><span class="pp">#include</span> <span class="st">&lt;LiquidCrystal.h&gt;</span>
+LiquidCrystal lcd(<span class="nm">12</span>,<span class="nm">11</span>,<span class="nm">5</span>,<span class="nm">4</span>,<span class="nm">3</span>,<span class="nm">2</span>); <span class="cm">// RS,EN,D4-D7</span>
+lcd.<span class="fn">begin</span>(<span class="nm">16</span>, <span class="nm">2</span>);              <span class="cm">// 16 cols, 2 filas</span>
+lcd.<span class="fn">print</span>(<span class="st">"Hola!"</span>);
+lcd.<span class="fn">setCursor</span>(<span class="nm">0</span>, <span class="nm">1</span>);          <span class="cm">// col 0, fila 1</span>
+lcd.<span class="fn">clear</span>();</pre>
+        </div>
+        <div class="card">
+          <div class="card-label">LiquidCrystal_I2C (LCD por I²C)</div>
+<pre><span class="pp">#include</span> <span class="st">&lt;LiquidCrystal_I2C.h&gt;</span>
+LiquidCrystal_I2C lcd(<span class="nm">0x27</span>, <span class="nm">16</span>, <span class="nm">2</span>);
+lcd.<span class="fn">init</span>();
+lcd.<span class="fn">backlight</span>();
+lcd.<span class="fn">print</span>(<span class="st">"Mr. Z"</span>);</pre>
+        </div>
+        <div class="card">
+          <div class="card-label">SoftwareSerial</div>
+<pre><span class="pp">#include</span> <span class="st">&lt;SoftwareSerial.h&gt;</span>
+SoftwareSerial bt(<span class="nm">10</span>, <span class="nm">11</span>);     <span class="cm">// RX, TX</span>
+bt.<span class="fn">begin</span>(<span class="nm">9600</span>);
+bt.<span class="fn">println</span>(<span class="st">"Hola BT"</span>);</pre>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+function toggleSection(head){
+  head.classList.toggle('collapsed');
+  head.nextElementSibling.classList.toggle('hidden');
+}
+
+function filterSections(q){
+  const term=q.toLowerCase().trim();
+  document.querySelectorAll('.section').forEach(sec=>{
+    if(!term){sec.style.display=''; return;}
+    const tags=(sec.dataset.search||'').toLowerCase();
+    const text=sec.innerText.toLowerCase();
+    const match=tags.includes(term)||text.includes(term);
+    sec.style.display=match?'':'none';
+  });
+}
+
+// Highlight active sidebar link on scroll
+const sections=document.querySelectorAll('.section');
+const links=document.querySelectorAll('.s-link');
+window.addEventListener('scroll',()=>{
+  let current='';
+  sections.forEach(s=>{
+    if(window.scrollY>=s.offsetTop-80) current='#'+s.id;
+  });
+  links.forEach(l=>{
+    l.classList.toggle('active',l.getAttribute('href')===current);
+  });
+},{passive:true});
+</script>
+</body>
+</html>

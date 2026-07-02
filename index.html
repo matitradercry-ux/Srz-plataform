@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sr. Z — Electrónica & Ciencias</title>
+    <title>Mr. Z — Electrónica & Ciencias</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
@@ -41,7 +41,7 @@
 <!-- NAV -->
 <nav class="fixed top-0 left-0 right-0 z-40 bg-[#070a12]/92 backdrop-blur-md border-b border-slate-800/60">
     <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-        <div class="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-400 tracking-wider">Sr.Z</div>
+        <div class="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-400 tracking-wider">Mr.Z</div>
         <div class="flex items-center gap-1 md:gap-2">
             <a href="laboratorio.html" class="text-xs text-slate-400 hover:text-cyan-400 transition px-2 py-1 rounded hover:bg-slate-800/60">⚡ Laboratorio</a>
             <a href="componentes.html" class="text-xs text-slate-400 hover:text-purple-400 transition px-2 py-1 rounded hover:bg-slate-800/60">🔌 Componentes</a>
@@ -67,8 +67,9 @@
 
 <div class="fade-in">
 <!-- HERO -->
-<header class="relative max-w-5xl mx-auto pt-28 pb-10 px-4 text-center z-10">
-    <div class="text-6xl font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-400 mb-2 filter drop-shadow-[0_0_20px_rgba(6,182,212,0.35)]">Sr. Z</div>
+<header class="relative max-w-5xl mx-auto pt-16 pb-10 px-4 text-center z-10">
+    <img src="mr-z.png" alt="Mr. Z" class="w-36 h-36 md:w-44 md:h-44 object-cover rounded-full mx-auto mb-4 border-4 border-cyan-500/40 shadow-[0_0_40px_rgba(6,182,212,0.25)]" onerror="this.style.display='none'">
+    <div class="text-6xl font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-400 mb-2 filter drop-shadow-[0_0_20px_rgba(6,182,212,0.35)]">Mr. Z</div>
     <h1 class="text-lg md:text-xl font-bold text-slate-400 uppercase tracking-wide">Docente de Electrónica <span class="text-slate-600">|</span> <span class="text-purple-400">Física & Ciencias</span></h1>
 
     <!-- BUSCADOR + CHAT IA -->
@@ -198,7 +199,7 @@
 
 <footer class="border-t border-slate-800/40 py-8 mt-4">
     <div class="max-w-5xl mx-auto px-4 flex flex-col items-center gap-3">
-        <div class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-400">Sr.Z</div>
+        <div class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-400">Mr.Z</div>
         <p class="text-slate-600 text-xs text-center">Electrónica · Física · Ciencias</p>
         <div class="flex gap-5 mt-1">
             <a href="laboratorio.html" class="text-slate-600 hover:text-cyan-400 text-xs transition">Laboratorio</a>
@@ -206,7 +207,7 @@
             <a href="formulas-hub.html" class="text-slate-600 hover:text-yellow-400 text-xs transition">Fórmulas</a>
             <a href="https://drive.google.com/drive/u/1/folders/1RU6Vg3VMCQaI0j7tWaHcihCiFekUZhMf" target="_blank" class="text-slate-600 hover:text-emerald-400 text-xs transition">Docs</a>
         </div>
-        <p class="text-slate-800 text-[10px] mt-2">© 2025 Sr.Z · Todos los derechos reservados</p>
+        <p class="text-slate-800 text-[10px] mt-2">© 2025 Mr.Z · Todos los derechos reservados</p>
     </div>
 </footer>
 </div>
@@ -318,7 +319,7 @@
         renderChat();
 
         try {
-            const SYS = `Sos el asistente de Sr. Z: docente de electrónica (circuitos, transistores, amplificadores, fuentes, PCBs) y apasionado de la física (termodinámica, fluidos, electromagnetismo, aeronáutica). Respondé en español, directo y técnico. Usá markdown: **negrita**, ## títulos, - listas, \`código inline\`. Para fórmulas matemáticas usá LaTeX entre $...$ o $$...$$. Si analizás una imagen de un componente o circuito, identificá el componente, sus pines y función.`;
+            const SYS = `Sos el asistente de Mr. Z: docente de electrónica (circuitos, transistores, amplificadores, fuentes, PCBs) y apasionado de la física (termodinámica, fluidos, electromagnetismo, aeronáutica). Respondé en español, directo y técnico. Usá markdown: **negrita**, ## títulos, - listas, \`código inline\`. Para fórmulas matemáticas usá LaTeX entre $...$ o $$...$$. Si analizás una imagen de un componente o circuito, identificá el componente, sus pines y función.`;
             const contents = [
                 { role:'user',  parts:[{text:SYS}] },
                 { role:'model', parts:[{text:'Entendido, listo.'}] }
