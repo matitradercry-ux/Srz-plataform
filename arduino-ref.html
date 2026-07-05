@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -15,13 +15,14 @@ body{background:#0f172a;color:#e2e8f0;font-family:system-ui,sans-serif;min-heigh
 .sidebar{width:220px;flex-shrink:0;padding:20px 0 40px;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;}
 .sidebar::-webkit-scrollbar{width:4px;}.sidebar::-webkit-scrollbar-track{background:transparent;}.sidebar::-webkit-scrollbar-thumb{background:#1e293b;border-radius:4px;}
 .s-title{font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.1em;padding:14px 0 6px;}
-.s-link{display:block;font-size:12px;color:#64748b;text-decoration:none;padding:4px 0 4px 10px;border-left:2px solid transparent;transition:all .12s;line-height:1.4;}
+.s-link{display:block;font-size:13px;color:#64748b;text-decoration:none;padding:4px 0 4px 10px;border-left:2px solid transparent;transition:all .12s;line-height:1.4;}
 .s-link:hover,.s-link.active{color:#f59e0b;border-left-color:#f59e0b;}
+.s-cat{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#334155;padding:10px 0 3px 10px;}
 /* Main */
 .main{flex:1;padding:24px 24px 60px;min-width:0;}
 .page-header{margin-bottom:24px;}
-.page-header h1{font-size:22px;font-weight:900;margin-bottom:4px;}
-.page-header p{font-size:13px;color:#64748b;}
+.page-header h1{font-size:26px;font-weight:900;margin-bottom:4px;}
+.page-header p{font-size:15px;color:#64748b;}
 /* Filter */
 .filter-bar{display:flex;align-items:center;gap:10px;margin-bottom:24px;background:#1e293b;border-radius:10px;padding:8px 14px;}
 .filter-bar input{flex:1;background:transparent;border:none;outline:none;color:#e2e8f0;font-size:13px;}
@@ -30,15 +31,15 @@ body{background:#0f172a;color:#e2e8f0;font-family:system-ui,sans-serif;min-heigh
 /* Sections */
 .section{margin-bottom:36px;}
 .section-head{display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px 0;border-bottom:1px solid #1e293b;margin-bottom:16px;user-select:none;}
-.section-head h2{font-size:15px;font-weight:800;color:#f59e0b;}
+.section-head h2{font-size:18px;font-weight:800;color:#f59e0b;}
 .section-head .toggle{margin-left:auto;color:#475569;font-size:12px;transition:.2s;}
 .section-head.collapsed .toggle{transform:rotate(-90deg);}
 .section-body{display:flex;flex-direction:column;gap:12px;}
 .section-body.hidden{display:none;}
 /* Cards */
 .card{background:#1e293b;border-radius:10px;overflow:hidden;}
-.card-label{font-size:12px;font-weight:700;color:#94a3b8;padding:10px 14px 6px;border-bottom:1px solid #0f172a;}
-pre{background:#0d1321;padding:12px 14px;font-size:12px;line-height:1.6;overflow-x:auto;font-family:'Courier New',Courier,monospace;color:#e2e8f0;}
+.card-label{font-size:14px;font-weight:700;color:#94a3b8;padding:10px 14px 6px;border-bottom:1px solid #0f172a;}
+pre{background:#0d1321;padding:12px 14px;font-size:14px;line-height:1.6;overflow-x:auto;font-family:'Courier New',Courier,monospace;color:#e2e8f0;}
 pre::-webkit-scrollbar{height:4px;}.pre::-webkit-scrollbar-track{background:#0d1321;}
 /* Syntax colors */
 .kw{color:#818cf8;} /* keyword */
@@ -48,6 +49,39 @@ pre::-webkit-scrollbar{height:4px;}.pre::-webkit-scrollbar-track{background:#0d1
 .nm{color:#fb923c;} /* number */
 .tp{color:#f59e0b;} /* type */
 .pp{color:#c084fc;} /* preprocessor */
+/* section divider */
+.page-divider{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#f59e0b;margin:40px 0 20px;padding-bottom:10px;border-bottom:2px solid #f59e0b;display:flex;align-items:center;gap:10px;}
+.page-divider::after{content:'';flex:1;height:1px;background:#1e293b;margin-left:8px;}
+/* Guide cards */
+.guide-cat{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#475569;margin:24px 0 12px;padding-bottom:8px;border-bottom:1px solid #1e293b;}
+.guide-cat:first-child{margin-top:0;}
+.guide-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:8px;}
+.gcard{display:flex;flex-direction:column;gap:8px;background:#0d1321;border:1px solid #1e293b;border-radius:12px;padding:16px;text-decoration:none;transition:border-color .2s,transform .15s;}
+.gcard:hover{border-color:#f59e0b;transform:translateY(-2px);}
+.gcard-num{font-size:10px;font-weight:800;color:#f59e0b;letter-spacing:.05em;}
+.gcard-title{font-size:13px;font-weight:700;color:#e2e8f0;line-height:1.3;}
+.gcard-desc{font-size:11px;color:#64748b;line-height:1.5;flex:1;}
+.gcard-ext{font-size:10px;color:#334155;margin-top:4px;}
+/* Lessons */
+.lesson{background:#0d1321;border:1px solid #1e293b;border-radius:12px;margin-bottom:10px;overflow:hidden;}
+.lesson-head{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;user-select:none;transition:background .15s;}
+.lesson-head:hover{background:#111827;}
+.lesson-num{font-size:10px;font-weight:800;color:#f59e0b;letter-spacing:.05em;min-width:20px;}
+.lesson-title{font-size:16px;font-weight:700;color:#e2e8f0;flex:1;}
+.lesson-arrow{font-size:10px;color:#475569;transition:transform .2s;}
+.lesson.open .lesson-arrow{transform:rotate(180deg);}
+.lesson-body{display:none;padding:0 16px 16px;border-top:1px solid #1e293b;}
+.lesson.open .lesson-body{display:block;}
+.lesson-p{font-size:15px;color:#94a3b8;line-height:1.65;margin:12px 0 8px;}
+.lesson-sub{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#475569;margin:14px 0 6px;}
+.lesson-ol,.lesson-ul{font-size:15px;color:#94a3b8;line-height:1.8;padding-left:18px;margin:4px 0;}
+.lesson-tip{font-size:13px;color:#64748b;background:#0a0f1a;border-left:3px solid #f59e0b;border-radius:4px;padding:8px 10px;margin-top:12px;line-height:1.5;}
+.lesson-table{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0;}
+.lesson-table th{background:#111827;color:#64748b;font-weight:700;text-transform:uppercase;font-size:11px;letter-spacing:.05em;padding:6px 8px;text-align:left;border:1px solid #1e293b;}
+.lesson-table td{color:#94a3b8;padding:6px 8px;border:1px solid #1e293b;vertical-align:top;}
+.lesson-table tr:nth-child(even) td{background:#0a0f1a;}
+.lesson-img{max-width:100%;border-radius:8px;display:block;margin:10px 0;border:1px solid #1e293b;}
+.lesson-img-cap{font-size:12px;color:#475569;text-align:center;margin-bottom:12px;font-style:italic;}
 /* Responsive */
 @media(max-width:700px){.sidebar{display:none;}.layout{padding:0 12px;}.main{padding:16px 0 40px;}}
 </style>
@@ -61,29 +95,2008 @@ pre::-webkit-scrollbar{height:4px;}.pre::-webkit-scrollbar-track{background:#0d1
 </nav>
 <div class="layout">
   <aside class="sidebar" id="sidebar">
-    <div class="s-title">En esta página</div>
-    <a class="s-link" href="#estructura">Estructura programa</a>
-    <a class="s-link" href="#io">Entradas y salidas</a>
-    <a class="s-link" href="#tiempo">Control de tiempo</a>
-    <a class="s-link" href="#serial">Comunicación Serial</a>
-    <a class="s-link" href="#operadores">Operadores</a>
-    <a class="s-link" href="#tipos">Tipos de datos</a>
-    <a class="s-link" href="#arrays">Arrays</a>
-    <a class="s-link" href="#strings">Strings</a>
-    <a class="s-link" href="#condicionales">Condicionales</a>
-    <a class="s-link" href="#bucles">Bucles</a>
-    <a class="s-link" href="#math">Funciones matemáticas</a>
-    <a class="s-link" href="#funciones">Funciones de usuario</a>
-    <a class="s-link" href="#avanzado">Tipos avanzados</a>
-    <a class="s-link" href="#interrupciones">Interrupciones</a>
-    <a class="s-link" href="#eeprom">EEPROM</a>
-    <a class="s-link" href="#librerias">Librerías útiles</a>
+    <div id="nav-guias">
+      <div class="s-title">Guías</div>
+      <div class="s-cat">🚀 Introducción</div>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l01')">01 · ¿Qué es Arduino?</a>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l02')">02 · Primer programa</a>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l09')">08 · Electrónica básica</a>
+      <div class="s-cat">🔩 Hardware</div>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l10')">09 · Anatomía Arduino</a>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l11')">10 · Pinout</a>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l12')">11 · Alimentación</a>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l13')">12 · Baterías</a>
+      <div class="s-cat">💻 Programación</div>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l03')">03 · Variables</a>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l04')">04 · Operaciones</a>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l05')">05 · Condicionales</a>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l06')">06 · Bucles</a>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l07')">07 · Funciones</a>
+      <div class="s-cat">🔌 Entradas / Salidas</div>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l14')">13 · Entradas digitales</a>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l15')">14 · Salidas digitales</a>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l16')">15 · Entradas analógicas</a>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l17')">16 · Salidas PWM</a>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l18')">17 · Interrupciones</a>
+      <div class="s-cat">⚡ Proyectos Básicos</div>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l20')">18 · Encender un LED</a>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l21')">19 · Leer pulsador</a>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l22')">20 · Resistencia variable</a>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l23')">21 · Potenciómetro</a>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l24')">22 · Debounce</a>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l25')">23 · EEPROM</a>
+      <div class="s-cat">📡 Comunicación</div>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l26')">24 · Puerto Serie</a>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l27')">25 · Serial Plotter</a>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l28')">26 · Bus I2C</a>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l29')">27 · Bus SPI</a>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l30')">28 · Arduino + C#</a>
+      <a class="s-link" href="javascript:void(0)" onclick="openLesson('l31')">29 · Arduino + Python</a>
+      <div class="s-cat">🔬 Sensores</div>
+      <a class="s-link" href="sensores.html">Ver catálogo de sensores →</a>
+      <div class="s-cat">📋 Cheatsheet</div>
+      <a class="s-link" href="#estructura">Estructura</a>
+      <a class="s-link" href="#io">E/S digitales y analógicas</a>
+      <a class="s-link" href="#tiempo">Tiempo</a>
+      <a class="s-link" href="#serial">Serial</a>
+      <a class="s-link" href="#operadores">Operadores</a>
+      <a class="s-link" href="#tipos">Tipos de datos</a>
+      <a class="s-link" href="#arrays">Arrays</a>
+      <a class="s-link" href="#strings">Strings</a>
+      <a class="s-link" href="#condicionales">Condicionales</a>
+      <a class="s-link" href="#bucles">Bucles</a>
+      <a class="s-link" href="#math">Matemáticas</a>
+      <a class="s-link" href="#funciones">Funciones</a>
+      <a class="s-link" href="#avanzado">Tipos avanzados</a>
+      <a class="s-link" href="#interrupciones">Interrupciones</a>
+      <a class="s-link" href="#eeprom">EEPROM</a>
+      <a class="s-link" href="#librerias">Librerías útiles</a>
+    </div>
   </aside>
   <main class="main">
     <div class="page-header">
-      <h1>📋 Referencia del lenguaje Arduino</h1>
-      <p>Cheatsheet completa de funciones, estructuras y sentencias disponibles en el lenguaje.</p>
+      <h1>⚡ Arduino</h1>
+      <p>Guías teóricas y cheatsheet completa del lenguaje.</p>
     </div>
+
+    <!-- GUÍAS -->
+
+      <div class="guide-cat">🚀 Introducción</div>
+
+      <div class="lesson" id="l01">
+        <div class="lesson-head" onclick="toggleLesson('l01')">
+          <span class="lesson-num">01</span>
+          <span class="lesson-title">¿Qué es Arduino?</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <img src="arduino/que%20es%20arduino%7D.webp" alt="Arduino UNO" class="lesson-img">
+          <p class="lesson-p">Arduino es una plataforma de electrónica de código abierto compuesta por dos partes inseparables: una <strong>placa con microcontrolador</strong> (el cerebro físico) y el <strong>Arduino IDE</strong> (el software donde escribís el programa). Juntas permiten que cualquier persona, sin ser ingeniero electrónico, pueda hacer que un circuito piense y reaccione al mundo real.</p>
+          <p class="lesson-p">La idea central es sencilla: el microcontrolador puede <strong>leer entradas</strong> del mundo físico —un botón presionado, la temperatura, luz, distancia— y convertirlas en <strong>salidas</strong> —encender un LED, mover un motor, mostrar datos en pantalla. Vos escribís las reglas de ese comportamiento en el programa.</p>
+          <p class="lesson-p">Arduino nació en 2005 en el Instituto de Diseño Interaction de Ivrea, Italia, con un objetivo claro: que estudiantes de diseño sin conocimientos de electrónica pudieran crear prototipos interactivos. Hoy es la plataforma de prototipado más popular del mundo, con millones de unidades vendidas y una comunidad enorme de proyectos y librerías gratuitas.</p>
+          <div class="lesson-sub">¿Qué modelos existen?</div>
+          <table class="lesson-table">
+            <tr><th>Modelo</th><th>MCU</th><th>Voltaje</th><th>Pines dig.</th><th>RAM</th><th>Ideal para</th></tr>
+            <tr><td>Uno R3</td><td>ATmega328P</td><td>5V</td><td>14</td><td>2 KB</td><td>Aprender, proyectos básicos</td></tr>
+            <tr><td>Nano</td><td>ATmega328P</td><td>5V</td><td>14</td><td>2 KB</td><td>Proyectos compactos</td></tr>
+            <tr><td>Mega 2560</td><td>ATmega2560</td><td>5V</td><td>54</td><td>8 KB</td><td>Proyectos grandes, muchos pines</td></tr>
+            <tr><td>Leonardo</td><td>ATmega32u4</td><td>5V</td><td>20</td><td>2.5 KB</td><td>HID (teclado/mouse USB)</td></tr>
+            <tr><td>ESP32</td><td>Xtensa LX6</td><td>3.3V</td><td>34</td><td>520 KB</td><td>WiFi, BT, IoT, mayor potencia</td></tr>
+            <tr><td>ESP8266</td><td>L106</td><td>3.3V</td><td>11</td><td>80 KB</td><td>WiFi económico</td></tr>
+          </table>
+          <div class="lesson-tip">💡 Para empezar: Arduino Uno. Para IoT o mayor potencia: ESP32.</div>
+
+          <div class="lesson-sub">¿Qué modelo comprar?</div>
+          <p class="lesson-p">Aunque existen decenas de placas oficiales y variantes, para empezar <strong>no te compliques</strong>. La elección se resume en tres "clásicos" que cubren el 99% de las necesidades de iniciación:</p>
+          <table class="lesson-table">
+            <tr><th>Modelo</th><th>I/O Digitales</th><th>Ent. Analógicas</th><th>Sal. PWM</th><th>UART</th><th>Memoria Flash</th><th>Precio aprox.</th></tr>
+            <tr><td><strong>Uno R3</strong></td><td>14 (6 PWM)</td><td>6</td><td>6</td><td>1</td><td>32 KB</td><td>~7 USD</td></tr>
+            <tr><td><strong>Nano V3</strong></td><td>14 (6 PWM)</td><td>8</td><td>6</td><td>1</td><td>32 KB</td><td>~3 USD</td></tr>
+            <tr><td><strong>Mega R3</strong></td><td>54 (15 PWM)</td><td>16</td><td>15</td><td>4</td><td>256 KB</td><td>~12 USD</td></tr>
+            <tr><td><strong>Mini 05</strong></td><td>14 (6 PWM)</td><td>8</td><td>6</td><td>1</td><td>32 KB</td><td>~2.5 USD</td></tr>
+            <tr><td><strong>ESP32</strong></td><td>34</td><td>18 (12-bit)</td><td>16</td><td>3</td><td>4 MB</td><td>~4 USD</td></tr>
+          </table>
+          <ul class="lesson-ul">
+            <li><strong>Arduino UNO:</strong> El estándar. Tamaño perfecto para manejarlo con las manos, robusto y compatible con la mayoría de accesorios (Shields). Es el más documentado del mundo.</li>
+            <li><strong>Arduino Nano:</strong> Básicamente un UNO "encogido". Misma potencia, tamaño minúsculo — ideal para pinchar directamente en una protoboard y para proyectos finales pequeños.</li>
+            <li><strong>Arduino Mega:</strong> La bestia. Más grande, más memoria, muchísimas más entradas y salidas. Para impresoras 3D, brazos robóticos o proyectos complejos que se quedan cortos con el UNO.</li>
+            <li><strong>ESP32:</strong> Microcontrolador más potente con WiFi y Bluetooth integrado. 3.3V — no tolera 5V en sus pines. Ideal para IoT y cuando necesitás conectividad.</li>
+          </ul>
+          <div class="lesson-tip">💡 <strong>Para empezar: comprá un Arduino UNO (R3 o R4).</strong> Es la placa más documentada del mundo, la más fácil de conectar y la que va a funcionar sin problemas. El Nano guardalo para cuando quieras hacer montajes finales pequeños. El Mega solo si tu proyecto se queda corto de pines.</div>
+        </div>
+      </div>
+
+      <div class="lesson" id="l02">
+        <div class="lesson-head" onclick="toggleLesson('l02')">
+          <span class="lesson-num">02</span>
+          <span class="lesson-title">Primer programa — Blink</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">En el mundo de la programación, cuando aprendés un lenguaje nuevo, la tradición dice que lo primero que hacés es escribir un programa que diga "Hola Mundo" en la pantalla. En el mundo de la electrónica y Arduino, nuestro "Hola Mundo" no es texto. Es algo mucho más físico: <strong>hacer parpadear una luz</strong>.</p>
+          <p class="lesson-p">Todo programa de Arduino se llama <strong>sketch</strong>. Lo mejor de todo es que para este primer sketch <strong>no necesitás conectar nada todavía</strong> — vamos a usar el pequeño LED que ya viene integrado en la propia placa Arduino, conectado al pin 13.</p>
+          <div class="lesson-tip">ℹ️ La mayoría de placas Arduino (UNO, Nano, Mega) tienen un LED de prueba integrado conectado al <strong>Pin 13</strong>. En el código se llama <code>LED_BUILTIN</code>.</div>
+
+          <div class="lesson-sub">La anatomía de un Sketch</div>
+          <p class="lesson-p">Abrí el Arduino IDE. Si creás un archivo nuevo (<em>Archivo → Nuevo</em>), vas a ver que no está vacío. Arduino siempre te da un esqueleto básico con dos funciones que <strong>siempre deben existir</strong>. Son el corazón de cualquier programa:</p>
+<pre><span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="cm">// Se ejecuta UNA SOLA VEZ al encender o reiniciar</span>
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="cm">// Se ejecuta INDEFINIDAMENTE, en bucle</span>
+}</pre>
+
+          <div class="lesson-sub">¿Qué hace setup()?</div>
+          <p class="lesson-p">Esta función se ejecuta <strong>una sola vez</strong>, justo cuando encendés el Arduino o pulsás el botón Reset. Es el momento de "preparar la mochila antes de ir al colegio": acá configurás qué pines vas a usar como entrada o salida, iniciás comunicaciones, etc. Una vez ejecutada, no se vuelve a mirar (hasta que reiniciés la placa).</p>
+
+          <div class="lesson-sub">¿Qué hace loop()?</div>
+          <p class="lesson-p">Como su nombre indica (<em>loop</em> = bucle), el código que escribas acá se va a <strong>repetir infinitamente</strong>, una y otra vez, a la máxima velocidad posible, hasta que desconectés la corriente. Es tu rutina diaria: levantarse, comer, dormir… y vuelta a empezar. Acá va la lógica de tu proyecto: leer sensores, tomar decisiones, activar salidas.</p>
+          <div class="lesson-tip">ℹ️ Esta configuración —una función de setup y un bucle que se ejecuta continuamente— es estándar en la programación de microcontroladores. Es la única estructura que acepta el IDE estándar de Arduino.</div>
+
+          <div class="lesson-sub">Nuestro primer programa — Blink</div>
+          <p class="lesson-p">Para probar el funcionamiento vamos a usar uno de los ejemplos incluidos en el IDE. Abrí <em>Archivo → Ejemplos → 01.Basics → Blink</em>. Vas a ver un código similar al siguiente:</p>
+          <img src="arduino/arduino-ejemplos.webp" alt="Menú Ejemplos Arduino IDE" class="lesson-img">
+          <p class="lesson-img-cap">Archivo → Ejemplos → 01.Basics → Blink</p>
+<pre><span class="kw">const</span> <span class="tp">int</span> pinLED = <span class="nm">13</span>;   <span class="cm">// asignar variable led como 13</span>
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(pinLED, <span class="tp">OUTPUT</span>); <span class="cm">// definir pin 13 como salida</span>
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="fn">digitalWrite</span>(pinLED, <span class="tp">HIGH</span>); <span class="cm">// encender LED</span>
+  <span class="fn">delay</span>(<span class="nm">1000</span>);               <span class="cm">// esperar un segundo</span>
+  <span class="fn">digitalWrite</span>(pinLED, <span class="tp">LOW</span>);  <span class="cm">// apagar LED</span>
+  <span class="fn">delay</span>(<span class="nm">1000</span>);               <span class="cm">// esperar un segundo</span>
+}</pre>
+          <p class="lesson-p">Este ejemplo enciende y apaga un LED cada segundo. El LED empleado está integrado en muchas de las placas Arduino (UNO, MEGA, etc.) <strong>conectado físicamente al PIN 13</strong>. La función de cada línea está comentada a la derecha.</p>
+
+          <div class="lesson-sub">Los 3 comandos básicos</div>
+          <p class="lesson-p">Para este primer programa usamos tres funciones esenciales que vas a usar el 90% del tiempo:</p>
+          <table class="lesson-table">
+            <tr><th>Función</th><th>Qué hace</th><th>Parámetros</th></tr>
+            <tr><td><code>pinMode(pin, modo)</code></td><td>Le dice al Arduino cómo debe comportarse un pin</td><td>pin: número · modo: <code>OUTPUT</code> o <code>INPUT</code></td></tr>
+            <tr><td><code>digitalWrite(pin, estado)</code></td><td>Cambia el estado de un pin configurado como salida</td><td>pin: número · estado: <code>HIGH</code> (5V) o <code>LOW</code> (0V)</td></tr>
+            <tr><td><code>delay(ms)</code></td><td>Pausa el programa el tiempo indicado</td><td>milisegundos (1000 = 1 segundo)</td></tr>
+          </table>
+          <ul class="lesson-ul">
+            <li><strong>pinMode:</strong> va casi siempre en el <code>setup()</code>. Al poner <code>OUTPUT</code> estás diciendo "Arduino, prepárate para <em>enviar</em> voltaje por este pin".</li>
+            <li><strong>digitalWrite HIGH:</strong> pone 5 Voltios en el pin → <strong>enciende</strong> la corriente.</li>
+            <li><strong>digitalWrite LOW:</strong> pone 0 Voltios (GND) en el pin → <strong>apaga</strong> la corriente.</li>
+          </ul>
+
+          <div class="lesson-sub">Subir el programa a la placa</div>
+          <p class="lesson-p">Primero <strong>conectá la placa Arduino al PC mediante el cable USB</strong>. Los primeros modelos usaban un USB A-B (el mismo de las impresoras antiguas), pero otros modelos usan mini, micro o USB-C. No hace falta cable de alimentación adicional — el USB es suficiente para programar.</p>
+          <img src="arduino/arduino-usb-a-b-e1383069974142.webp" alt="Cable USB A-B" class="lesson-img">
+          <p class="lesson-img-cap">Cable USB A-B — el mismo que usan las impresoras antiguas</p>
+          <p class="lesson-p">A continuación, en el IDE seleccioná el <strong>modelo de tu placa</strong> y el <strong>puerto COM</strong> al que está conectada:</p>
+          <img src="arduino/arduino-board.webp" alt="Selección de placa" class="lesson-img">
+          <p class="lesson-img-cap">Herramientas → Placa → seleccioná tu modelo (ej: Arduino UNO)</p>
+          <img src="arduino/arduino-porrt.webp" alt="Selección de puerto" class="lesson-img">
+          <p class="lesson-img-cap">Herramientas → Puerto → el COMx que aparece al conectar la placa</p>
+          <div class="lesson-tip">ℹ️ En <strong>Windows</strong> el puerto será tipo <code>COM1</code>, <code>COM3</code>… · En <strong>Linux</strong> será del estilo <code>/dev/ttyACM0</code>. Si no aparece ningún puerto, instalá el driver CH340 o FTDI según tu placa.</div>
+
+          <div class="lesson-sub">Compilar y enviar</div>
+          <p class="lesson-p">Con la placa y el puerto seleccionados, hacé clic en el botón <strong>→ (Subir)</strong> para compilar y enviar la programación a la placa. Los LEDs TX/RX de la placa van a parpadear mientras se transfiere el programa. Tras unos segundos, la pantalla inferior del IDE debería mostrar "Subido correctamente".</p>
+          <img src="arduino/arduino-compilado.webp" alt="Compilar y subir" class="lesson-img">
+          <p class="lesson-img-cap">Clic en → para compilar y subir. La barra inferior muestra el progreso y uso de memoria</p>
+          <div class="lesson-tip">✅ <strong>¡Listo!</strong> Si la placa empezó a parpadear el LED, significa que todo funciona y está bien configurado. A partir de acá estás listo para empezar a experimentar.</div>
+        </div>
+      </div>
+
+      <div class="lesson" id="l09">
+        <div class="lesson-head" onclick="toggleLesson('l09')">
+          <span class="lesson-num">08</span>
+          <span class="lesson-title">Electrónica básica para Arduino</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">Para conectar componentes a Arduino necesitás combinar electrónica y programación. Antes de escribir código que controle componentes reales, hay que entender tres magnitudes fundamentales y las reglas que las relacionan.</p>
+
+          <div class="lesson-sub">Las tres magnitudes</div>
+          <table class="lesson-table">
+            <tr><th>Magnitud</th><th>Símbolo</th><th>Unidad</th><th>Qué es</th></tr>
+            <tr><td><strong>Voltaje</strong> (Tensión)</td><td>V</td><td>Voltio [V]</td><td>La energía que mueve los electrones. En Arduino trabajamos con <strong>5V</strong> o <strong>3.3V</strong>.</td></tr>
+            <tr><td><strong>Corriente</strong></td><td>I</td><td>Amperio [A]</td><td>La cantidad de electrones que fluyen por segundo. Los pines de Arduino soportan máximo 40 mA (recomendado 20 mA).</td></tr>
+            <tr><td><strong>Resistencia</strong></td><td>R</td><td>Ohm [Ω]</td><td>La oposición al paso de corriente. Se usa para proteger componentes como LEDs.</td></tr>
+          </table>
+
+          <div class="lesson-sub">Las reglas del juego</div>
+          <p class="lesson-p"><strong>Ley de Ohm</strong> — la relación entre las tres magnitudes:</p>
+<pre>V = I × R     <span class="cm">// tensión = corriente × resistencia</span>
+I = V / R     <span class="cm">// corriente = tensión / resistencia</span>
+R = V / I     <span class="cm">// resistencia = tensión / corriente</span>
+
+<span class="cm">// Ejemplo: calcular resistencia para un LED</span>
+<span class="cm">// Vcc=5V, Vled=2V, Iled=20mA → R = (5-2) / 0.020 = 150 Ω</span></pre>
+          <p class="lesson-p"><strong>Leyes de Kirchhoff</strong> — en un circuito en serie, la suma de caídas de tensión es igual a la tensión de alimentación. En paralelo, la tensión en todos los ramas es la misma.</p>
+
+          <div class="lesson-sub">El concepto de GND</div>
+          <p class="lesson-p">La electricidad <strong>siempre</strong> necesita un circuito cerrado: los electrones tienen que salir de la fuente de energía, hacer su trabajo y volver. Para eso existen dos puntos:</p>
+          <ul class="lesson-ul">
+            <li><strong>5V / VCC</strong>: el punto de salida, donde hay mucha energía (presión alta).</li>
+            <li><strong>GND (Ground/Tierra)</strong>: el punto de retorno, el nivel cero (el desagüe).</li>
+          </ul>
+          <p class="lesson-p">El Arduino tiene varios pines GND repartidos por la placa. Todos son iguales y están conectados entre sí internamente. El circuito siempre debe cerrarse a GND.</p>
+
+          <div class="lesson-sub">El concepto de cortocircuito</div>
+          <p class="lesson-p">Si conectás un cable directo de 5V a GND sin nada en el medio, los electrones encuentran un camino libre sin resistencia — "una autopista vacía". La placa se calienta, huele a quemado y se produce un <strong>Cortocircuito</strong>.</p>
+          <div class="lesson-tip">⚠ Siempre poné algo en el medio (una resistencia, un LED, un motor). Nunca conectes 5V directo a GND. Nunca conectes un LED sin resistencia limitadora — puede quemar el pin o el LED.</div>
+
+          <div class="lesson-sub">Límites del Arduino Uno</div>
+          <ul class="lesson-ul">
+            <li>Corriente máxima por pin digital: <strong>40 mA</strong> (recomendado 20 mA)</li>
+            <li>Corriente total de todos los pines juntos: <strong>200 mA</strong></li>
+            <li>Tensión en pines analógicos: <strong>0 a 5V</strong> — nunca superar</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="guide-cat">🔩 Hardware</div>
+
+      <div class="lesson" id="l10">
+        <div class="lesson-head" onclick="toggleLesson('l10')">
+          <span class="lesson-num">08</span>
+          <span class="lesson-title">Anatomía del Arduino Uno</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">Entender qué hace cada parte de tu Arduino te ayuda a saber por qué las cosas funcionan (o no funcionan) cuando conectás componentes. Vamos parte por parte.</p>
+
+          <div class="lesson-sub">El sistema de alimentación</div>
+          <p class="lesson-p">La placa puede recibir energía de tres formas distintas:</p>
+          <ul class="lesson-ul">
+            <li><strong>Puerto USB</strong>: permite cargar el código desde la computadora y alimenta la placa con los 5V del USB. Es lo que van a usar el 99% del tiempo al empezar.</li>
+            <li><strong>Jack DC / Barril</strong>: conector negro redondo para pilas, baterías o adaptadores de corriente. El voltaje recomendado es 7V a 12V.</li>
+            <li><strong>Pines Vin y GND</strong>: si la batería no tiene conector Jack, conectan los cables directamente aquí (+ a Vin, − a GND). Mismo voltaje que el Jack.</li>
+          </ul>
+
+          <div class="lesson-sub">El microcontrolador</div>
+          <p class="lesson-p">Es el <strong>chip negro y alargado</strong> que domina el centro de la placa. Normalmente un <strong>ATmega328p</strong>. Ahí es donde se guarda el código y donde se toman las decisiones. Es el cerebro de la placa.</p>
+
+          <div class="lesson-sub">Los Pines de Potencia</div>
+          <p class="lesson-p">Son las tiras de agujeritos negros en los bordes, agrupados en el bloque marcado como <code>POWER</code>. Arduino les da energía para alimentar sensores y LEDs:</p>
+          <ul class="lesson-ul">
+            <li><strong>5V</strong>: proporciona 5 Voltios estables.</li>
+            <li><strong>3.3V</strong>: proporciona 3.3 Voltios (para componentes más delicados como el ESP8266).</li>
+            <li><strong>GND (Ground/Tierra)</strong>: el negativo. Hay varios pines GND repartidos por la placa — todos son iguales y están conectados entre sí. El circuito siempre debe cerrarse a GND.</li>
+          </ul>
+
+          <div class="lesson-sub">Pines digitales</div>
+          <p class="lesson-p">Van a ver una fila larga numerada del <strong>0 al 13</strong>. Son los <strong>pines digitales</strong> y pueden funcionar de dos formas:</p>
+          <ul class="lesson-ul">
+            <li><strong>Como SALIDA (Output)</strong>: para encender o apagar cosas (0V o 5V).</li>
+            <li><strong>Como ENTRADA (Input)</strong>: para leer si un botón está pulsado o no.</li>
+          </ul>
+          <p class="lesson-p">Los pines <strong>3, 5, 6, 9, 10 y 11</strong> tienen un símbolo ondulado <strong>~</strong>. Son pines <strong>PWM</strong> (Pulse Width Modulation): pueden encenderse y apagarse tan rápido que simulan voltajes intermedios. Los usamos para regular intensidad de LEDs o velocidad de motores.</p>
+
+          <div class="lesson-sub">Pines analógicos</div>
+          <p class="lesson-p">Abajo a la derecha están los pines marcados como <strong>ANALOG IN</strong> (A0, A1... A5). A diferencia de los digitales (que solo entienden "Todo o Nada"), estos pines pueden medir voltajes con decimales (0.3V, 2.7V, etc.). Devuelven un valor de 0 a 1023. Son los que se usan para leer sensores analógicos: temperatura, luz, distancia, potenciómetros...</p>
+
+          <div class="lesson-sub">Componentes adicionales</div>
+          <table class="lesson-table">
+            <tr><th>Componente</th><th>Descripción</th></tr>
+            <tr><td>Cristal 16 MHz</td><td>Oscilador de referencia del microcontrolador</td></tr>
+            <tr><td>Regulador 5V</td><td>Convierte el voltaje del Jack DC (7–12V) a 5V estables</td></tr>
+            <tr><td>Botón RESET</td><td>Reinicia el programa desde el principio</td></tr>
+            <tr><td>LED L (pin 13)</td><td>LED integrado en la placa, conectado al pin 13</td></tr>
+            <tr><td>LEDs TX/RX</td><td>Parpadean al transferir datos por el puerto Serial</td></tr>
+            <tr><td>ICSP Header</td><td>Conector para programación avanzada in-circuit</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="lesson" id="l11">
+        <div class="lesson-head" onclick="toggleLesson('l11')">
+          <span class="lesson-num">08</span>
+          <span class="lesson-title">Pinout — Esquema de pines</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">El esquema de patillaje (pinout) muestra qué función tiene cada pin de la placa. Cada pin puede tener múltiples funciones: digital básica, PWM, comunicación (SPI, I²C, UART), interrupciones, etc.</p>
+
+          <div class="lesson-sub">Arduino UNO — Pinout completo</div>
+          <img src="arduino/pinout1.webp" alt="Pinout Arduino UNO" class="lesson-img">
+          <p class="lesson-img-cap">Esquema completo de pines del Arduino UNO R3</p>
+
+          <div class="lesson-sub">Arduino Nano — Pinout</div>
+          <img src="arduino/pinout2.webp" alt="Pinout Arduino Nano" class="lesson-img">
+          <p class="lesson-img-cap">Esquema completo de pines del Arduino Nano V3</p>
+
+          <div class="lesson-sub">Arduino Pro Mini — Pinout</div>
+          <img src="arduino/pinout3.webp" alt="Pinout Arduino Pro Mini" class="lesson-img">
+          <p class="lesson-img-cap">Esquema completo de pines del Arduino Pro Mini</p>
+
+          <div class="lesson-sub">Arduino Mega — Pinout</div>
+          <img src="arduino/pinout4.webp" alt="Pinout Arduino Mega" class="lesson-img">
+          <p class="lesson-img-cap">Esquema completo de pines del Arduino Mega 2560</p>
+
+          <div class="lesson-sub">Referencia rápida UNO</div>
+          <table class="lesson-table">
+            <tr><th>Pin</th><th>Función digital</th><th>Función alternativa</th></tr>
+            <tr><td>0 (RX)</td><td>Digital I/O</td><td>UART RX — recibe Serial</td></tr>
+            <tr><td>1 (TX)</td><td>Digital I/O</td><td>UART TX — transmite Serial</td></tr>
+            <tr><td>2</td><td>Digital I/O</td><td>Interrupción externa INT0</td></tr>
+            <tr><td>3~</td><td>Digital I/O + PWM</td><td>Interrupción externa INT1</td></tr>
+            <tr><td>5~, 6~, 9~, 10~, 11~</td><td>Digital I/O + PWM</td><td>analogWrite() para regular intensidad</td></tr>
+            <tr><td>10~</td><td>Digital I/O + PWM</td><td>SPI SS</td></tr>
+            <tr><td>11~</td><td>Digital I/O + PWM</td><td>SPI MOSI</td></tr>
+            <tr><td>12</td><td>Digital I/O</td><td>SPI MISO</td></tr>
+            <tr><td>13</td><td>Digital I/O + LED</td><td>SPI SCK</td></tr>
+            <tr><td>A0–A5</td><td>Analógico ADC (0–1023)</td><td>También usables como digital</td></tr>
+            <tr><td>A4 (SDA)</td><td>Analógico / I²C</td><td>I²C Data</td></tr>
+            <tr><td>A5 (SCL)</td><td>Analógico / I²C</td><td>I²C Clock</td></tr>
+          </table>
+          <div class="lesson-tip">💡 Los pines con ~ admiten PWM (analogWrite). Los pines 0 y 1 comparten el Serial con USB — evitá usarlos si usás el Monitor Serie. Corriente máxima por pin: 40 mA (recomendado 20 mA). Total de todos los pines: no superar 200 mA.</div>
+        </div>
+      </div>
+
+      <div class="lesson" id="l12">
+        <div class="lesson-head" onclick="toggleLesson('l12')">
+          <span class="lesson-num">08</span>
+          <span class="lesson-title">Cómo alimentar Arduino</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">Arduino puede recibir energía de varias formas. Cada una tiene sus reglas. Entenderlas evita quemar la placa.</p>
+
+          <div class="lesson-sub">Puerto USB</div>
+          <p class="lesson-p">Es la forma más común al empezar. El cable USB-B hace dos cosas a la vez:</p>
+          <ul class="lesson-ul">
+            <li>Permite cargar el código desde la computadora.</li>
+            <li>Alimenta la placa con los <strong>5V del USB</strong> (del puerto de la PC, cargador de celular o powerbank).</li>
+          </ul>
+          <div class="lesson-tip">💡 Un powerbank USB es la opción más práctica para prototipos portátiles: 5V estables, se recarga fácil, sin necesidad de regulador.</div>
+
+          <div class="lesson-sub">El conector de Barril o Jack DC</div>
+          <p class="lesson-p">Es el conector negro redondo en una esquina de la placa. Está pensado para conectar pilas, baterías o adaptadores de corriente de pared. Aquí entra en juego el <strong>Regulador de Voltaje</strong> de la placa: si meten 9V por el Jack, el regulador se encarga de "recortar" el sobrante y convertirlo en 5V estables.</p>
+          <ul class="lesson-ul">
+            <li><strong>Rango de voltaje recomendado:</strong> 7V a 12V.</li>
+            <li><strong>¿Por qué mínimo 7V?</strong> El regulador necesita un mínimo por encima de 5V para poder regular correctamente. Con 6V entraría justo y la salida sería inestable.</li>
+            <li><strong>¿Por qué máximo 12V?</strong> La diferencia entre el voltaje de entrada y 5V se disipa como calor. Con 12V y 500mA el regulador disipa (12-5)×0.5 = 3.5W — se calienta mucho. Con 9V el calor es menor.</li>
+            <li><strong>Fuente típica:</strong> la pila cuadrada de 9V, o un portapilas con 6 pilas AA.</li>
+          </ul>
+
+          <div class="lesson-sub">El Pin VIN</div>
+          <p class="lesson-p">Si miran los pines de POWER, van a ver uno llamado <strong>VIN</strong> (Voltage Input). Este pin está conectado internamente al Jack DC.</p>
+          <ul class="lesson-ul">
+            <li><strong>Uso:</strong> si la batería no tiene conector Jack sino dos cables sueltos (Rojo y Negro), pueden conectarlos aquí.</li>
+            <li><strong>Conexión:</strong> cable Positivo (+) va a VIN. Cable Negativo (−) va a GND.</li>
+            <li><strong>Voltaje:</strong> el mismo que el Jack: 7V a 12V.</li>
+          </ul>
+          <div class="lesson-tip">⚠ El pin VIN <strong>no tiene protección de polaridad</strong>. Si conectan el positivo y GND al revés por error, van a quemar la placa instantáneamente. Revisen los cables dos veces.</div>
+
+          <div class="lesson-sub">El Pin 5V</div>
+          <p class="lesson-p">El pin 5V está pensado para ser una <strong>SALIDA</strong> (para alimentar sensores), no una entrada. Si meten energía por ahí se saltean el regulador de voltaje y las protecciones de seguridad.</p>
+          <ul class="lesson-ul">
+            <li>Si la fuente da 5.5V → pueden quemar el chip.</li>
+            <li>Si hay un pico de tensión → adiós Arduino.</li>
+            <li>Si conectan el USB a la vez → conflicto eléctrico.</li>
+          </ul>
+          <div class="lesson-tip">⚠ Por seguridad, usen el pin 5V solo para alimentar sensores, <strong>no para alimentar la placa</strong>. Solo úsenlo como entrada si tienen una fuente de 5V perfectamente regulada y regulada, nunca al mismo tiempo que el USB.</div>
+
+          <div class="lesson-sub">¿Cuánto dura la batería?</div>
+          <p class="lesson-p">Autonomía (horas) = Capacidad en mAh ÷ Consumo en mA</p>
+          <table class="lesson-table">
+            <tr><th>Batería</th><th>Capacidad</th><th>Consumo Arduino</th><th>Autonomía aprox.</th></tr>
+            <tr><td>9V alcalina</td><td>~400 mAh</td><td>~50 mA (solo)</td><td>~8 hs</td></tr>
+            <tr><td>6× AA (9V)</td><td>~2000 mAh</td><td>~100 mA (con sensores)</td><td>~20 hs</td></tr>
+            <tr><td>LiPo 2S (7.4V)</td><td>~2000 mAh</td><td>~100 mA</td><td>~20 hs</td></tr>
+            <tr><td>Power Bank USB</td><td>5000–20000 mAh</td><td>~50–200 mA</td><td>días</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="lesson" id="l13">
+        <div class="lesson-head" onclick="toggleLesson('l13')">
+          <span class="lesson-num">08</span>
+          <span class="lesson-title">Alimentación con baterías</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <table class="lesson-table">
+            <tr><th>Batería</th><th>Tensión</th><th>Capacidad</th><th>Conexión</th><th>Ideal para</th></tr>
+            <tr><td>9V alcalina</td><td>9V</td><td>~200–600 mAh</td><td>Jack DC</td><td>Pruebas cortas, poca autonomía</td></tr>
+            <tr><td>4× AA (6V)</td><td>6V</td><td>~2000 mAh</td><td>Vin o Jack</td><td>Proyectos simples, económica</td></tr>
+            <tr><td>6× AA (9V)</td><td>9V</td><td>~2000 mAh</td><td>Jack DC</td><td>Buena autonomía, bajo costo</td></tr>
+            <tr><td>LiPo 1S (3.7V)</td><td>3.7–4.2V</td><td>500–5000 mAh</td><td>Pin 5V + boost</td><td>Proyectos compactos con boost converter</td></tr>
+            <tr><td>LiPo 2S (7.4V)</td><td>7.4–8.4V</td><td>variable</td><td>Vin o Jack</td><td>Robótica, buena autonomía</td></tr>
+            <tr><td>Power Bank USB</td><td>5V</td><td>5000–20000 mAh</td><td>USB</td><td>Proyectos portátiles, muy práctico</td></tr>
+          </table>
+          <div class="lesson-sub">Estimación de autonomía</div>
+<pre><span class="cm">// Autonomía (horas) = Capacidad_mAh / Consumo_mA</span>
+<span class="cm">// Arduino Uno en idle: ~50mA</span>
+<span class="cm">// Con sensores + LED: ~100–200mA</span>
+<span class="cm">// Ejemplo: 9V 600mAh / 100mA = 6 horas</span></pre>
+          <div class="lesson-tip">💡 Power Bank USB es la opción más práctica para prototipos: 5V estables, se recarga fácil y no necesita regulador.</div>
+        </div>
+      </div>
+
+      <div class="guide-cat">💻 Programación</div>
+
+      <div class="lesson" id="l03">
+        <div class="lesson-head" onclick="toggleLesson('l03')">
+          <span class="lesson-num">03</span>
+          <span class="lesson-title">Variables y tipos de datos</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">Para manejar Arduino necesitás combinar electrónica y programación. Y la programación empieza con las variables. Una variable es un pequeño espacio en la memoria del Arduino que reservamos para guardar un dato. Como si fuera una <strong>caja de mudanza</strong>.</p>
+          <p class="lesson-p">Para que el Arduino no se lie con tanta caja, necesitamos hacer dos cosas obligatorias al crearla:</p>
+          <ul class="lesson-ul">
+            <li><strong>Ponerle una etiqueta (Nombre):</strong> para saber cómo pedirle ese dato después (<code>velocidad</code>, <code>brillo</code>, <code>pinLed</code>).</li>
+            <li><strong>Decirle qué cabe dentro (Tipo):</strong> no es lo mismo guardar un calcetín que una enciclopedia. En programación, tenemos que definir el <strong>Tipo de Dato</strong> antes de usarlo.</li>
+          </ul>
+
+          <div class="lesson-sub">Los tres tipos fundamentales</div>
+          <p class="lesson-p">Aunque C++ tiene muchos tipos, para empezar <strong>solo necesitás dominar estos tres</strong>. Cubren el 99% de las necesidades iniciales:</p>
+          <table class="lesson-table">
+            <tr><th>Tipo</th><th>Qué guarda</th><th>Rango</th><th>Ejemplos de uso</th></tr>
+            <tr><td><strong>int</strong></td><td>Números enteros (sin decimales)</td><td>-32,768 a 32,767</td><td>Número de pines (<code>int led = 13</code>), contadores (<code>int vueltas = 0</code>), lecturas analógicas (<code>0 a 1023</code>)</td></tr>
+            <tr><td><strong>float</strong></td><td>Números decimales</td><td>~6-7 dígitos significativos</td><td>Temperaturas (<code>float temp = 23.5</code>), cálculos con decimales</td></tr>
+            <tr><td><strong>bool</strong></td><td>Verdadero o Falso</td><td>true / false</td><td>Estados (<code>bool encendido = true</code>), flags de control</td></tr>
+          </table>
+<pre><span class="tp">int</span> edad = <span class="nm">35</span>;
+<span class="tp">int</span> pinLed = <span class="nm">13</span>;
+<span class="tp">float</span> temperatura = <span class="nm">23.5</span>;
+<span class="kw">bool</span> encendido = <span class="kw">true</span>;</pre>
+
+          <div class="lesson-sub">El ámbito de la variable</div>
+          <p class="lesson-p">Cuando creamos una variable, no siempre es visible para todo el código. Depende de <strong>dónde</strong> la escribamos. Esto se llama <strong>Ámbito de la variable</strong>.</p>
+          <p class="lesson-p"><strong>Variables globales</strong> — las que declaramos <em>fuera de cualquier función</em>, normalmente al principio del todo del código (antes del <code>setup</code>):</p>
+          <ul class="lesson-ul">
+            <li><strong>Visibilidad:</strong> todo el mundo (el <code>setup</code>, el <code>loop</code> y cualquier otra función) puede verlas, leerlas y escribirlas.</li>
+            <li><strong>Duración: Nunca mueren.</strong> Guardan su valor mientras el Arduino esté encendido.</li>
+          </ul>
+          <p class="lesson-p">Es como escribir un dato en la <strong>pizarra</strong> de la clase. Cualquiera que entre en el aula puede ver el número, borrarlo y escribir otro. El dato permanece ahí toda la clase.</p>
+          <p class="lesson-p"><strong>Variables locales</strong> — las que declaramos <em>dentro de una función</em> (dentro de las llaves <code>{ }</code>):</p>
+          <ul class="lesson-ul">
+            <li><strong>Visibilidad:</strong> solo la función donde viven puede verlas.</li>
+            <li><strong>Duración:</strong> se crean al entrar a la función y se <strong>destruyen al salir</strong>.</li>
+          </ul>
+
+          <div class="lesson-sub">Ejemplo práctico: El Contador vs El Temporal</div>
+          <p class="lesson-p">Queremos contar cuántas veces parpadea un LED:</p>
+<pre><span class="cm">// --- VARIABLE GLOBAL ---</span>
+<span class="cm">// Está fuera. Es la "Pizarra".</span>
+<span class="cm">// Necesitamos que recuerde la cuenta vuelta tras vuelta.</span>
+<span class="tp">int</span> contadorTotal = <span class="nm">0</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="cm">// --- VARIABLE LOCAL ---</span>
+  <span class="cm">// Está dentro. Es la "Libreta".</span>
+  <span class="cm">// Se crea de nuevo en CADA vuelta del loop.</span>
+  <span class="tp">int</span> milisegundosEspera = <span class="nm">500</span>;
+
+  <span class="cm">// Aumentamos la cuenta global</span>
+  contadorTotal = contadorTotal + <span class="nm">1</span>;
+
+  Serial.<span class="fn">print</span>(<span class="st">"Parpadeo numero: "</span>);
+  Serial.<span class="fn">println</span>(contadorTotal);
+
+  <span class="fn">delay</span>(milisegundosEspera);
+
+  <span class="cm">// Al llegar a esta llave de cierre '}', la variable</span>
+  <span class="cm">// 'milisegundosEspera' SE DESTRUYE.</span>
+  <span class="cm">// Pero 'contadorTotal' SOBREVIVE.</span>
+}</pre>
+
+          <div class="lesson-sub">Consejos de nomenclatura</div>
+          <p class="lesson-p">Arduino no admite espacios en los nombres. Convenciones:</p>
+          <ul class="lesson-ul">
+            <li><code>int numero led = 13;</code> ❌ Error fatal (espacio).</li>
+            <li><code>int numero_led = 13;</code> ✅ Bien (snake_case).</li>
+            <li><code>int numeroLed = 13;</code> ✅ Mejor (camelCase, el estándar de Arduino).</li>
+          </ul>
+          <p class="lesson-p">Y sean descriptivos con los nombres:</p>
+          <ul class="lesson-ul">
+            <li><code>int x = 13;</code> 😐 ¿Qué es x?</li>
+            <li><code>int pinLedRojo = 13;</code> 😊 Profesional.</li>
+          </ul>
+          <div class="lesson-tip">💡 Usá <code>const</code> para valores que no cambian: <code>const int PIN_LED = 13;</code> — el compilador optimiza y no ocupa RAM dinámica.</div>
+
+          <div class="lesson-sub">Tipos completos para referencia</div>
+          <table class="lesson-table">
+            <tr><th>Tipo</th><th>Tamaño</th><th>Rango</th></tr>
+            <tr><td>bool</td><td>1 byte</td><td>true / false</td></tr>
+            <tr><td>byte</td><td>1 byte</td><td>0 – 255</td></tr>
+            <tr><td>int</td><td>2 bytes</td><td>-32768 – 32767</td></tr>
+            <tr><td>unsigned int</td><td>2 bytes</td><td>0 – 65535</td></tr>
+            <tr><td>long</td><td>4 bytes</td><td>±2.1 × 10⁹</td></tr>
+            <tr><td>unsigned long</td><td>4 bytes</td><td>0 – 4.3 × 10⁹ (ideal para millis())</td></tr>
+            <tr><td>float</td><td>4 bytes</td><td>decimales, ~6-7 dígitos</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="lesson" id="l04">
+        <div class="lesson-head" onclick="toggleLesson('l04')">
+          <span class="lesson-num">04</span>
+          <span class="lesson-title">Operaciones matemáticas y lógicas</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">Ya sabemos guardar datos en variables. Pero guardar datos sirve de poco si no hacemos nada con ellos. La potencia de un ordenador (y tu Arduino es uno pequeñito) reside en su capacidad para <strong>calcular cosas muy muy rápido</strong>.</p>
+          <p class="lesson-p">Calcular no es solo sumar números; también es <strong>comparar cosas</strong> ("¿Es esto mayor que aquello?") y tomar <strong>decisiones lógicas</strong> ("Si pasa esto Y lo otro"). Para ello usamos los <strong>operadores</strong>. Vamos a enseñar a nuestro Arduino a sumar, restar y pensar.</p>
+
+          <div class="lesson-sub">La asignación (=)</div>
+          <p class="lesson-p">En programación, el signo <code>=</code> se llama <strong>Operador de Asignación</strong>. Significa "meter este valor dentro de esta variable".</p>
+<pre><span class="tp">int</span> numero = <span class="nm">5</span>;
+<span class="cm">// Significa: Coge el valor 5 y guárdalo dentro de la caja llamada numero</span></pre>
+
+          <div class="lesson-sub">Aritmética básica</div>
+          <p class="lesson-p">Arduino sabe hacer cuentas básicas con las variables <code>int</code> y <code>float</code>. Los símbolos son casi los que esperás, con un par de cambios:</p>
+          <table class="lesson-table">
+            <tr><th>Operación</th><th>Símbolo</th><th>Ejemplo</th><th>Resultado si A=10, B=2</th></tr>
+            <tr><td>Suma</td><td>+</td><td><code>int suma = a + b;</code></td><td>12</td></tr>
+            <tr><td>Resta</td><td>-</td><td><code>int resta = a - b;</code></td><td>8</td></tr>
+            <tr><td>Multiplicación</td><td>*</td><td><code>int mult = a * b;</code></td><td>20</td></tr>
+            <tr><td>División</td><td>/</td><td><code>int div = a / b;</code></td><td>5</td></tr>
+            <tr><td>Resto (Módulo)</td><td>%</td><td><code>int resto = a % b;</code></td><td>0</td></tr>
+          </table>
+
+          <div class="lesson-sub">El peligro de la División</div>
+          <p class="lesson-p">Cuidado con la división. Si estás usando números enteros (<code>int</code>), <strong>Arduino no puede usar decimales</strong> (porque estás usando enteros, claro). En la vida real da 2.5. En Arduino, como la caja <code>resultado</code> es entera, <strong>corta los decimales y los tira</strong>. El resultado será <code>2</code>.</p>
+<pre><span class="tp">int</span> a = <span class="nm">5</span>;
+<span class="tp">int</span> b = <span class="nm">2</span>;
+<span class="tp">int</span> resultado = a / b; <span class="cm">// ¿Cuánto da? → 2 (corta el .5)</span></pre>
+          <div class="lesson-tip">💡 Si necesitás decimales, recordá usar variables de tipo <code>float</code> para todo.<br><code>float resultado = (float)a / b;</code> → da 2.5</div>
+
+          <div class="lesson-sub">Los atajos ++, +=</div>
+          <p class="lesson-p">Existen algunos "atajos" para las operaciones más comunes. Por ejemplo imaginá que querés contar vueltas. Lo normal sería: <code>vueltas = vueltas + 1;</code> (Coge lo que valía vueltas, súmale 1 y guardalo otra vez). En Arduino vás a ver esto escrito así:</p>
+          <ul class="lesson-ul">
+            <li><code>vueltas++;</code> — Suma 1 a la variable. (Incremento)</li>
+            <li><code>vueltas--;</code> — Resta 1 a la variable. (Decremento)</li>
+            <li><code>vueltas += 5;</code> — Suma 5 a lo que ya hubiera. (Es igual a <code>vueltas = vueltas + 5</code>)</li>
+          </ul>
+          <div class="lesson-tip">ℹ️ Estos símbolos los vas a ver hasta en la sopa, especialmente en los bucles <code>for</code>.</div>
+
+          <div class="lesson-sub">Operadores de comparación</div>
+          <p class="lesson-p">Ahora que sabemos calcular, queremos <strong>preguntar</strong>. Estas operaciones no devuelven un número, devuelven una respuesta de <strong>Verdadero (true)</strong> o <strong>Falso (false)</strong>. Son la base de la sentencia <code>if</code>.</p>
+          <table class="lesson-table">
+            <tr><th>Pregunta</th><th>Símbolo</th><th>Ejemplo</th><th>Significado</th></tr>
+            <tr><td>Igualdad</td><td>==</td><td><code>a == 5</code></td><td>¿Vale 'a' exactamente 5?</td></tr>
+            <tr><td>Desigualdad</td><td>!=</td><td><code>a != 5</code></td><td>¿Es 'a' distinto de 5?</td></tr>
+            <tr><td>Menor</td><td>&lt;</td><td><code>a &lt; 10</code></td><td>¿Es 'a' más pequeño que 10?</td></tr>
+            <tr><td>Mayor</td><td>&gt;</td><td><code>a &gt; 10</code></td><td>¿Es 'a' más grande que 10?</td></tr>
+            <tr><td>Menor o igual</td><td>&lt;=</td><td><code>a &lt;= 10</code></td><td>¿Es 10 o menos?</td></tr>
+            <tr><td>Mayor o igual</td><td>&gt;=</td><td><code>a &gt;= 10</code></td><td>¿Es 10 o más?</td></tr>
+          </table>
+          <div class="lesson-tip">⚠ <strong>Fijate en el primero.</strong> Para preguntar si es igual usamos <strong>DOBLE IGUAL ( == )</strong>.<br>
+            <code>if (a = 5)</code> → MAL. Estás guardando un 5 en 'a' y Arduino se lía.<br>
+            <code>if (a == 5)</code> → BIEN. Estás comparando.</div>
+
+          <div class="lesson-sub">Operadores lógicos</div>
+          <p class="lesson-p">A veces una sola pregunta no basta. Queremos preguntar cosas como "¿Es de día Y tengo sueño?". Para eso unimos comparaciones con la lógica:</p>
+          <table class="lesson-table">
+            <tr><th>Operador</th><th>Símbolo</th><th>Significado</th><th>Ejemplo</th></tr>
+            <tr><td>AND</td><td>&amp;&amp;</td><td>Las DOS condiciones deben cumplirse</td><td><code>if (dia &amp;&amp; sueño)</code></td></tr>
+            <tr><td>OR</td><td>||</td><td>Con que UNA se cumpla alcanza</td><td><code>if (calor || lluvia)</code></td></tr>
+            <tr><td>NOT</td><td>!</td><td>Invierte el resultado</td><td><code>if (!botonPulsado)</code></td></tr>
+          </table>
+
+          <div class="lesson-sub">Ejemplo práctico — Un contador con límite</div>
+          <p class="lesson-p">Vamos a juntar todo en un ejemplo real. Queremos una variable que cuente del 0 al 10. Cuando llegue a 10, que vuelva a 0. Y solo imprimimos los números pares mayores que 5:</p>
+<pre><span class="tp">int</span> contador = <span class="nm">0</span>; <span class="cm">// Usamos Asignación (=)</span>
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="cm">// 1. Aritmética: Sumamos 1</span>
+  contador++;
+
+  <span class="cm">// 2. Comparación: ¿Nos hemos pasado?</span>
+  <span class="kw">if</span> (contador &gt; <span class="nm">10</span>) {
+    <span class="cm">// 3. Asignación: Reiniciamos</span>
+    contador = <span class="nm">0</span>;
+    Serial.<span class="fn">println</span>(<span class="st">"¡Vuelta a empezar!"</span>);
+  }
+
+  <span class="cm">// 4. Lógica compuesta: Solo imprimimos si es par Y mayor que 5</span>
+  <span class="cm">// (El operador % 2 == 0 nos dice si es par)</span>
+  <span class="kw">if</span> (contador &gt; <span class="nm">5</span> &amp;&amp; (contador % <span class="nm">2</span> == <span class="nm">0</span>)) {
+    Serial.<span class="fn">print</span>(<span class="st">"Numero par alto: "</span>);
+    Serial.<span class="fn">println</span>(contador);
+  }
+
+  <span class="fn">delay</span>(<span class="nm">500</span>);
+}</pre>
+        </div>
+      </div>
+
+      <div class="lesson" id="l05">
+        <div class="lesson-head" onclick="toggleLesson('l05')">
+          <span class="lesson-num">05</span>
+          <span class="lesson-title">Condicionales — if / else</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">De momento, nuestros programas han sido una lista de la compra: "Haz esto, luego espera, luego haz esto otro". El Arduino obedecía en orden, línea tras línea. Pero la <strong>verdadera inteligencia surge cuando somos capaces de adaptarnos a las circunstancias</strong>.</p>
+          <p class="lesson-p">No siempre queremos que el LED parpadee. Quizás queremos que se encienda <strong>SOLO SI</strong> pulsamos un botón, o que se apague <strong>SI</strong> hay mucha luz. Hoy vamos a aprender la estructura más fundamental de la programación: la <strong>sentencia condicional if / else</strong> (es el momento en que tu Arduino aprende a tomar decisiones).</p>
+
+          <div class="lesson-sub">El concepto: Un cruce de caminos</div>
+          <p class="lesson-p">Imaginá que vas conduciendo y llegás a una bifurcación. Tenés que tomar una decisión basada en una condición:</p>
+          <ul class="lesson-ul">
+            <li><strong>SI</strong> tengo gasolina, sigo conduciendo por la autopista.</li>
+            <li><strong>SI NO</strong>, me desvío a la gasolinera.</li>
+          </ul>
+          <p class="lesson-p">En programación, esto funciona exactamente igual. Le damos al Arduino una condición (una pregunta de Sí o No). Si la respuesta es Sí, ejecuta un bloque de código. Si es No, lo ignora (o hace otra cosa).</p>
+
+          <div class="lesson-sub">La sintaxis</div>
+          <p class="lesson-p">La estructura en C++ (el lenguaje de Arduino) es bastante intuitiva:</p>
+<pre><span class="kw">if</span> (condicion) {
+  <span class="cm">// Código que se ejecuta si la condición es VERDADERA</span>
+}
+<span class="kw">else</span> {
+  <span class="cm">// Código que se ejecuta si la condición es FALSA</span>
+}</pre>
+          <ul class="lesson-ul">
+            <li><code>if</code>: Significa "Si…".</li>
+            <li><code>()</code>: Dentro de los paréntesis va la pregunta.</li>
+            <li><code>{}</code>: Las llaves delimitan qué acciones ocurren.</li>
+            <li><code>else</code>: (Opcional) Significa "Si no…". Es lo que pasa si la condición no se cumple.</li>
+          </ul>
+
+          <div class="lesson-sub">Operadores de Comparación</div>
+          <p class="lesson-p">Para que el <code>if</code> funcione, necesitamos hacer preguntas cuya respuesta sea Verdadero (True) o Falso (False). Para ello usamos los operadores de comparación:</p>
+          <table class="lesson-table">
+            <tr><th>Operador</th><th>Significado</th><th>Ejemplo</th></tr>
+            <tr><td>==</td><td>¿Es igual a?</td><td><code>if (x == 5)</code></td></tr>
+            <tr><td>!=</td><td>¿Es distinto de?</td><td><code>if (x != 0)</code></td></tr>
+            <tr><td>&lt;</td><td>Menor que</td><td><code>if (x &lt; 10)</code></td></tr>
+            <tr><td>&gt;</td><td>Mayor que</td><td><code>if (x &gt; 10)</code></td></tr>
+            <tr><td>&lt;=</td><td>Menor o igual</td><td><code>if (x &lt;= 10)</code></td></tr>
+            <tr><td>&gt;=</td><td>Mayor o igual</td><td><code>if (x &gt;= 10)</code></td></tr>
+          </table>
+          <div class="lesson-tip">⚠ En C++, el signo igual simple <code>=</code> sirve para <strong>asignar</strong> (meter un valor en una caja). Para <strong>comparar</strong>, debés usar el <strong>doble igual ==</strong>.<br>
+            <code>a = 5</code> → "Guarda el 5 en la variable a".<br>
+            <code>if (a == 5)</code> → "¿Vale 'a' lo mismo que 5?"</div>
+
+          <div class="lesson-sub">Ejemplo práctico — El botón inteligente</div>
+          <p class="lesson-p">Vamos a retomar el montaje clásico: un botón conectado al Pin 2 y el LED integrado en el Pin 13. Queremos que: si pulso el botón, el LED se encienda. Si no, se apague.</p>
+<pre><span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(<span class="nm">13</span>, <span class="tp">OUTPUT</span>);
+  <span class="fn">pinMode</span>(<span class="nm">2</span>, <span class="tp">INPUT_PULLUP</span>); <span class="cm">// lo veremos en su momento</span>
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="cm">// 1. Leemos el botón</span>
+  <span class="tp">int</span> estado = <span class="fn">digitalRead</span>(<span class="nm">2</span>);
+
+  <span class="cm">// 2. Tomamos la decisión</span>
+  <span class="kw">if</span> (estado == <span class="tp">LOW</span>) {
+    <span class="cm">// Si la condición es cierta (está pulsado)</span>
+    <span class="fn">digitalWrite</span>(<span class="nm">13</span>, <span class="tp">HIGH</span>); <span class="cm">// Encendemos LED</span>
+  }
+  <span class="kw">else</span> {
+    <span class="cm">// Si la condición es falsa (no está pulsado)</span>
+    <span class="fn">digitalWrite</span>(<span class="nm">13</span>, <span class="tp">LOW</span>);  <span class="cm">// Apagamos LED</span>
+  }
+}</pre>
+          <div class="lesson-tip">💡 Al subir este código, el comportamiento es idéntico al tutorial anterior, pero el código es <strong>mucho más legible</strong>. Estamos expresando nuestra intención claramente: "Si pasa A, haz B".</div>
+
+          <div class="lesson-sub">¿Y si quiero que funcione al revés?</div>
+          <p class="lesson-p">Imaginá que querés una "Luz de hombre muerto" (se apaga si pulsas, se enciende si soltás). Solo tenés que cambiar la lógica dentro de las llaves, o cambiar la pregunta:</p>
+<pre><span class="kw">if</span> (estado == <span class="tp">HIGH</span>) { <span class="cm">// Si el botón está SUELTO</span>
+  <span class="fn">digitalWrite</span>(<span class="nm">13</span>, <span class="tp">HIGH</span>);
+} <span class="kw">else</span> {
+  <span class="fn">digitalWrite</span>(<span class="nm">13</span>, <span class="tp">LOW</span>);
+}</pre>
+
+          <div class="lesson-sub">Anidando decisiones</div>
+          <p class="lesson-p">¿Qué pasa si queremos condiciones más complejas? Podemos meter un <code>if</code> dentro de otro <code>if</code>. Por ejemplo: "Si pulso el botón… y además el LED estaba apagado… entonces enciéndelo" (comportamiento tipo toggle):</p>
+<pre><span class="kw">const</span> <span class="tp">int</span> pinBoton = <span class="nm">2</span>;
+<span class="kw">const</span> <span class="tp">int</span> pinLed = <span class="nm">13</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(pinLed, <span class="tp">OUTPUT</span>);
+  <span class="fn">pinMode</span>(pinBoton, <span class="tp">INPUT</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="cm">// Primera pregunta: ¿El botón está pulsado?</span>
+  <span class="kw">if</span> (<span class="fn">digitalRead</span>(pinBoton) == <span class="tp">HIGH</span>) {
+
+    <span class="cm">// Si entramos aquí, es que el botón SÍ está pulsado.</span>
+    <span class="cm">// Ahora hacemos la segunda pregunta (anidada):</span>
+    <span class="kw">if</span> (<span class="fn">digitalRead</span>(pinLed) == <span class="tp">LOW</span>) {
+      <span class="cm">// Si llegamos aquí, se cumplen las DOS condiciones:</span>
+      <span class="cm">// 1. Botón pulsado  2. El LED estaba apagado</span>
+      <span class="fn">digitalWrite</span>(pinLed, <span class="tp">HIGH</span>); <span class="cm">// ¡Encendemos el LED!</span>
+    }
+  }
+
+  <span class="fn">delay</span>(<span class="nm">100</span>); <span class="cm">// Una pequeña pausa para estabilidad</span>
+}</pre>
+          <div class="lesson-tip">💡 Si de momento es muy complicado, no te preocupes. Por ahora, quedate con la idea de que dentro de las llaves <code>{ ... }</code> podés escribir <strong>cualquier</strong> código válido: encender LEDs, esperar con <code>delay</code>, o hacer otra pregunta <code>if</code>.</div>
+        </div>
+      </div>
+
+      <div class="lesson" id="l06">
+        <div class="lesson-head" onclick="toggleLesson('l06')">
+          <span class="lesson-num">06</span>
+          <span class="lesson-title">Bucles — for / while</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">Con lo que hemos visto hasta ahora, si quisiéramos hacer parpadear un LED cinco veces, probablemente escribiríamos esto:</p>
+<pre><span class="cm">// encender apagar el LED</span>
+<span class="fn">digitalWrite</span>(<span class="nm">13</span>, <span class="tp">HIGH</span>); <span class="fn">delay</span>(<span class="nm">200</span>); <span class="fn">digitalWrite</span>(<span class="nm">13</span>, <span class="tp">LOW</span>); <span class="fn">delay</span>(<span class="nm">200</span>);
+<span class="cm">// encender apagar el LED</span>
+<span class="fn">digitalWrite</span>(<span class="nm">13</span>, <span class="tp">HIGH</span>); <span class="fn">delay</span>(<span class="nm">200</span>); <span class="fn">digitalWrite</span>(<span class="nm">13</span>, <span class="tp">LOW</span>); <span class="fn">delay</span>(<span class="nm">200</span>);
+<span class="cm">// ... y así hasta el cinco</span></pre>
+          <p class="lesson-p">Que funcionar, funciona, sí… Pero es un poco horrible. Primero, porque cansa escribirlo (y leerlo). Segundo, porque si de repente querés cambiar la velocidad, tenés que cambiarla en 20 sitios distintos. Y tercero, ¿y si querés que parpadee 1000 veces?</p>
+          <p class="lesson-p">Precisamente una de las grandes virtudes de los ordenadores (y de Arduino) es que <strong>se les da genial repetir tareas</strong>. Para decirle a nuestra placa que repita algo muchas veces, usamos los <strong>Bucles</strong>. Hoy vamos a ver las dos herramientas fundamentales: el <code>for</code> y el <code>while</code>.</p>
+
+          <div class="lesson-sub">El Bucle for</div>
+          <p class="lesson-p">El bucle <code>for</code> sirve cuando <strong>sabemos exactamente cuántas veces queremos repetir algo</strong>. Su estructura se compone de tres partes separadas por punto y coma:</p>
+<pre><span class="kw">for</span> (inicio; condicion; actualizacion) {
+  <span class="cm">// Código a repetir</span>
+}</pre>
+          <ul class="lesson-ul">
+            <li><strong>Inicio:</strong> Creamos una variable contador (normalmente llamada <code>i</code>) y le damos un valor inicial. Ej: <code>int i = 0;</code> (Empezamos en 0).</li>
+            <li><strong>Condición:</strong> Preguntamos si debemos seguir repitiendo. Ej: <code>i &lt; 5;</code> (¿Es i menor que 5?).</li>
+            <li><strong>Actualización:</strong> Cambiamos el contador al final de cada vuelta. Ej: <code>i++</code> (Suma 1 a i).</li>
+          </ul>
+
+          <div class="lesson-sub">Ejemplo práctico — Contando parpadeos</div>
+          <p class="lesson-p">En el ejemplo anterior, para parpadear un LED 5 veces, haríamos esto:</p>
+<pre><span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i &lt; <span class="nm">5</span>; i++) {
+  <span class="fn">digitalWrite</span>(<span class="nm">13</span>, <span class="tp">HIGH</span>);
+  <span class="fn">delay</span>(<span class="nm">200</span>);
+  <span class="fn">digitalWrite</span>(<span class="nm">13</span>, <span class="tp">LOW</span>);
+  <span class="fn">delay</span>(<span class="nm">200</span>);
+}</pre>
+          <p class="lesson-p">El Arduino hará esto. Primero crea <code>i = 0</code>. Y luego empieza a repetir:</p>
+          <ul class="lesson-ul">
+            <li>¿0 es menor que 5? SÍ → Parpadea y suma 1 a <code>i</code>, es 1</li>
+            <li>¿1 es menor que 5? SÍ → Parpadea y suma 1</li>
+            <li>¿2 es menor que 5? SÍ → Parpadea y suma 1</li>
+            <li>¿3 es menor que 5? SÍ → Parpadea y suma 1</li>
+            <li>¿4 es menor que 5? SÍ → Parpadea y suma 1</li>
+            <li>¿5 es menor que 5? <strong>NO</strong>. Sale del bucle y continúa con el resto del programa.</li>
+          </ul>
+
+          <div class="lesson-sub">El Bucle while</div>
+          <p class="lesson-p">A veces no sabemos cuántas veces tenemos que repetir algo. Solo sabemos que queremos hacerlo <strong>mientras se cumpla una condición</strong>. La estructura del <code>while</code> es más simple:</p>
+<pre><span class="kw">while</span> (condicion) {
+  <span class="cm">// Código a repetir</span>
+}</pre>
+          <div class="lesson-tip">⚠ En el <code>for</code>, la variable se actualiza sola (<code>i++</code>). En el <code>while</code>, <strong>vos sos responsable</strong> de que la condición cambie en algún momento dentro del bucle. Si la condición siempre es verdadera, el Arduino se quedará ahí atrapado sin hacer nada hasta que lo reiniciés (se "cuelga").</div>
+
+          <div class="lesson-sub">Ejemplo while — Esperar a un botón</div>
+<pre><span class="cm">// Mientras el botón NO esté pulsado... no hagas nada</span>
+<span class="kw">while</span> (<span class="fn">digitalRead</span>(<span class="nm">2</span>) == <span class="tp">HIGH</span>) {
+  <span class="cm">// Esperamos...</span>
+  <span class="fn">delay</span>(<span class="nm">100</span>);
+}
+<span class="cm">// Si llegamos aquí, es que alguien ha pulsado el botón</span>
+<span class="fn">encenderCohete</span>();</pre>
+          <div class="lesson-tip">💡 Normalmente siempre ponemos un pequeño <code>delay</code> porque si no, tu Arduino se pone como una moto a repetir el bucle a full velocidad. Es bueno darle un descansito.</div>
+
+          <div class="lesson-sub">Proyecto práctico — El coche fantástico</div>
+          <p class="lesson-p">Para entender la potencia del <code>for</code>, vamos a hacer el efecto de luces más famoso de los años 80: el escáner frontal de KITT, el coche fantástico. Tenemos 5 LEDs en fila. Queremos que la luz se mueva de izquierda a derecha y vuelva, creando una estela. Sin bucles, tendríamos que escribir decenas de <code>digitalWrite</code>. Con bucles, lo haremos en unas pocas líneas.</p>
+          <p class="lesson-p"><strong>Montaje:</strong> Conectá 5 LEDs (con sus resistencias) a los pines digitales consecutivos: <strong>2, 3, 4, 5 y 6</strong>. Alinealos en la protoboard.</p>
+<pre><span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="cm">// Configurar pines del 2 al 6 como SALIDA</span>
+  <span class="cm">// En vez de escribir 5 líneas pinMode, usamos un bucle</span>
+  <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">2</span>; i &lt;= <span class="nm">6</span>; i++) {
+    <span class="fn">pinMode</span>(i, <span class="tp">OUTPUT</span>);
+  }
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="cm">// --- IDA: De izquierda a derecha (Pines 2 al 6) ---</span>
+  <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">2</span>; i &lt;= <span class="nm">6</span>; i++) {
+    <span class="fn">digitalWrite</span>(i, <span class="tp">HIGH</span>); <span class="cm">// Encendemos el LED actual</span>
+    <span class="fn">delay</span>(<span class="nm">100</span>);             <span class="cm">// Esperamos un poquito</span>
+    <span class="fn">digitalWrite</span>(i, <span class="tp">LOW</span>);  <span class="cm">// Apagamos (para dar efecto de movimiento)</span>
+  }
+
+  <span class="cm">// --- VUELTA: De derecha a izquierda (Pines 5 al 3) ---</span>
+  <span class="cm">// Nota: No empezamos en el 6 ni acabamos en el 2 para no repetir los extremos</span>
+  <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">5</span>; i &gt;= <span class="nm">3</span>; i--) {
+    <span class="fn">digitalWrite</span>(i, <span class="tp">HIGH</span>);
+    <span class="fn">delay</span>(<span class="nm">100</span>);
+    <span class="fn">digitalWrite</span>(i, <span class="tp">LOW</span>);
+  }
+}</pre>
+          <div class="lesson-tip">💡 Si querés que la estela sea más larga (que queden un poco encendidos los anteriores), podés jugar con los tiempos o no apagar el LED inmediatamente. Para empezar, este efecto "punto que se mueve" es perfecto.</div>
+        </div>
+      </div>
+
+      <div class="lesson" id="l07">
+        <div class="lesson-head" onclick="toggleLesson('l07')">
+          <span class="lesson-num">07</span>
+          <span class="lesson-title">Funciones y librerías</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">A medida que los proyectos crecen, el <code>loop()</code> empieza a hacerse eterno: cada vez más largo, más difícil de leer y con mucho código repetido. Las funciones son la solución.</p>
+          <p class="lesson-p">Una función es como una <strong>receta de cocina</strong>. La escribís una vez, le ponés un nombre y después la llamás cuando la necesitás. <code>setup()</code>, <code>loop()</code>, <code>digitalWrite()</code>, <code>delay()</code> — todas son funciones. Las primeras dos las escribe Arduino automáticamente; el resto las llamamos nosotros.</p>
+
+          <div class="lesson-sub">Creando tu primera función</div>
+          <p class="lesson-p">La estructura básica para definir una función es:</p>
+<pre><span class="tp">tipoDevuelto</span> <span class="fn">nombreFuncion</span>(parametros) {
+  <span class="cm">// El código de la receta</span>
+}</pre>
+          <p class="lesson-p">Un ejemplo sencillo: una función llamada <code>parpadearTresVeces()</code>:</p>
+<pre><span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(<span class="nm">13</span>, <span class="tp">OUTPUT</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="cm">// En lugar de escribir todo el código aquí, solo llamamos a la función</span>
+  <span class="fn">parpadearTresVeces</span>();
+
+  <span class="fn">delay</span>(<span class="nm">2000</span>); <span class="cm">// Esperamos un poco</span>
+
+  <span class="fn">parpadearTresVeces</span>(); <span class="cm">// ¡Podemos reutilizarla las veces que queramos!</span>
+}
+
+<span class="cm">// --- ZONA DE TUS FUNCIONES ---</span>
+<span class="cm">// (Normalmente se escriben después del loop)</span>
+
+<span class="kw">void</span> <span class="fn">parpadearTresVeces</span>() {
+  <span class="kw">for</span>(<span class="tp">int</span> i=<span class="nm">0</span>; i&lt;<span class="nm">3</span>; i++) {
+    <span class="fn">digitalWrite</span>(<span class="nm">13</span>, <span class="tp">HIGH</span>);
+    <span class="fn">delay</span>(<span class="nm">200</span>);
+    <span class="fn">digitalWrite</span>(<span class="nm">13</span>, <span class="tp">LOW</span>);
+    <span class="fn">delay</span>(<span class="nm">200</span>);
+  }
+}</pre>
+          <ul class="lesson-ul">
+            <li><strong>void</strong>: significa "vacío". Esta función hace cosas (enciende luces) pero no nos devuelve ningún resultado (no nos da un número).</li>
+            <li><strong>parpadearTresVeces</strong>: el nombre que le pusimos.</li>
+            <li><strong>()</strong>: paréntesis vacíos, porque no necesita información extra para funcionar.</li>
+            <li><strong>{ ... }</strong>: el cuerpo de la función.</li>
+          </ul>
+          <div class="lesson-tip">💡 Gracias a esto, el <code>loop()</code> queda limpísimo y es muy fácil de leer. Cualquiera que lea <code>parpadearTresVeces()</code> entiende qué pasa sin necesidad de ver los <code>digitalWrite</code> internos.</div>
+
+          <div class="lesson-sub">Funciones con parámetros</div>
+          <p class="lesson-p">La función anterior está bien, pero es un poco rígida. Siempre parpadea 3 veces. ¿Y si queremos que parpadee 5? ¿O 10? Podemos pasarle información a la función a través de los paréntesis. Esto se llama <strong>Parámetros</strong> de la función:</p>
+<pre><span class="kw">void</span> <span class="fn">parpadear</span>(<span class="tp">int</span> numeroVeces) {
+  <span class="kw">for</span>(<span class="tp">int</span> i=<span class="nm">0</span>; i &lt; numeroVeces; i++) {
+    <span class="fn">digitalWrite</span>(<span class="nm">13</span>, <span class="tp">HIGH</span>);
+    <span class="fn">delay</span>(<span class="nm">200</span>);
+    <span class="fn">digitalWrite</span>(<span class="nm">13</span>, <span class="tp">LOW</span>);
+    <span class="fn">delay</span>(<span class="nm">200</span>);
+  }
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="fn">parpadear</span>(<span class="nm">5</span>);  <span class="cm">// Parpadea 5 veces</span>
+  <span class="fn">delay</span>(<span class="nm">1000</span>);
+  <span class="fn">parpadear</span>(<span class="nm">2</span>);  <span class="cm">// Parpadea 2 veces</span>
+}</pre>
+          <p class="lesson-p">Creamos una herramienta genérica que se adapta a lo que necesitemos.</p>
+
+          <div class="lesson-sub">Las librerías: usando el código de otros</div>
+          <p class="lesson-p">Una librería no es más que un conjunto de funciones que podemos añadir a nuestro proyecto para <strong>no tener que reinventar la rueda</strong>. Gente muy lista ha dedicado su tiempo a escribir cientos de funciones súper útiles para controlar motores, pantallas, sensores complejos o conectarse a Internet. Eso es una <strong>Librería</strong>.</p>
+          <p class="lesson-p"><strong>Cómo se usan</strong> — para usar una librería, primero tenemos que avisar a nuestro programa que la queremos incluir. Esto se hace con el comando <code>#include</code>:</p>
+<pre><span class="pp">#include</span> <span class="st">&lt;Servo.h&gt;</span> <span class="cm">// Incluimos la "caja de herramientas" del Servo</span>
+
+Servo miMotor; <span class="cm">// Creamos nuestro objeto motor</span>
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  miMotor.<span class="fn">attach</span>(<span class="nm">9</span>); <span class="cm">// Le decimos que el motor está en el pin 9</span>
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="cm">// ¡Mirá qué fácil! No tenemos que saber cómo funcionan los pulsos eléctricos.</span>
+  <span class="cm">// Solo usamos la función "write" que viene en la librería.</span>
+  miMotor.<span class="fn">write</span>(<span class="nm">90</span>);  <span class="cm">// Ponete a 90 grados</span>
+  <span class="fn">delay</span>(<span class="nm">1000</span>);
+  miMotor.<span class="fn">write</span>(<span class="nm">0</span>);   <span class="cm">// Ponete a 0 grados</span>
+  <span class="fn">delay</span>(<span class="nm">1000</span>);
+}</pre>
+          <p class="lesson-p">Sin la librería, tendríamos que haber escrito decenas de líneas de código complejo con <code>digitalWrite</code> y microsegundos para mover ese motor. Con la librería, es una sola línea.</p>
+
+          <p class="lesson-p"><strong>¿Dónde consigo librerías?</strong> — Arduino tiene un <strong>Gestor de Librerías</strong> integrado:</p>
+          <ol class="lesson-ol">
+            <li>Ir a <em>Sketch → Include Library → Manage Libraries...</em></li>
+            <li>Buscar lo que necesitan (ej: "DHT11" para temperatura, "NeoPixel" para luces de colores).</li>
+            <li>Le dan a <strong>Install</strong>.</li>
+          </ol>
+          <div class="lesson-tip">💡 Antes de pelearse programando un sensor complejo desde cero, busquen en Google "Arduino library [nombre del sensor]". El 99% de las veces, alguien ya ha hecho el trabajo duro.</div>
+        </div>
+      </div>
+
+      <div class="guide-cat">🔌 Entradas y Salidas</div>
+
+      <div class="lesson" id="l14">
+        <div class="lesson-head" onclick="toggleLesson('l14')">
+          <span class="lesson-num">08</span>
+          <span class="lesson-title">Entradas digitales</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">Una señal digital solo puede tener dos valores: <strong>LOW</strong> (0V) o <strong>HIGH</strong> (5V). El proceso de discretización toma la tensión del pin y la convierte a uno de esos dos estados usando un umbral: de 0 a 2,5V el Arduino lee <strong>LOW</strong>, de 2,5V a 5V lee <strong>HIGH</strong>. Nunca hay que superar el rango 0–5V o se daña el microcontrolador.</p>
+          <p class="lesson-p">Cuando un sensor o dispositivo externo conecta el pin a 5V o a GND, el Arduino lee directamente con <code>digitalRead(pin)</code>. La función devuelve <code>HIGH</code> o <code>LOW</code> y el pin trabaja en alta impedancia (~100 MΩ), lo que significa que prácticamente no consume corriente del sensor.</p>
+          <div class="lesson-sub">Conexión típica sensor → pin digital</div>
+          <img class="lesson-img" src="arduino/entradas4bis.png" alt="Conexión sensor a pin digital Arduino">
+          <p class="lesson-img-cap">Sensor conectado a pin digital: el sensor entrega 5V o GND al pin, Arduino lee HIGH o LOW.</p>
+          <div class="lesson-sub">Código básico — entrada digital</div>
+<pre><span class="kw">const</span> <span class="tp">int</span> sensorPin = <span class="nm">4</span>;
+<span class="tp">int</span> sensorValue;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(sensorPin, <span class="tp">INPUT</span>);
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  sensorValue = <span class="fn">digitalRead</span>(sensorPin); <span class="cm">// devuelve HIGH o LOW</span>
+  Serial.<span class="fn">println</span>(sensorValue);
+  <span class="fn">delay</span>(<span class="nm">500</span>);
+}</pre>
+          <div class="lesson-sub">Lectura de señales mayores a 5V — divisor de tensión</div>
+          <p class="lesson-p">Si la señal del sensor supera los 5V, no se puede conectar directo al pin. Se usa un <strong>divisor de tensión</strong> con R1 = 10 kΩ y R2 = 4,7 kΩ para reducir la tensión a un rango seguro (0–3,9V), que el Arduino puede interpretar sin problemas.</p>
+          <img class="lesson-img" src="arduino/entradas6bis.png" alt="Divisor de tensión 10K/4K7 para entradas digitales">
+          <p class="lesson-img-cap">Divisor de tensión R1=10K / R2=4K7: reduce señales mayores a 5V a un rango seguro para el pin digital.</p>
+          <table class="lesson-table">
+            <tr><th>Función</th><th>Uso</th></tr>
+            <tr><td><code>pinMode(pin, INPUT)</code></td><td>Configura pin como entrada (requiere circuito externo)</td></tr>
+            <tr><td><code>pinMode(pin, INPUT_PULLUP)</code></td><td>Entrada con resistencia pull-up interna (~50 kΩ)</td></tr>
+            <tr><td><code>digitalRead(pin)</code></td><td>Lee el estado: devuelve HIGH (1) o LOW (0)</td></tr>
+          </table>
+          <div class="lesson-tip">⚠ Umbral de decisión ≈ 2,5V. Tensiones en esa zona son inestables — asegurate de que la señal llegue limpia a HIGH (cerca de 5V) o LOW (cerca de 0V). Para pulsadores, usá <code>INPUT_PULLUP</code> para evitar pines flotantes.</div>
+        </div>
+      </div>
+
+      <div class="lesson" id="l15">
+        <div class="lesson-head" onclick="toggleLesson('l15')">
+          <span class="lesson-num">08</span>
+          <span class="lesson-title">Salidas digitales</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">Una salida digital puede entregar solo dos tensiones: <strong>0V (LOW)</strong> o <strong>5V (HIGH)</strong>. Todos los pines digitales son configurables como entrada o salida. El UNO y el Nano tienen 22 pines digitales, el Mini 20, y el Mega 70. Con <code>pinMode(pin, OUTPUT)</code> y <code>digitalWrite(pin, HIGH/LOW)</code> controlamos cualquier carga conectada.</p>
+          <p class="lesson-p">El límite de corriente es crítico: <strong>máximo 40 mA por pin</strong> (se recomienda no superar 20 mA), y la suma total de todos los pines no debe exceder <strong>300 mA</strong>. Para cargas que consumen más (motores, tiras LED, relés) se necesita un transistor BJT o MOSFET que actúe como interruptor: el pin Arduino da la orden, el transistor maneja la corriente real. Siempre usar resistencia ≥ 300 Ω en serie con LEDs.</p>
+          <div class="lesson-sub">Esquema de medición — salida digital con voltímetro</div>
+          <img class="lesson-img" src="arduino/salidas3bis.png" alt="Arduino salida digital con voltímetro">
+          <p class="lesson-img-cap">Medición de la salida digital con voltímetro: muestra 5V (HIGH) o 0V (LOW) según el estado del pin.</p>
+          <div class="lesson-sub">Código básico — salida digital</div>
+<pre><span class="kw">const</span> <span class="tp">int</span> ledPin = <span class="nm">13</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(ledPin, <span class="tp">OUTPUT</span>);
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="kw">if</span> (Serial.<span class="fn">available</span>()) {
+    <span class="tp">char</span> c = Serial.<span class="fn">read</span>();
+    <span class="kw">if</span> (c == <span class="st">'1'</span>) <span class="fn">digitalWrite</span>(ledPin, <span class="tp">HIGH</span>); <span class="cm">// enciende</span>
+    <span class="kw">if</span> (c == <span class="st">'0'</span>) <span class="fn">digitalWrite</span>(ledPin, <span class="tp">LOW</span>);  <span class="cm">// apaga</span>
+  }
+}</pre>
+          <div class="lesson-sub">Límites de corriente por placa</div>
+          <table class="lesson-table">
+            <tr><th>Parámetro</th><th>Valor</th></tr>
+            <tr><td>Corriente máxima por pin</td><td>40 mA (recomendado: 20 mA)</td></tr>
+            <tr><td>Corriente total todos los pines</td><td>&lt; 300 mA</td></tr>
+            <tr><td>Resistencia mínima con LED</td><td>≥ 300 Ω</td></tr>
+            <tr><td>Cargas &gt; 40 mA</td><td>Transistor BJT o MOSFET obligatorio</td></tr>
+          </table>
+          <div class="lesson-sub">Pines digitales por placa</div>
+          <ul class="lesson-ul">
+            <li><strong>UNO / Nano:</strong> 22 pines digitales (D0–D13 + A0–A5 usables como digitales)</li>
+            <li><strong>Pro Mini:</strong> 20 pines digitales</li>
+            <li><strong>Mega:</strong> 70 pines digitales</li>
+          </ul>
+          <div class="lesson-tip">⚠ Nunca conectar una carga directamente al pin sin resistencia. Si el pin entrega 5V a un LED sin resistencia, la corriente sube sin límite y destruye el pin o el LED en segundos.</div>
+        </div>
+      </div>
+
+      <div class="lesson" id="l16">
+        <div class="lesson-head" onclick="toggleLesson('l16')">
+          <span class="lesson-num">08</span>
+          <span class="lesson-title">Entradas analógicas</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">A diferencia de las entradas digitales, una señal analógica puede tomar <strong>cualquier valor entre 0V y 5V</strong>. El ADC (Conversor Analógico-Digital) del Arduino convierte esa tensión a un número entero. En el UNO es de <strong>10 bits</strong>: divide el rango en 1024 niveles y devuelve un valor de 0 a 1023. La precisión es ±2,44 mV por paso (5V ÷ 1024 / 2).</p>
+          <p class="lesson-p">La función <code>analogRead(pin)</code> no necesita <code>pinMode()</code> previo — los pines A0–A5 son exclusivamente de entrada analógica. La frecuencia de muestreo máxima es ~9.600 Hz. Para convertir el valor leído a voltaje real: <code>V = lectura × (5.0 / 1023.0)</code>.</p>
+          <div class="lesson-sub">Conexión típica sensor → pin analógico</div>
+          <img class="lesson-img" src="arduino/entanalog5bis.png" alt="Conexión sensor a pin analógico Arduino">
+          <p class="lesson-img-cap">Sensor conectado a pin analógico: entrega una tensión variable entre 0V y 5V que el ADC convierte a 0–1023.</p>
+          <div class="lesson-sub">Código básico — lectura analógica</div>
+<pre><span class="kw">const</span> <span class="tp">int</span> sensorPin = A0;
+<span class="tp">int</span> sensorValue;
+<span class="tp">float</span> voltage;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  sensorValue = <span class="fn">analogRead</span>(sensorPin);       <span class="cm">// 0–1023</span>
+  voltage = sensorValue * (<span class="nm">5.0</span> / <span class="nm">1023.0</span>);   <span class="cm">// convertir a voltaje</span>
+  Serial.<span class="fn">print</span>(<span class="st">"Valor: "</span>); Serial.<span class="fn">print</span>(sensorValue);
+  Serial.<span class="fn">print</span>(<span class="st">"  Voltaje: "</span>); Serial.<span class="fn">println</span>(voltage);
+  <span class="fn">delay</span>(<span class="nm">500</span>);
+}</pre>
+          <div class="lesson-sub">Referencias del ADC — analogReference()</div>
+          <table class="lesson-table">
+            <tr><th>Modo</th><th>Rango</th><th>Precisión</th></tr>
+            <tr><td><code>DEFAULT</code></td><td>0–5V</td><td>±2,44 mV/paso</td></tr>
+            <tr><td><code>INTERNAL</code></td><td>0–1,1V</td><td>±0,54 mV/paso (más preciso)</td></tr>
+            <tr><td><code>EXTERNAL</code></td><td>0–V(Aref pin)</td><td>Referencia externa por pin Aref</td></tr>
+          </table>
+<pre><span class="fn">analogReference</span>(<span class="tp">INTERNAL</span>); <span class="cm">// rango 0–1.1V, mayor resolución para señales pequeñas</span>
+<span class="fn">analogReference</span>(<span class="tp">DEFAULT</span>);  <span class="cm">// vuelve a 0–5V</span></pre>
+          <div class="lesson-sub">Lectura de señales mayores a 5V — divisor de tensión</div>
+          <p class="lesson-p">Si la señal supera los 5V, se usa el mismo divisor con R1 = 10 kΩ y R2 = 4,7 kΩ para bajarla al rango seguro del ADC.</p>
+          <img class="lesson-img" src="arduino/entanalog8bis.png" alt="Divisor de tensión 10K/4K7 para entradas analógicas">
+          <p class="lesson-img-cap">Divisor de tensión para entradas analógicas: reduce señales mayores a 5V al rango 0–3,9V aceptable por el ADC.</p>
+          <div class="lesson-tip">⚠ Nunca aplicar más de 5V a un pin analógico del UNO. Para señales mayores, el divisor de tensión es obligatorio.</div>
+        </div>
+      </div>
+
+      <div class="lesson" id="l17">
+        <div class="lesson-head" onclick="toggleLesson('l17')">
+          <span class="lesson-num">08</span>
+          <span class="lesson-title">Salidas analógicas — PWM</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">Arduino <strong>no genera señal analógica real</strong>. Lo que sí puede hacer es simularla con <strong>PWM (Modulación por Ancho de Pulso)</strong>: en lugar de entregar un voltaje constante de 2,5V, el pin pulsa entre 5V y 0V a alta frecuencia. Si está el 50% del tiempo en HIGH, el voltaje promedio que percibe la carga es 2,5V. El parámetro que se controla se llama <strong>duty cycle</strong> (ciclo de trabajo), que es el porcentaje de tiempo que el pin está en HIGH.</p>
+          <p class="lesson-p"><strong>Importante:</strong> el PWM no es una señal analógica. Durante el tiempo que está encendido, el pin sigue entregando los 5V completos de Vcc. Esto puede dañar dispositivos que no son compatibles con esa tensión. El voltaje promedio se calcula como: <code>V_medio = Vcc × DutyCycle / 100</code>. Es útil para controlar brillo de LEDs y velocidad de motores DC, pero no para alimentar circuitos que necesitan una tensión analógica estable.</p>
+          <div class="lesson-sub">Gráfica de duty cycles — 10%, 30%, 50%, 90%</div>
+          <img class="lesson-img" src="arduino/salidanalog3bis.png" alt="Gráfica de duty cycles PWM">
+          <p class="lesson-img-cap">Distintos duty cycles: a mayor % de tiempo en HIGH, mayor voltaje promedio. 0% = 0V, 50% = 2,5V, 100% = 5V.</p>
+          <div class="lesson-sub">Código básico — analogWrite()</div>
+<pre><span class="kw">const</span> <span class="tp">int</span> ledPin = <span class="nm">9</span>; <span class="cm">// pin PWM (marcado con ~ en la placa)</span>
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(ledPin, <span class="tp">OUTPUT</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="fn">analogWrite</span>(ledPin, <span class="nm">0</span>);   <span class="cm">// 0% duty → 0V</span>
+  <span class="fn">delay</span>(<span class="nm">1000</span>);
+  <span class="fn">analogWrite</span>(ledPin, <span class="nm">128</span>); <span class="cm">// 50% duty → ~2.5V</span>
+  <span class="fn">delay</span>(<span class="nm">1000</span>);
+  <span class="fn">analogWrite</span>(ledPin, <span class="nm">255</span>); <span class="cm">// 100% duty → 5V</span>
+  <span class="fn">delay</span>(<span class="nm">1000</span>);
+}</pre>
+          <div class="lesson-sub">Esquema con voltímetro — midiendo salida PWM</div>
+          <img class="lesson-img" src="arduino/salidanalog6bis.png" alt="Arduino salida PWM con voltímetro">
+          <p class="lesson-img-cap">Voltímetro en salida PWM: muestra el voltaje promedio, no los pulsos individuales. A 50% duty cycle lee ~2,5V.</p>
+          <div class="lesson-sub">Pines PWM por placa</div>
+          <table class="lesson-table">
+            <tr><th>Placa</th><th>Pines PWM</th><th>Resolución</th></tr>
+            <tr><td>UNO / Nano</td><td>3, 5, 6, 9, 10, 11 (6 pines)</td><td>8 bits → 0–255</td></tr>
+            <tr><td>Mega</td><td>2–13, 44–46 (15 pines)</td><td>8 bits → 0–255</td></tr>
+          </table>
+          <div class="lesson-sub">Incompatibilidades con Timers</div>
+          <ul class="lesson-ul">
+            <li>La librería <code>Servo.h</code> usa el <strong>Timer1</strong> → bloquea pines 9 y 10 en el UNO</li>
+            <li>Si usás Servo, los pines 9/10 dejan de funcionar como PWM</li>
+            <li>Mover el servo a otro pin no soluciona esto — el Timer1 queda ocupado igual</li>
+          </ul>
+          <div class="lesson-tip">⚠ PWM no es voltaje analógico real. No usar para alimentar circuitos sensibles a variaciones de tensión. Sí sirve para LEDs (el ojo promedia) y motores DC (la inercia promedia).</div>
+        </div>
+      </div>
+
+      <div class="lesson" id="l18">
+        <div class="lesson-head" onclick="toggleLesson('l18')">
+          <span class="lesson-num">08</span>
+          <span class="lesson-title">Interrupciones</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">La forma habitual de detectar un evento es el <strong>polling</strong>: preguntar repetidamente en el <code>loop()</code> si algo cambió. El problema es que si el loop() está ocupado con un <code>delay()</code> o cualquier otra tarea, puede perderse un evento corto. Además consume CPU constantemente aunque no pase nada.</p>
+          <p class="lesson-p">La solución es una <strong>interrupción</strong>: se registra una función especial (ISR) y cuando ocurre el evento en el pin, el hardware pausa el programa al instante, ejecuta la ISR, y luego retoma exactamente donde estaba. No importa qué esté haciendo el loop() — la interrupción salta igual.</p>
+          <div class="lesson-sub">Pines de interrupción</div>
+          <table class="lesson-table">
+            <tr><th>Placa</th><th>Pines disponibles</th></tr>
+            <tr><td>UNO / Nano</td><td>Pin 2 (INT0), Pin 3 (INT1)</td></tr>
+            <tr><td>Mega</td><td>Pines 2, 3, 21, 20, 19, 18 (INT0–INT5)</td></tr>
+          </table>
+          <div class="lesson-sub">Esquema de conexión — emular señal externa</div>
+          <img class="lesson-img" src="arduino/interrupciones5bis.png" alt="Conexión pin10 a pin2 para probar interrupciones">
+          <p class="lesson-img-cap">Pin 10 conectado al pin 2: el pin 10 genera una onda cuadrada que el pin 2 detecta como señal de interrupción.</p>
+          <div class="lesson-sub">Ejemplo 1 — LED parpadea vía ISR (CHANGE)</div>
+<pre><span class="kw">const</span> <span class="tp">int</span> emuPin = <span class="nm">10</span>;  <span class="cm">// genera la onda (conectado a intPin)</span>
+<span class="kw">const</span> <span class="tp">int</span> LEDPin = <span class="nm">13</span>;
+<span class="kw">const</span> <span class="tp">int</span> intPin = <span class="nm">2</span>;
+<span class="kw">volatile</span> <span class="tp">int</span> state = <span class="tp">LOW</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(emuPin, <span class="tp">OUTPUT</span>);
+  <span class="fn">pinMode</span>(LEDPin, <span class="tp">OUTPUT</span>);
+  <span class="fn">pinMode</span>(intPin, <span class="tp">INPUT_PULLUP</span>);
+  <span class="fn">attachInterrupt</span>(<span class="fn">digitalPinToInterrupt</span>(intPin), blink, <span class="tp">CHANGE</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="fn">digitalWrite</span>(emuPin, <span class="tp">HIGH</span>); <span class="fn">delay</span>(<span class="nm">150</span>);
+  <span class="fn">digitalWrite</span>(emuPin, <span class="tp">LOW</span>);  <span class="fn">delay</span>(<span class="nm">150</span>);
+}
+
+<span class="kw">void</span> <span class="fn">blink</span>() {
+  state = !state;
+  <span class="fn">digitalWrite</span>(LEDPin, state);
+}</pre>
+          <div class="lesson-sub">Ejemplo 2 — Contar disparos (FALLING)</div>
+<pre><span class="kw">const</span> <span class="tp">int</span> emuPin = <span class="nm">10</span>;
+<span class="kw">const</span> <span class="tp">int</span> intPin = <span class="nm">2</span>;
+<span class="kw">volatile</span> <span class="tp">int</span> ISRCounter = <span class="nm">0</span>;
+<span class="tp">int</span> counter = <span class="nm">0</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(emuPin, <span class="tp">OUTPUT</span>);
+  <span class="fn">pinMode</span>(intPin, <span class="tp">INPUT_PULLUP</span>);
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+  <span class="fn">attachInterrupt</span>(<span class="fn">digitalPinToInterrupt</span>(intPin), interruptCount, <span class="tp">FALLING</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="fn">digitalWrite</span>(emuPin, <span class="tp">HIGH</span>); <span class="fn">delay</span>(<span class="nm">1000</span>);
+  <span class="fn">digitalWrite</span>(emuPin, <span class="tp">LOW</span>);  <span class="fn">delay</span>(<span class="nm">1000</span>);
+  <span class="kw">if</span> (counter != ISRCounter) {
+    counter = ISRCounter;
+    Serial.<span class="fn">println</span>(counter);
+  }
+}
+
+<span class="kw">void</span> <span class="fn">interruptCount</span>() {
+  ISRCounter++;
+}</pre>
+          <div class="lesson-sub">Modos de disparo</div>
+          <table class="lesson-table">
+            <tr><th>Modo</th><th>Cuándo dispara</th></tr>
+            <tr><td><code>RISING</code></td><td>Flanco ascendente: LOW → HIGH</td></tr>
+            <tr><td><code>FALLING</code></td><td>Flanco descendente: HIGH → LOW</td></tr>
+            <tr><td><code>CHANGE</code></td><td>Cualquier cambio de estado</td></tr>
+            <tr><td><code>LOW</code></td><td>Mientras el pin esté en LOW (disparo continuo)</td></tr>
+          </table>
+          <div class="lesson-sub">Reglas de la ISR</div>
+          <ul class="lesson-ul">
+            <li>No recibe parámetros ni devuelve nada: <code>void nombreISR() { }</code></li>
+            <li>Debe ser <strong>lo más corta posible</strong> — sin <code>delay()</code>, sin <code>Serial.print()</code></li>
+            <li>Variables compartidas entre ISR y loop() deben ser <code>volatile</code></li>
+            <li><code>millis()</code> y <code>micros()</code> no se actualizan dentro de la ISR</li>
+          </ul>
+<pre><span class="cm">// Para leer variables de 4 bytes (long) de forma segura:</span>
+<span class="fn">noInterrupts</span>();
+<span class="tp">long</span> copia = miContador; <span class="cm">// copia atómica</span>
+<span class="fn">interrupts</span>();
+
+<span class="cm">// Desactivar/reactivar una interrupción específica:</span>
+<span class="fn">detachInterrupt</span>(<span class="fn">digitalPinToInterrupt</span>(<span class="nm">2</span>));
+<span class="fn">attachInterrupt</span>(<span class="fn">digitalPinToInterrupt</span>(<span class="nm">2</span>), miISR, <span class="tp">FALLING</span>);</pre>
+          <div class="lesson-tip">⚠ Los dispositivos físicos (pulsadores, sensores) generan "rebote" al cambiar de estado — pueden disparar la ISR varias veces por un solo evento. Para evitarlo, usá un capacitor de filtro o implementá debounce por software con un flag de tiempo.</div>
+        </div>
+      </div>
+
+      <div class="guide-cat">⚡ Electrónica Básica — Proyectos</div>
+
+      <!-- L20: LED -->
+      <div class="lesson" id="l20">
+        <div class="lesson-head" onclick="toggleLesson('l20')">
+          <span class="lesson-num">08</span>
+          <span class="lesson-title">Encender un LED con Arduino</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">Un LED (Light Emitting Diode) es un diodo que emite luz al ser atravesado por corriente eléctrica. Tiene <strong>polaridad</strong>: solo conduce en un sentido. La pata larga es el <strong>ánodo (+)</strong> y la corta el <strong>cátodo (–)</strong>.</p>
+          <p class="lesson-p">El LED no tiene resistencia interna significativa: una vez que supera su tensión de polarización (Vf), la corriente crece sin límite y lo destruye. Por eso <strong>siempre necesitás una resistencia en serie</strong>. La resistencia absorbe la diferencia de tensión: <code>V_R = Vcc – Vf</code>. Con la Ley de Ohm: <code>R = (Vcc – Vf) / I</code>.</p>
+
+          <div class="lesson-sub">Tabla de resistencias — Vcc × Color × 20 mA</div>
+          <p class="lesson-p">Valor calculado y resistencia comercial E12 recomendada. Si no tenés el valor exacto, usá el <em>inmediatamente superior</em>.</p>
+          <table class="lesson-table">
+            <tr><th>Color</th><th>Vf</th><th>3.3V</th><th>5V</th><th>9V</th><th>12V</th></tr>
+            <tr><td>🔴 Rojo</td><td>1.8–2.0V</td><td>65→<strong>68Ω</strong></td><td>150→<strong>150Ω</strong></td><td>350→<strong>330Ω</strong></td><td>500→<strong>510Ω</strong></td></tr>
+            <tr><td>🟠 Naranja</td><td>2.0–2.2V</td><td>55→<strong>56Ω</strong></td><td>140→<strong>150Ω</strong></td><td>340→<strong>330Ω</strong></td><td>490→<strong>470Ω</strong></td></tr>
+            <tr><td>🟡 Amarillo</td><td>2.0–2.2V</td><td>55→<strong>56Ω</strong></td><td>140→<strong>150Ω</strong></td><td>340→<strong>330Ω</strong></td><td>490→<strong>470Ω</strong></td></tr>
+            <tr><td>🟢 Verde std</td><td>2.0–2.2V</td><td>55→<strong>56Ω</strong></td><td>140→<strong>150Ω</strong></td><td>340→<strong>330Ω</strong></td><td>490→<strong>470Ω</strong></td></tr>
+            <tr><td>🟢 Verde bright</td><td>3.0–3.5V</td><td>—</td><td>75→<strong>82Ω</strong></td><td>275→<strong>270Ω</strong></td><td>425→<strong>430Ω</strong></td></tr>
+            <tr><td>🔵 Azul</td><td>3.0–3.5V</td><td>—</td><td>75→<strong>82Ω</strong></td><td>275→<strong>270Ω</strong></td><td>425→<strong>430Ω</strong></td></tr>
+            <tr><td>⚪ Blanco</td><td>3.0–3.5V</td><td>—</td><td>75→<strong>82Ω</strong></td><td>275→<strong>270Ω</strong></td><td>425→<strong>430Ω</strong></td></tr>
+            <tr><td>🟣 UV</td><td>3.3–3.8V</td><td>—</td><td>60→<strong>68Ω</strong></td><td>260→<strong>270Ω</strong></td><td>410→<strong>390Ω</strong></td></tr>
+          </table>
+          <div class="lesson-tip">💡 Para 5V con LED rojo/amarillo/verde, <strong>220Ω</strong> es el valor más usado en la práctica — es el superior más cercano a 150Ω y da un pequeño margen de seguridad extra.</div>
+
+          <div class="lesson-sub">Patillaje del LED</div>
+          <img src="arduino/arduino-led-patillaje.webp" alt="Patillaje LED" class="lesson-img">
+          <p class="lesson-img-cap">Pata larga = ánodo (+) · Pata corta = cátodo (–) · El lado plano marca el cátodo</p>
+
+          <div class="lesson-sub">Esquema eléctrico</div>
+          <img src="arduino/arduino-led-esquema-electrico.png" alt="Esquema eléctrico LED con Arduino" class="lesson-img">
+          <p class="lesson-img-cap">Esquema eléctrico: Pin digital → resistencia → LED → GND</p>
+
+          <div class="lesson-sub">Montaje en protoboard</div>
+          <img src="arduino/arduino-led-montaje-proroboard.png" alt="Montaje LED en protoboard" class="lesson-img">
+          <p class="lesson-img-cap">Montaje real en protoboard — la resistencia va en serie con el LED</p>
+
+          <div class="lesson-sub">Esquema eléctrico — Pin digital → R → LED → GND</div>
+          <img class="lesson-img" src="arduino/encenderled6bis.png" alt="Esquema eléctrico LED con Arduino">
+          <p class="lesson-img-cap">Esquema eléctrico: pin digital → resistencia 330Ω → ánodo LED → cátodo LED → GND.</p>
+
+          <div class="lesson-sub">Montaje en protoboard</div>
+          <img class="lesson-img" src="arduino/encenderled7bis.png" alt="Montaje LED en protoboard con Arduino UNO">
+          <p class="lesson-img-cap">Montaje real: la resistencia va en serie con el LED. Ánodo (pata larga) hacia la resistencia, cátodo (pata corta) hacia GND.</p>
+
+          <div class="lesson-sub">Código 1 — Parpadeo simple (Blink)</div>
+<pre><span class="kw">const</span> <span class="tp">int</span> PIN_LED = <span class="nm">13</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(PIN_LED, <span class="tp">OUTPUT</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="fn">digitalWrite</span>(PIN_LED, <span class="tp">HIGH</span>); <span class="cm">// enciende</span>
+  <span class="fn">delay</span>(<span class="nm">500</span>);
+  <span class="fn">digitalWrite</span>(PIN_LED, <span class="tp">LOW</span>);  <span class="cm">// apaga</span>
+  <span class="fn">delay</span>(<span class="nm">500</span>);
+}</pre>
+
+          <div class="lesson-sub">Código 2 — Encender N veces por Serial</div>
+          <p class="lesson-p">Mandás un número del 1 al 9 por el Monitor Serie y el LED parpadea esa cantidad de veces.</p>
+<pre><span class="kw">const</span> <span class="tp">int</span> ledPIN = <span class="nm">9</span>;
+<span class="tp">int</span> option;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+  <span class="fn">pinMode</span>(ledPIN, <span class="tp">OUTPUT</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="kw">if</span> (Serial.<span class="fn">available</span>() &gt; <span class="nm">0</span>) {
+    option = Serial.<span class="fn">read</span>();
+    <span class="kw">if</span> (option &gt;= <span class="st">'1'</span> &amp;&amp; option &lt;= <span class="st">'9'</span>) {
+      option -= <span class="st">'0'</span>; <span class="cm">// convierte char a número</span>
+      <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i &lt; option; i++) {
+        <span class="fn">digitalWrite</span>(ledPIN, <span class="tp">HIGH</span>); <span class="fn">delay</span>(<span class="nm">100</span>);
+        <span class="fn">digitalWrite</span>(ledPIN, <span class="tp">LOW</span>);  <span class="fn">delay</span>(<span class="nm">200</span>);
+      }
+    }
+  }
+}</pre>
+
+          <div class="lesson-sub">Código 3 — Regulable por PWM desde Serial</div>
+          <p class="lesson-p">Mandás un número del 0 al 9 para controlar el brillo: 0 = apagado, 9 = máximo. El valor se multiplica × 25 para mapear al rango 0–225.</p>
+<pre><span class="kw">const</span> <span class="tp">int</span> ledPIN = <span class="nm">5</span>; <span class="cm">// pin PWM ~</span>
+<span class="tp">byte</span> outputValue = <span class="nm">0</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+  <span class="fn">pinMode</span>(ledPIN, <span class="tp">OUTPUT</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="kw">if</span> (Serial.<span class="fn">available</span>() &gt; <span class="nm">0</span>) {
+    outputValue = Serial.<span class="fn">read</span>();
+    <span class="kw">if</span> (outputValue &gt;= <span class="st">'0'</span> &amp;&amp; outputValue &lt;= <span class="st">'9'</span>) {
+      outputValue -= <span class="st">'0'</span>; <span class="cm">// char → número</span>
+      outputValue *= <span class="nm">25</span>;  <span class="cm">// escala 0–9 a 0–225</span>
+      <span class="fn">analogWrite</span>(ledPIN, outputValue);
+    }
+  }
+}</pre>
+          <div class="lesson-tip">💡 Aunque usés una salida PWM, la tensión que recibe el LED sigue siendo 5V durante el tiempo encendido — la resistencia en serie es siempre obligatoria.</div>
+        </div>
+      </div>
+
+      <!-- L21: Pulsador -->
+      <div class="lesson" id="l21">
+        <div class="lesson-head" onclick="toggleLesson('l21')">
+          <span class="lesson-num">19</span>
+          <span class="lesson-title">Leer un pulsador con Arduino</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">Para leer un pulsador, Arduino necesita que el pin tenga siempre una tensión de referencia definida. Sin ella el pin queda en <strong>estado de alta impedancia (pin flotante)</strong>: cuando el pulsador está abierto el pin no está conectado a nada y capta interferencias electromagnéticas del ambiente, dando lecturas aleatorias e impredecibles.</p>
+
+          <div class="lesson-sub">Problema 1 — Conexión directa: pin flotante</div>
+          <img class="lesson-img" src="arduino/leerpulsadorbis.webp" alt="Pin flotante: conexión directa sin referencia">
+          <p class="lesson-img-cap">Izquierda: pulsador a GND — cuando está abierto el pin no tiene referencia → flotante. Derecha: pulsador a 5V — mismo problema.</p>
+
+          <div class="lesson-sub">Problema 2 — Doble conexión: cortocircuito</div>
+          <p class="lesson-p">Para evitar el pin flotante podría parecer lógico conectar el pin a 5V y también a GND a través del pulsador. Pero al cerrar el pulsador se genera un <strong>cortocircuito directo entre 5V y GND</strong> — corriente ilimitada, destrucción de componentes.</p>
+          <img class="lesson-img" src="arduino/leerpulsador3bis.png" alt="Doble conexión: cortocircuito entre 5V y GND">
+          <p class="lesson-img-cap">Al cerrar el pulsador, 5V y GND quedan directamente conectados → cortocircuito. Nunca hacer esto.</p>
+
+          <div class="lesson-sub">Solución correcta — Resistencia Pull-Up o Pull-Down</div>
+          <p class="lesson-p">La solución es agregar una <strong>resistencia de referencia</strong> que mantenga el pin en un estado definido cuando el pulsador está abierto, pero que limite la corriente cuando está cerrado:</p>
+          <ul class="lesson-ul">
+            <li><strong>Pull-Up:</strong> R desde 5V al pin → fuerza HIGH cuando abierto. Al pulsar: LOW</li>
+            <li><strong>Pull-Down:</strong> R desde GND al pin → fuerza LOW cuando abierto. Al pulsar: HIGH</li>
+          </ul>
+          <img class="lesson-img" src="arduino/leerpulsador5bis.png" alt="Esquema pull-up y pull-down correctos">
+          <p class="lesson-img-cap">Izquierda: resistencia pull-up (HIGH en reposo, LOW al pulsar). Derecha: resistencia pull-down (LOW en reposo, HIGH al pulsar).</p>
+
+          <div class="lesson-sub">Montaje real — Pull-Up y Pull-Down</div>
+          <img class="lesson-img" src="arduino/leerpulsador6bis.png" alt="Montaje protoboard pull-up y pull-down">
+          <p class="lesson-img-cap">Montaje en protoboard de ambas configuraciones. Valores típicos de resistencia: 1kΩ a 10kΩ.</p>
+
+          <div class="lesson-sub">Código — Lectura con resistencia externa (INPUT)</div>
+<pre><span class="kw">const</span> <span class="tp">int</span> inputPin = <span class="nm">2</span>;
+<span class="tp">int</span> value = <span class="nm">0</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+  <span class="fn">pinMode</span>(inputPin, <span class="tp">INPUT</span>); <span class="cm">// resistencia externa obligatoria</span>
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  value = <span class="fn">digitalRead</span>(inputPin);
+  <span class="kw">if</span> (value == <span class="tp">HIGH</span>) {
+    Serial.<span class="fn">println</span>(<span class="st">"Encendido"</span>);
+  } <span class="kw">else</span> {
+    Serial.<span class="fn">println</span>(<span class="st">"Apagado"</span>);
+  }
+  <span class="fn">delay</span>(<span class="nm">1000</span>);
+}</pre>
+
+          <div class="lesson-sub">Atajo — Pull-up interno del Arduino (INPUT_PULLUP)</div>
+          <p class="lesson-p">Arduino tiene resistencias pull-up internas de ~30kΩ activables por software. Con <code>INPUT_PULLUP</code> no necesitás resistencia externa, pero la lógica queda <strong>invertida</strong>: HIGH = suelto, LOW = pulsado.</p>
+<pre><span class="fn">pinMode</span>(inputPin, <span class="tp">INPUT_PULLUP</span>); <span class="cm">// sin resistencia externa</span>
+<span class="cm">// LOW = pulsado (lógica invertida)</span>
+<span class="kw">if</span> (<span class="fn">digitalRead</span>(inputPin) == <span class="tp">LOW</span>) {
+  <span class="cm">// pulsador presionado</span>
+}</pre>
+
+          <div class="lesson-sub">¿Qué valor de resistencia elegir?</div>
+          <ul class="lesson-ul">
+            <li><strong>Muy pequeña:</strong> mucha autoridad pero mayor consumo de corriente al pulsar</li>
+            <li><strong>Muy grande:</strong> poco consumo pero más susceptible a ruido e interferencias</li>
+            <li><strong>Valores típicos:</strong> 1kΩ a 10kΩ — buen equilibrio entre autoridad y consumo</li>
+          </ul>
+          <div class="lesson-tip">⚠ Las pull-up internas del Arduino (~30kΩ) tienen poca "autoridad" — si hay mucho ruido en el circuito, pueden dar lecturas incorrectas. Para entornos ruidosos usá resistencia externa de 1kΩ a 4.7kΩ.</div>
+        </div>
+      </div>
+
+      <!-- L22: Resistencia variable -->
+      <div class="lesson" id="l22">
+        <div class="lesson-head" onclick="toggleLesson('l22')">
+          <span class="lesson-num">08</span>
+          <span class="lesson-title">Leer una resistencia variable — LDR / NTC</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">Una resistencia variable cambia su valor óhmico según una magnitud física: la <strong>LDR</strong> (fotorresistencia) disminuye su resistencia al aumentar la luz, la <strong>NTC</strong> (termistor) disminuye con el aumento de temperatura. El problema es que Arduino no mide resistencia — solo tensión.</p>
+          <p class="lesson-p">La solución es un <strong>divisor de tensión</strong>: la resistencia variable en serie con una resistencia fija (10kΩ). Arduino mide el punto medio. Cuando R_variable cambia, la tensión en el punto medio cambia proporcionalmente y podés inferir la magnitud física.</p>
+
+          <div class="lesson-sub">Esquema eléctrico — Divisor de tensión: Rsensor + Rc → A0</div>
+          <img class="lesson-img" src="arduino/resistvariable2bis.png" alt="Esquema divisor de tensión con resistencia variable y Rc calibración">
+          <p class="lesson-img-cap">Divisor de tensión: Rsensor (arriba) en serie con Rc de calibración (abajo). El punto medio se conecta a A0. Al variar Rsensor, cambia la tensión en A0.</p>
+
+          <div class="lesson-sub">Montaje en protoboard</div>
+          <img class="lesson-img" src="arduino/resistvariable3bis.png" alt="Montaje protoboard resistencia variable con Arduino">
+          <p class="lesson-img-cap">Montaje real: 5V → Rsensor → nodo A0 → Rc → GND.</p>
+
+          <div class="lesson-sub">Código — Calcular el valor de la resistencia</div>
+          <p class="lesson-p">Leemos la tensión en A0 y usamos la ecuación del divisor de tensión despejada para calcular Rsensor. Se usa aritmética de enteros (sin float) para ahorrar memoria y velocidad.</p>
+<pre><span class="kw">const</span> <span class="tp">int</span> sensorPin = A0;
+<span class="kw">const</span> <span class="tp">int</span> Rc = <span class="nm">1500</span>; <span class="cm">// resistencia de calibración en Ω</span>
+
+<span class="tp">int</span>  V;        <span class="cm">// lectura ADC 0–1023</span>
+<span class="tp">long</span> Rsensor;  <span class="cm">// resistencia calculada en Ω</span>
+
+<span class="kw">void</span> <span class="fn">setup</span>() { }
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  V = <span class="fn">analogRead</span>(sensorPin);           <span class="cm">// leer ADC</span>
+  Rsensor = <span class="nm">1024L</span> * Rc / V - Rc;      <span class="cm">// calcular Rsensor</span>
+  <span class="cm">// acá usás Rsensor: encender LED, imprimir, etc.</span>
+  <span class="fn">delay</span>(<span class="nm">1000</span>);
+}</pre>
+
+          <div class="lesson-sub">¿Qué valor de Rc usar?</div>
+          <ul class="lesson-ul">
+            <li><strong>Suficientemente grande</strong> para limitar la corriente cuando Rsensor llega a 0Ω</li>
+            <li><strong>Suficientemente pequeña</strong> para no perder precisión de medición</li>
+            <li><strong>Regla práctica:</strong> Rc igual al valor de Rsensor a media escala del sensor</li>
+            <li><strong>Valores típicos:</strong> 1kΩ a 4.7kΩ para LDR y NTC comunes</li>
+          </ul>
+          <div class="lesson-tip">💡 Siempre que sea posible, usá aritmética de enteros en lugar de float. Las operaciones en punto flotante ocupan más memoria y son significativamente más lentas en el AVR.</div>
+        </div>
+      </div>
+
+      <!-- L23: Potenciómetro -->
+      <div class="lesson" id="l23">
+        <div class="lesson-head" onclick="toggleLesson('l23')">
+          <span class="lesson-num">19</span>
+          <span class="lesson-title">Leer un potenciómetro con Arduino</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">Un potenciómetro es un <strong>divisor de tensión ajustable manualmente</strong>. Internamente tiene una pista resistiva con un contacto móvil (cursor/wiper) que se desplaza por ella. Tiene tres terminales: dos extremos fijos y uno variable (el cursor). Al conectar los extremos a 5V y GND, el cursor entrega cualquier tensión entre 0V y 5V según la posición.</p>
+          <p class="lesson-p">Valores comunes de Rmax: 5kΩ, 10kΩ, 20kΩ. El potenciómetro ya es el divisor de tensión — no necesita resistencia fija adicional. El cursor es el punto medio del divisor interno.</p>
+
+          <div class="lesson-sub">Tipos de potenciómetro</div>
+          <img class="lesson-img" src="arduino/pote3bis.webp" alt="Potenciómetro lineal y rotativo">
+          <p class="lesson-img-cap">Tipos de geometría: lineal (deslizante) y rotativo (el más común en electrónica).</p>
+
+          <div class="lesson-sub">Curva de respuesta — Lineal vs Logarítmico</div>
+          <img class="lesson-img" src="arduino/pote3bisgrafico.webp" alt="Gráfica resistencia vs posición: lineal, pseudo-log, logarítmico">
+          <p class="lesson-img-cap">Lineal: resistencia proporcional al desplazamiento. Logarítmico: mayor resolución en valores bajos (audío, volumen). Pseudo-log: intermedio.</p>
+
+          <div class="lesson-sub">Esquema eléctrico — 3 terminales → Arduino</div>
+          <img class="lesson-img" src="arduino/pote4bis.webp" alt="Esquema eléctrico potenciómetro conectado a Arduino A0">
+          <p class="lesson-img-cap">Terminal 1 → 5V · Terminal 2 (cursor) → A0 · Terminal 3 → GND. Sin resistencia adicional.</p>
+
+          <div class="lesson-sub">Montaje en protoboard</div>
+          <img class="lesson-img" src="arduino/pote6bis.webp" alt="Montaje protoboard potenciómetro con Arduino UNO">
+          <p class="lesson-img-cap">Montaje real: 5V (rojo) y GND (negro) a los extremos, cursor (verde) a la entrada analógica.</p>
+
+          <div class="lesson-sub">Código — Potenciómetro controla brillo LED</div>
+<pre><span class="kw">const</span> <span class="tp">int</span> PIN_POT = A0;
+<span class="kw">const</span> <span class="tp">int</span> PIN_LED = <span class="nm">9</span>;  <span class="cm">// pin PWM ~</span>
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(PIN_LED, <span class="tp">OUTPUT</span>);
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="tp">int</span> pot    = <span class="fn">analogRead</span>(PIN_POT);           <span class="cm">// 0–1023</span>
+  <span class="tp">int</span> brillo = <span class="fn">map</span>(pot, <span class="nm">0</span>, <span class="nm">1023</span>, <span class="nm">0</span>, <span class="nm">255</span>);  <span class="cm">// remapea a 0–255</span>
+  <span class="fn">analogWrite</span>(PIN_LED, brillo);
+
+  Serial.<span class="fn">print</span>(<span class="st">"POT:"</span>); Serial.<span class="fn">print</span>(pot);
+  Serial.<span class="fn">print</span>(<span class="st">"  Brillo:"</span>); Serial.<span class="fn">println</span>(brillo);
+  <span class="fn">delay</span>(<span class="nm">50</span>);
+}</pre>
+
+          <div class="lesson-sub">Código — Potenciómetro controla posición de servo</div>
+<pre><span class="pp">#include</span> <span class="st">&lt;Servo.h&gt;</span>
+Servo miServo;
+
+<span class="kw">void</span> <span class="fn">setup</span>() { miServo.<span class="fn">attach</span>(<span class="nm">9</span>); }
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="tp">int</span> pot    = <span class="fn">analogRead</span>(A0);
+  <span class="tp">int</span> angulo = <span class="fn">map</span>(pot, <span class="nm">0</span>, <span class="nm">1023</span>, <span class="nm">0</span>, <span class="nm">180</span>);
+  miServo.<span class="fn">write</span>(angulo);
+  <span class="fn">delay</span>(<span class="nm">15</span>);
+}</pre>
+          <div class="lesson-tip">💡 <code>map(valor, inMin, inMax, outMin, outMax)</code> es la función más útil de Arduino para adaptar rangos. Transforma linealmente cualquier escala a otra — ideal siempre que conectés un sensor a una salida.</div>
+        </div>
+      </div>
+
+      <!-- L24: Debounce -->
+      <div class="lesson" id="l24">
+        <div class="lesson-head" onclick="toggleLesson('l24')">
+          <span class="lesson-num">08</span>
+          <span class="lesson-title">Debounce — Eliminar rebotes del pulsador</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">Los contactos mecánicos de un pulsador no se cierran limpiamente: <strong>rebotan</strong> durante 10–50 ms generando múltiples señales HIGH/LOW antes de estabilizarse. Para el Arduino, una sola presión parece 5, 10 o 20 pulsaciones. Si estás contando clicks o haciendo toggle, el rebote genera comportamientos erráticos imposibles de debuggear sin saber que existen.</p>
+          <p class="lesson-p">El <strong>debounce (antirrebote)</strong> consiste en ignorar los cambios de estado que ocurren demasiado rápido. La técnica correcta usa <code>millis()</code>: guardamos el momento del último cambio y solo aceptamos uno nuevo si pasaron más de 50 ms. Esto no bloquea el loop() — a diferencia del debounce con <code>delay()</code>.</p>
+
+          <div class="lesson-sub">Señal digital limpia — sin rebote (osciloscopio)</div>
+          <img class="lesson-img" src="arduino/debounce1bis.png" alt="Osciloscopio - señal digital limpia sin rebote">
+          <p class="lesson-img-cap">Señal de una salida digital de Arduino al cambiar de HIGH a LOW: flanco perfectamente limpio, sin ruido.</p>
+
+          <div class="lesson-sub">Señal de un pulsador real con rebote (osciloscopio)</div>
+          <img class="lesson-img" src="arduino/debounce2bis.png" alt="Osciloscopio - señal pulsador con rebote">
+          <p class="lesson-img-cap">La misma transición generada por un pulsador mecánico: decenas de picos de ruido en los primeros microsegundos — cada pico puede disparar una interrupción.</p>
+
+          <div class="lesson-sub">Esquema — Circuito de prueba del rebote</div>
+          <img class="lesson-img" src="arduino/debounce2bisesquema.png" alt="Esquema - circuito para probar rebote en pin 2">
+          <p class="lesson-img-cap">Circuito de prueba: pin 2 con Pull-UP interno y un cable a GND (o pulsador). Al conectar, se disparan múltiples interrupciones por el rebote.</p>
+
+          <div class="lesson-sub">Debounce por hardware — condensador 1µF</div>
+          <img class="lesson-img" src="arduino/debounce4bis.png" alt="Esquema debounce hardware con condensador 1uF">
+          <p class="lesson-img-cap">Debounce por hardware: condensador de 1µF en paralelo con el pulsador filtra el ruido. Es más robusto pero agrega componentes al circuito.</p>
+
+          <div class="lesson-sub">Código — Debounce con millis() (no bloqueante)</div>
+<pre><span class="kw">const</span> <span class="tp">int</span>   PIN_BTN   = <span class="nm">2</span>;
+<span class="kw">const</span> <span class="tp">int</span>   PIN_LED   = <span class="nm">13</span>;
+<span class="kw">const</span> <span class="tp">long</span>  DEBOUNCE  = <span class="nm">50</span>;
+
+<span class="tp">int</span>           estadoBtn      = <span class="tp">HIGH</span>;
+<span class="tp">int</span>           estadoAnterior = <span class="tp">HIGH</span>;
+<span class="tp">bool</span>          ledOn          = <span class="kw">false</span>;
+<span class="tp">unsigned long</span> tUltimoCambio  = <span class="nm">0</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(PIN_BTN, <span class="tp">INPUT_PULLUP</span>);
+  <span class="fn">pinMode</span>(PIN_LED, <span class="tp">OUTPUT</span>);
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="tp">int</span> lectura = <span class="fn">digitalRead</span>(PIN_BTN);
+
+  <span class="kw">if</span> (lectura != estadoAnterior)
+    tUltimoCambio = <span class="fn">millis</span>(); <span class="cm">// registra el cambio</span>
+
+  <span class="kw">if</span> ((<span class="fn">millis</span>() - tUltimoCambio) &gt; DEBOUNCE) {
+    <span class="cm">// lleva &gt;50ms estable → cambio real</span>
+    <span class="kw">if</span> (lectura != estadoBtn) {
+      estadoBtn = lectura;
+      <span class="kw">if</span> (estadoBtn == <span class="tp">LOW</span>) {       <span class="cm">// flanco bajada = pulsación</span>
+        ledOn = !ledOn;
+        <span class="fn">digitalWrite</span>(PIN_LED, ledOn);
+        Serial.<span class="fn">println</span>(<span class="st">"Click!"</span>);
+      }
+    }
+  }
+  estadoAnterior = lectura;
+}</pre>
+
+          <div class="lesson-sub">Código — Debounce con interrupción (máxima respuesta)</div>
+<pre><span class="kw">volatile</span> <span class="tp">bool</span>          pulsado = <span class="kw">false</span>;
+<span class="kw">volatile</span> <span class="tp">unsigned long</span> tISR    = <span class="nm">0</span>;
+
+<span class="kw">void</span> <span class="fn">ISR_btn</span>() {
+  <span class="kw">if</span> (<span class="fn">millis</span>() - tISR &gt; <span class="nm">50</span>) {
+    pulsado = <span class="kw">true</span>;
+    tISR    = <span class="fn">millis</span>();
+  }
+}
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">pinMode</span>(<span class="nm">2</span>, <span class="tp">INPUT_PULLUP</span>);
+  <span class="fn">attachInterrupt</span>(<span class="fn">digitalPinToInterrupt</span>(<span class="nm">2</span>), ISR_btn, <span class="tp">FALLING</span>);
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="kw">if</span> (pulsado) {
+    pulsado = <span class="kw">false</span>;
+    Serial.<span class="fn">println</span>(<span class="st">"Pulsación válida"</span>);
+  }
+  <span class="cm">// loop() libre — puede hacer otras cosas sin perderse pulsaciones</span>
+}</pre>
+          <div class="lesson-tip">💡 Usá el debounce con <code>millis()</code> para proyectos donde el botón se pulsa ocasionalmente. Usá el debounce con interrupción cuando el botón se puede pulsar en cualquier momento, incluso cuando el loop() está ocupado con otras tareas.</div>
+        </div>
+      </div>
+
+      <!-- L25: EEPROM -->
+      <div class="lesson" id="l25">
+        <div class="lesson-head" onclick="toggleLesson('l25')">
+          <span class="lesson-num">19</span>
+          <span class="lesson-title">EEPROM — Guardar datos entre reinicios</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">Cuando el Arduino se apaga o reinicia, toda la RAM se borra. La <strong>EEPROM</strong> es una memoria no volátil integrada en el chip que <strong>mantiene los datos sin energía</strong>, igual que un pendrive. El Arduino Uno tiene 1 KB (1024 bytes). Es ideal para guardar configuraciones, calibraciones, contadores de uso o el último estado del sistema.</p>
+          <p class="lesson-p">La limitación crítica: la EEPROM tiene una vida útil de unas <strong>100.000 escrituras por dirección</strong>. Nunca la escribas dentro de un <code>loop()</code> sin control — en pocos minutos la destruirías. Usá <code>EEPROM.update()</code> o <code>EEPROM.put()</code> que solo escriben si el valor cambió realmente.</p>
+
+          <div class="lesson-sub">Capacidad según placa</div>
+          <table class="lesson-table">
+            <tr><th>Placa</th><th>MCU</th><th>EEPROM</th><th>Direcciones</th></tr>
+            <tr><td>Uno R3 / Nano</td><td>ATmega328P</td><td>1 KB</td><td>0 – 1023</td></tr>
+            <tr><td>Mega 2560</td><td>ATmega2560</td><td>4 KB</td><td>0 – 4095</td></tr>
+            <tr><td>Leonardo</td><td>ATmega32u4</td><td>1 KB</td><td>0 – 1023</td></tr>
+            <tr><td>ESP32</td><td>Xtensa LX6</td><td>Sin EEPROM física — usa Flash emulada</td><td>EEPROM.begin(size)</td></tr>
+          </table>
+
+          <div class="lesson-sub">Código — Leer y escribir byte básico</div>
+<pre><span class="pp">#include</span> <span class="st">&lt;EEPROM.h&gt;</span>
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+
+  EEPROM.<span class="fn">write</span>(<span class="nm">0</span>, <span class="nm">42</span>);       <span class="cm">// escribe 42 en dirección 0</span>
+  <span class="tp">byte</span> val = EEPROM.<span class="fn">read</span>(<span class="nm">0</span>); <span class="cm">// lee dirección 0</span>
+  Serial.<span class="fn">println</span>(val);       <span class="cm">// 42</span>
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {}</pre>
+
+          <div class="lesson-sub">Código — Guardar y recuperar un float (put / get)</div>
+<pre><span class="pp">#include</span> <span class="st">&lt;EEPROM.h&gt;</span>
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+
+  <span class="tp">float</span> calibracion = <span class="nm">23.75</span>;
+  EEPROM.<span class="fn">put</span>(<span class="nm">0</span>, calibracion); <span class="cm">// ocupa 4 bytes (dir. 0–3)</span>
+
+  <span class="tp">float</span> leido;
+  EEPROM.<span class="fn">get</span>(<span class="nm">0</span>, leido);
+  Serial.<span class="fn">println</span>(leido); <span class="cm">// 23.75</span>
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {}</pre>
+
+          <div class="lesson-sub">Código — Contador persistente entre reinicios</div>
+<pre><span class="pp">#include</span> <span class="st">&lt;EEPROM.h&gt;</span>
+
+<span class="kw">const</span> <span class="tp">int</span> ADDR_CNT = <span class="nm">0</span>; <span class="cm">// dirección del contador (2 bytes)</span>
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+
+  <span class="tp">int</span> cnt;
+  EEPROM.<span class="fn">get</span>(ADDR_CNT, cnt);
+
+  <span class="cm">// EEPROM virgen = 0xFF en cada byte → int = 65535 (0xFFFF)</span>
+  <span class="kw">if</span> (cnt == <span class="nm">65535</span> || cnt &lt; <span class="nm">0</span>) cnt = <span class="nm">0</span>;
+
+  cnt++;
+  EEPROM.<span class="fn">put</span>(ADDR_CNT, cnt); <span class="cm">// put() usa update() → no escribe si no cambió</span>
+
+  Serial.<span class="fn">print</span>(<span class="st">"Inicio número: "</span>);
+  Serial.<span class="fn">println</span>(cnt);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {}</pre>
+          <div class="lesson-tip">⚠ Usá siempre <code>put()</code> en lugar de <code>write()</code>: solo escribe si el valor cambió, preservando la vida útil. Para variables de más de 1 byte (int, float, struct) <code>put()</code> / <code>get()</code> son las únicas opciones correctas.</div>
+        </div>
+      </div>
+
+      <!-- L26: Puerto Serie -->
+      <div class="lesson" id="l26">
+        <div class="lesson-head" onclick="toggleLesson('l26')">
+          <span class="lesson-num">08</span>
+          <span class="lesson-title">Puerto Serie — Comunicar Arduino con la PC</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">El <strong>puerto serie</strong> es la forma principal de comunicar Arduino con una computadora u otro dispositivo. Funciona enviando datos bit a bit por dos líneas: <strong>RX</strong> (recepción) y <strong>TX</strong> (transmisión). A diferencia del puerto paralelo que necesita muchos cables, el serie solo requiere dos conductores de datos.</p>
+          <img class="lesson-img" src="arduino/puertoserie2bis.webp" alt="Comunicación serie vs paralelo">
+          <p class="lesson-img-cap">Comparación: comunicación serie (2 cables de datos) vs comunicación paralela (múltiples cables simultáneos).</p>
+          <p class="lesson-p">El Arduino Uno y Nano tienen <strong>una unidad UART</strong> que opera a nivel TTL 0V/5V y se conecta directamente por USB al IDE. El Mega y Due tienen 4 unidades UART. Los pines RX/TX no se pueden usar como digitales mientras el puerto serie está activo.</p>
+
+          <div class="lesson-sub">Pines del puerto serie por placa</div>
+          <table class="lesson-table">
+            <tr><th>Placa</th><th>Puerto</th><th>RX</th><th>TX</th></tr>
+            <tr><td>Uno / Nano / Mini Pro</td><td>Serie 0</td><td>0</td><td>1</td></tr>
+            <tr><td>Mega — Serie 0</td><td>Serie 0</td><td>0</td><td>1</td></tr>
+            <tr><td>Mega — Serie 1</td><td>Serie 1</td><td>19</td><td>18</td></tr>
+            <tr><td>Mega — Serie 2</td><td>Serie 2</td><td>17</td><td>16</td></tr>
+            <tr><td>Mega — Serie 3</td><td>Serie 3</td><td>15</td><td>14</td></tr>
+          </table>
+
+          <div class="lesson-sub">Monitor Serie del IDE</div>
+          <img class="lesson-img" src="arduino/puertoserie5bis.png" alt="IDE Arduino - botón Monitor Serie">
+          <p class="lesson-img-cap">Para abrirlo: menú Herramientas → Monitor Serie, o el ícono lupa en la barra del IDE.</p>
+          <img class="lesson-img" src="arduino/puertoserie6bis.png" alt="Monitor Serie - zona Enviar y Recibir">
+          <p class="lesson-img-cap">El monitor tiene dos zonas: arriba para enviar datos al Arduino, abajo para recibir lo que Arduino manda.</p>
+
+          <div class="lesson-sub">Código — Recibir datos desde Arduino (contador)</div>
+<pre><span class="tp">int</span> cont = <span class="nm">0</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  Serial.<span class="fn">print</span>(<span class="st">"Contador: "</span>);
+  Serial.<span class="fn">println</span>(cont);
+  cont++;
+  <span class="fn">delay</span>(<span class="nm">1000</span>);
+}</pre>
+
+          <div class="lesson-sub">Código — Enviar datos al Arduino (control LED con 'a'/'b')</div>
+<pre><span class="tp">int</span> led = <span class="nm">13</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+  <span class="fn">pinMode</span>(led, <span class="tp">OUTPUT</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="kw">if</span> (Serial.<span class="fn">available</span>() &gt; <span class="nm">0</span>) {
+    <span class="tp">int</span> option = Serial.<span class="fn">read</span>();
+    <span class="kw">if</span> (option == <span class="st">'a'</span>) { <span class="fn">digitalWrite</span>(led, <span class="tp">LOW</span>);  Serial.<span class="fn">println</span>(<span class="st">"OFF"</span>); }
+    <span class="kw">if</span> (option == <span class="st">'b'</span>) { <span class="fn">digitalWrite</span>(led, <span class="tp">HIGH</span>); Serial.<span class="fn">println</span>(<span class="st">"ON"</span>);  }
+  }
+}</pre>
+
+          <div class="lesson-sub">Código — Enviar número y parpadear N veces</div>
+<pre><span class="tp">int</span> led = <span class="nm">13</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+  <span class="fn">pinMode</span>(led, <span class="tp">OUTPUT</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="kw">if</span> (Serial.<span class="fn">available</span>() &gt; <span class="nm">0</span>) {
+    <span class="tp">char</span> option = Serial.<span class="fn">read</span>();
+    <span class="kw">if</span> (option &gt;= <span class="st">'1'</span> &amp;&amp; option &lt;= <span class="st">'9'</span>) {
+      option -= <span class="st">'0'</span>;          <span class="cm">// de char ASCII a número</span>
+      <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i &lt; option; i++) {
+        <span class="fn">digitalWrite</span>(led, <span class="tp">HIGH</span>); <span class="fn">delay</span>(<span class="nm">100</span>);
+        <span class="fn">digitalWrite</span>(led, <span class="tp">LOW</span>);  <span class="fn">delay</span>(<span class="nm">200</span>);
+      }
+    }
+  }
+}</pre>
+          <div class="lesson-tip">⚠ El puerto serie usa los pines 0 y 1. Mientras lo usás, no podés usar esos pines como digitales. Tampoco lo uses si no es necesario: las librerías del puerto serie ocupan bastante espacio de programa.</div>
+        </div>
+      </div>
+
+      <!-- L27: Serial Plotter -->
+      <div class="lesson" id="l27">
+        <div class="lesson-head" onclick="toggleLesson('l27')">
+          <span class="lesson-num">19</span>
+          <span class="lesson-title">Serial Plotter — Graficar datos en tiempo real</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">El <strong>Serial Plotter</strong> es una herramienta nativa del IDE de Arduino que <strong>convierte los números recibidos por puerto serie en gráficas en tiempo real</strong>. Se abre desde Herramientas → Serial Plotter (o <kbd>Ctrl+Shift+L</kbd>). Tiene un eje X (tiempo) y un eje Y que se auto-escala según los valores que recibe.</p>
+          <p class="lesson-p">No es MATLAB ni una herramienta de análisis profesional, pero su mayor virtud es la sencillez: no hay que instalar ni configurar nada. Muy útil para ver el comportamiento de sensores analógicos, señales PWM o algoritmos de control.</p>
+
+          <div class="lesson-sub">Código — Graficar una variable (onda senoidal)</div>
+<pre><span class="kw">void</span> <span class="fn">setup</span>() {
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="tp">float</span> angulo = <span class="fn">millis</span>() / <span class="nm">1000.0</span>;
+  <span class="tp">float</span> valor  = <span class="fn">sin</span>(angulo) * <span class="nm">100.0</span>;
+  Serial.<span class="fn">println</span>(valor);   <span class="cm">// una variable: una línea = un punto</span>
+  <span class="fn">delay</span>(<span class="nm">10</span>);
+}</pre>
+
+          <div class="lesson-sub">Código — Graficar múltiples variables</div>
+<pre><span class="kw">void</span> <span class="fn">setup</span>() {
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="tp">float</span> tiempo    = <span class="fn">millis</span>() / <span class="nm">1000.0</span>;
+  <span class="tp">float</span> variable1 = <span class="fn">sin</span>(tiempo) * <span class="nm">100.0</span>;
+  <span class="tp">float</span> variable2 = <span class="fn">cos</span>(tiempo) * <span class="nm">100.0</span>;
+
+  Serial.<span class="fn">print</span>(variable1);
+  Serial.<span class="fn">print</span>(<span class="st">","</span>);          <span class="cm">// separador coma o espacio</span>
+  Serial.<span class="fn">println</span>(variable2); <span class="cm">// salto de línea al final</span>
+  <span class="fn">delay</span>(<span class="nm">10</span>);
+}</pre>
+
+          <div class="lesson-sub">Código — Nombrar las series en la leyenda</div>
+<pre><span class="cm">// Formato "Etiqueta:valor" — el nombre aparece en la leyenda del Plotter</span>
+Serial.<span class="fn">print</span>(<span class="st">"Seno:"</span>);
+Serial.<span class="fn">print</span>(variable1);
+Serial.<span class="fn">print</span>(<span class="st">","</span>);
+Serial.<span class="fn">print</span>(<span class="st">"Coseno:"</span>);
+Serial.<span class="fn">println</span>(variable2);</pre>
+          <div class="lesson-tip">💡 Asegurate de que la velocidad (baudios) del Plotter coincida con la del <code>Serial.begin()</code>. Si no coinciden, vas a ver basura o nada en la pantalla.</div>
+        </div>
+      </div>
+
+      <!-- L28: Bus I2C -->
+      <div class="lesson" id="l28">
+        <div class="lesson-head" onclick="toggleLesson('l28')">
+          <span class="lesson-num">08</span>
+          <span class="lesson-title">Bus I2C — Conectar múltiples dispositivos con 2 cables</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">El <strong>bus I2C</strong> (Inter-Integrated Circuit, también llamado TWI) es un protocolo que usa solo <strong>2 cables: SDA</strong> (datos) y <strong>SCL</strong> (reloj). Fue desarrollado por Philips en 1982 y se convirtió en estándar: acelerómetros, brújulas, displays OLED, sensores de temperatura — la mayoría de sensores modernos tienen I2C.</p>
+          <img class="lesson-img" src="arduino/i2c2bis.png" alt="Esquema bus I2C - maestro y múltiples esclavos">
+          <p class="lesson-img-cap">Arquitectura del bus I2C: un maestro (Arduino) y múltiples esclavos en el mismo par de cables SDA/SCL, con resistencias Pull-UP a Vcc.</p>
+          <p class="lesson-p">Cada dispositivo tiene una <strong>dirección única de 7 bits</strong> (hasta 112 dispositivos en el mismo bus). La velocidad estándar es 100 kHz, con modo rápido de 400 kHz. Las resistencias Pull-UP internas del Arduino (20–30 kΩ) son suficientes para velocidades bajas; para mayor velocidad o distancia usá resistencias externas de 1k–4k7.</p>
+
+          <div class="lesson-sub">Pines I2C por placa</div>
+          <table class="lesson-table">
+            <tr><th>Placa</th><th>SDA</th><th>SCL</th></tr>
+            <tr><td>Uno / Nano / Mini Pro</td><td>A4</td><td>A5</td></tr>
+            <tr><td>Mega</td><td>20</td><td>21</td></tr>
+          </table>
+
+          <div class="lesson-sub">Funciones principales — librería Wire.h</div>
+<pre><span class="pp">#include</span> <span class="st">&lt;Wire.h&gt;</span>
+
+Wire.<span class="fn">begin</span>();                        <span class="cm">// inicializa el bus (como maestro)</span>
+Wire.<span class="fn">beginTransmission</span>(address);    <span class="cm">// abre comunicación con esclavo</span>
+Wire.<span class="fn">write</span>(dato);                    <span class="cm">// envía un byte</span>
+Wire.<span class="fn">endTransmission</span>();             <span class="cm">// cierra la transmisión</span>
+
+Wire.<span class="fn">requestFrom</span>(address, nBytes);  <span class="cm">// solicita N bytes al esclavo</span>
+Wire.<span class="fn">available</span>();                   <span class="cm">// bytes pendientes de leer</span>
+Wire.<span class="fn">read</span>();                        <span class="cm">// lee un byte</span></pre>
+
+          <div class="lesson-sub">Código — Escáner I2C (encontrar la dirección del dispositivo)</div>
+<pre><span class="pp">#include</span> <span class="st">&lt;Wire.h&gt;</span>
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  Wire.<span class="fn">begin</span>();
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+  Serial.<span class="fn">println</span>(<span class="st">"Escaneando bus I2C..."</span>);
+
+  <span class="kw">for</span> (<span class="tp">byte</span> addr = <span class="nm">8</span>; addr &lt; <span class="nm">120</span>; addr++) {
+    Wire.<span class="fn">beginTransmission</span>(addr);
+    <span class="tp">byte</span> rc = Wire.<span class="fn">endTransmission</span>();
+    <span class="kw">if</span> (rc == <span class="nm">0</span>) {
+      Serial.<span class="fn">print</span>(<span class="st">"Encontrado en 0x"</span>);
+      Serial.<span class="fn">println</span>(addr, <span class="tp">HEX</span>);
+    }
+  }
+  Serial.<span class="fn">println</span>(<span class="st">"Terminado"</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() { <span class="fn">delay</span>(<span class="nm">1000</span>); }</pre>
+          <div class="lesson-tip">💡 Usá el escáner I2C siempre que conectes un sensor nuevo: te dice exactamente qué dirección tiene. Muchos fabricantes no la documentan o la cambian entre versiones del hardware.</div>
+        </div>
+      </div>
+
+      <!-- L29: Bus SPI -->
+      <div class="lesson" id="l29">
+        <div class="lesson-head" onclick="toggleLesson('l29')">
+          <span class="lesson-num">19</span>
+          <span class="lesson-title">Bus SPI — Comunicación rápida Full Duplex</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">El <strong>bus SPI</strong> (Serial Peripheral Interface) es un protocolo síncrono <strong>Full Duplex</strong>: el maestro puede enviar y recibir simultáneamente. Usa <strong>4 líneas</strong>: MOSI (maestro→esclavo), MISO (esclavo→maestro), SCK (reloj) y SS/CS (selección de esclavo). Es más rápido que I2C pero requiere más cables.</p>
+          <img class="lesson-img" src="arduino/spi1bis.png" alt="Esquema SPI - maestro y un esclavo con 4 líneas">
+          <p class="lesson-img-cap">Conexión básica SPI entre maestro y un esclavo: 4 líneas (SCK, MOSI, MISO, SS).</p>
+          <img class="lesson-img" src="arduino/spi2bis.png" alt="SPI con múltiples esclavos - SS independientes">
+          <p class="lesson-img-cap">Con múltiples esclavos: SCK, MOSI y MISO se comparten, pero cada esclavo necesita su propia línea SS.</p>
+          <img class="lesson-img" src="arduino/spi2bis2.png" alt="SPI conexión en cascada">
+          <p class="lesson-img-cap">Alternativa en cascada: se usa una sola línea SS pero los datos atraviesan todos los esclavos en cadena.</p>
+
+          <div class="lesson-sub">Pines SPI por placa</div>
+          <table class="lesson-table">
+            <tr><th>Placa</th><th>SS</th><th>MOSI</th><th>MISO</th><th>SCK</th></tr>
+            <tr><td>Uno / Nano</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
+            <tr><td>Mega</td><td>53</td><td>51</td><td>50</td><td>52</td></tr>
+          </table>
+
+          <div class="lesson-sub">Funciones principales — librería SPI.h</div>
+<pre><span class="pp">#include</span> <span class="st">&lt;SPI.h&gt;</span>
+
+SPI.<span class="fn">begin</span>();
+SPI.<span class="fn">beginTransaction</span>(<span class="fn">SPISettings</span>(<span class="nm">2000000</span>, <span class="tp">MSBFIRST</span>, <span class="tp">SPI_MODE0</span>));
+                                    <span class="cm">// 2 MHz, MSB primero, modo 0</span>
+<span class="tp">byte</span> resp = SPI.<span class="fn">transfer</span>(dato);   <span class="cm">// envía y recibe 1 byte simultáneamente</span>
+SPI.<span class="fn">endTransaction</span>();
+
+<span class="cm">// Modos de reloj disponibles:</span>
+<span class="cm">// SPI_MODE0: CLK idle LOW, muestreo en flanco subida</span>
+<span class="cm">// SPI_MODE1: CLK idle LOW, muestreo en flanco bajada</span>
+<span class="cm">// SPI_MODE2: CLK idle HIGH, muestreo en flanco bajada</span>
+<span class="cm">// SPI_MODE3: CLK idle HIGH, muestreo en flanco subida</span></pre>
+          <div class="lesson-tip">💡 En la práctica casi nunca usás las funciones SPI directamente: las librerías de cada componente (tarjeta SD, pantallas TFT, etc.) se encargan del protocolo. Lo importante es saber qué pines usa SPI para no tener conflictos con otros dispositivos conectados.</div>
+        </div>
+      </div>
+
+      <!-- L30: Arduino + C# -->
+      <div class="lesson" id="l30">
+        <div class="lesson-head" onclick="toggleLesson('l30')">
+          <span class="lesson-num">08</span>
+          <span class="lesson-title">Arduino + C# — Controlar Arduino desde una app de escritorio</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">Con C# y Visual Studio podés crear <strong>aplicaciones de escritorio Windows</strong> que se comuniquen con Arduino por puerto serie. C# tiene soporte nativo mediante la clase <code>System.IO.Ports.SerialPort</code>. Necesitás Visual Studio Community (gratuito) con .NET Framework.</p>
+          <p class="lesson-p">El flujo es siempre el mismo: crear un objeto <code>SerialPort</code>, configurar puerto y velocidad, abrir la conexión, y luego usar <code>Write()</code> para enviar datos. La comunicación es exactamente la misma que usa el Monitor Serie del IDE.</p>
+
+          <div class="lesson-sub">Ejemplo 1 — Formulario ON/OFF para controlar un LED</div>
+          <img class="lesson-img" src="arduino/arduinoyc2bis.png" alt="Visual Studio - crear nuevo proyecto Windows Forms">
+          <p class="lesson-img-cap">Crear proyecto: Visual Studio → New Project → Windows Forms Application → nombre "BasicSerialPort".</p>
+          <img class="lesson-img" src="arduino/arduinoyc3bis2.png" alt="Formulario C# con botones ON y OFF">
+          <p class="lesson-img-cap">Formulario final con dos botones. Elementos: frmMain (texto "Basic C#"), btOn (texto "ON"), btOff (texto "OFF").</p>
+
+          <div class="lesson-sub">Código C# — Formulario ON/OFF</div>
+<pre><span class="cm">// frmMain.cs — C#</span>
+System.IO.Ports.SerialPort ArduinoPort;
+
+<span class="kw">public</span> <span class="fn">frmMain</span>() {
+    <span class="fn">InitializeComponent</span>();
+    ArduinoPort = <span class="kw">new</span> System.IO.Ports.<span class="fn">SerialPort</span>();
+    ArduinoPort.PortName = <span class="st">"COM4"</span>;  <span class="cm">// cambiá por tu puerto</span>
+    ArduinoPort.BaudRate = <span class="nm">9600</span>;
+    ArduinoPort.<span class="fn">Open</span>();
+    <span class="kw">this</span>.FormClosing += FrmMain_FormClosing;
+    <span class="kw">this</span>.btOFF.Click += BtOFF_Click;
+    <span class="kw">this</span>.btON.Click  += BtON_Click;
+}
+<span class="kw">private void</span> <span class="fn">FrmMain_FormClosing</span>(...) {
+    <span class="kw">if</span> (ArduinoPort.IsOpen) ArduinoPort.<span class="fn">Close</span>();
+}
+<span class="kw">private void</span> <span class="fn">BtOFF_Click</span>(...) { ArduinoPort.<span class="fn">Write</span>(<span class="st">"a"</span>); }
+<span class="kw">private void</span> <span class="fn">BtON_Click</span>(...)  { ArduinoPort.<span class="fn">Write</span>(<span class="st">"b"</span>); }</pre>
+
+          <div class="lesson-sub">Código Arduino — Para el ejemplo ON/OFF</div>
+<pre><span class="kw">const</span> <span class="tp">int</span> pinLED = <span class="nm">13</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+  <span class="fn">pinMode</span>(pinLED, <span class="tp">OUTPUT</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="kw">if</span> (Serial.<span class="fn">available</span>() &gt; <span class="nm">0</span>) {
+    <span class="tp">int</span> option = Serial.<span class="fn">read</span>();
+    <span class="kw">if</span> (option == <span class="st">'a'</span>) <span class="fn">digitalWrite</span>(pinLED, <span class="tp">LOW</span>);
+    <span class="kw">if</span> (option == <span class="st">'b'</span>) <span class="fn">digitalWrite</span>(pinLED, <span class="tp">HIGH</span>);
+  }
+}</pre>
+
+          <div class="lesson-sub">Ejemplo 2 — Textbox para enviar número y parpadear N veces</div>
+          <img class="lesson-img" src="arduino/arduinoyc4bis.png" alt="Formulario C# con Textbox y botón Send">
+          <p class="lesson-img-cap">Segundo formulario: un TextBox (txNumber) y un botón "Send". Se ingresa un número entre 1 y 9 y se envía al Arduino.</p>
+
+          <div class="lesson-sub">Código C# — Enviar número desde Textbox</div>
+<pre><span class="kw">private void</span> <span class="fn">BtSend_Click</span>(object sender, EventArgs e) {
+    <span class="tp">int</span> value;
+    <span class="tp">bool</span> rst = Int32.<span class="fn">TryParse</span>(txNumber.Text, <span class="kw">out</span> value);
+    <span class="kw">if</span> (rst == <span class="kw">true</span> &amp;&amp; value &gt; <span class="nm">0</span> &amp;&amp; value &lt; <span class="nm">9</span>)
+        ArduinoPort.<span class="fn">Write</span>(value.<span class="fn">ToString</span>());
+}</pre>
+          <div class="lesson-tip">💡 Recordá cambiar "COM4" por el puerto al que tenés conectado el Arduino. Siempre cerrá el SerialPort en el evento FormClosing — si cerrás el formulario sin cerrar el puerto, la app puede quedarse colgada.</div>
+        </div>
+      </div>
+
+      <!-- L31: Arduino + Python -->
+      <div class="lesson" id="l31">
+        <div class="lesson-head" onclick="toggleLesson('l31')">
+          <span class="lesson-num">19</span>
+          <span class="lesson-title">Arduino + Python — Controlar Arduino con PySerial</span>
+          <span class="lesson-arrow">▼</span>
+        </div>
+        <div class="lesson-body">
+          <p class="lesson-p">Python es uno de los lenguajes más usados para IoT y automatización. Con la librería <strong>PySerial</strong> podés comunicarte con Arduino por puerto serie en pocas líneas de código. Funciona en Windows, Linux y Mac, y es perfecto para scripts de control, logging o integración con APIs.</p>
+
+          <div class="lesson-sub">Instalación de PySerial</div>
+<pre>python -m pip install PySerial</pre>
+
+          <div class="lesson-sub">Código Python — Recibir datos desde Arduino</div>
+<pre><span class="cm"># read.py — lee lo que Arduino envía por puerto serie</span>
+<span class="kw">import</span> serial, time
+
+arduino = serial.<span class="fn">Serial</span>(<span class="st">'COM4'</span>, <span class="nm">9600</span>)  <span class="cm"># cambiá COM4 por tu puerto</span>
+time.<span class="fn">sleep</span>(<span class="nm">2</span>)                          <span class="cm"># espera a que el puerto esté listo</span>
+
+rawString = arduino.<span class="fn">readline</span>()        <span class="cm"># lee una línea</span>
+<span class="fn">print</span>(rawString)
+arduino.<span class="fn">close</span>()</pre>
+
+          <div class="lesson-sub">Código Arduino — Envía "Hola mundo" cada segundo</div>
+<pre><span class="kw">void</span> <span class="fn">setup</span>() { Serial.<span class="fn">begin</span>(<span class="nm">9600</span>); }
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  Serial.<span class="fn">println</span>(<span class="st">"Hola mundo"</span>);
+  <span class="fn">delay</span>(<span class="nm">1000</span>);
+}</pre>
+
+          <div class="lesson-sub">Código Python — Enviar datos al Arduino</div>
+<pre><span class="cm"># write.py — envía un número al Arduino para hacer parpadear el LED</span>
+<span class="kw">import</span> serial, time
+
+arduino = serial.<span class="fn">Serial</span>(<span class="st">"COM4"</span>, <span class="nm">9600</span>)
+time.<span class="fn">sleep</span>(<span class="nm">2</span>)
+
+arduino.<span class="fn">write</span>(b<span class="st">'9'</span>)    <span class="cm"># write() envía bytes — usá b'...' para convertir</span>
+arduino.<span class="fn">close</span>()</pre>
+
+          <div class="lesson-sub">Código Arduino — Parpadea LED N veces según número recibido</div>
+<pre><span class="kw">const</span> <span class="tp">int</span> pinLED = <span class="nm">13</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  Serial.<span class="fn">begin</span>(<span class="nm">9600</span>);
+  <span class="fn">pinMode</span>(pinLED, <span class="tp">OUTPUT</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="kw">if</span> (Serial.<span class="fn">available</span>() &gt; <span class="nm">0</span>) {
+    <span class="tp">char</span> option = Serial.<span class="fn">read</span>();
+    <span class="kw">if</span> (option &gt;= <span class="st">'1'</span> &amp;&amp; option &lt;= <span class="st">'9'</span>) {
+      option -= <span class="st">'0'</span>;
+      <span class="kw">for</span> (<span class="tp">int</span> i = <span class="nm">0</span>; i &lt; option; i++) {
+        <span class="fn">digitalWrite</span>(pinLED, <span class="tp">HIGH</span>); <span class="fn">delay</span>(<span class="nm">100</span>);
+        <span class="fn">digitalWrite</span>(pinLED, <span class="tp">LOW</span>);  <span class="fn">delay</span>(<span class="nm">200</span>);
+      }
+    }
+  }
+}</pre>
+          <div class="lesson-tip">💡 La función <code>write()</code> de PySerial envía bytes, no texto. Siempre precedé el string con <code>b</code> (ej: <code>b'9'</code>) o usá <code>encode()</code>. El <code>sleep(2)</code> es necesario porque Arduino hace reset al abrir el puerto — si enviás datos antes de que termine el reset, los pierde.</div>
+        </div>
+      </div>
+
+    <div class="page-divider" id="cheatsheet">📋 Cheatsheet — Referencia rápida</div>
     <div class="filter-bar">
       <span class="filter-icon">⚡</span>
       <input type="text" id="filterInput" placeholder="Filtrar cheatsheet..." oninput="filterSections(this.value)">
@@ -712,6 +2725,20 @@ function toggleSection(head){
   head.nextElementSibling.classList.toggle('hidden');
 }
 
+function toggleLesson(id){
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+}
+function openLesson(id){
+  const el = document.getElementById(id);
+  el.classList.add('open');
+  setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),50);
+  // highlight sidebar link
+  document.querySelectorAll('#nav-guias .s-link').forEach(l=>l.classList.remove('active'));
+  const link = document.querySelector('#nav-guias [onclick*="'+id+'"]');
+  if(link) link.classList.add('active');
+}
+
 function filterSections(q){
   const term=q.toLowerCase().trim();
   document.querySelectorAll('.section').forEach(sec=>{
@@ -738,3 +2765,5 @@ window.addEventListener('scroll',()=>{
 </script>
 </body>
 </html>
+
+
