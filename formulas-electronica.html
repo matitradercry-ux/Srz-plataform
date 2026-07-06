@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mr. Z — Fórmulas Electrónica</title>
 <style>
-:root{--accent:#a78bfa;--accent-b:#1a0d30;--border:#2a1050;}
+:root{--accent:#38bdf8;--accent-b:#0b1e2e;--border:#1e3a5f;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#070b14;color:#cbd5e1;font-family:system-ui,sans-serif;font-size:15px;line-height:1.7;}
 a{text-decoration:none;}
@@ -31,13 +31,15 @@ a{text-decoration:none;}
 .fgroup{margin-bottom:30px;}
 .fname{font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:10px;}
 .fblock{background:#0c1422;border:1px solid var(--border);border-radius:10px;padding:20px 28px;margin:8px 0;text-align:center;}
-.fl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#2a1050;margin-bottom:8px;text-align:left;}
-.fm{font-size:22px;font-family:'Courier New',monospace;color:#f1f5f9;font-weight:700;line-height:1.5;}
-.fa{font-size:15px;font-family:'Courier New',monospace;color:#94a3b8;margin-top:7px;line-height:1.6;}
+.fl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#38bdf8;opacity:.7;margin-bottom:8px;text-align:left;}
+.fm{font-size:24px;font-family:Georgia,'Times New Roman',serif;font-style:italic;color:#f1f5f9;font-weight:400;line-height:1.9;}
+.fa{font-size:15px;font-family:Georgia,'Times New Roman',serif;font-style:italic;color:#94a3b8;margin-top:7px;line-height:1.7;}
+.fm sub,.fm sup,.fa sub,.fa sup{font-size:68%;font-style:normal;position:relative;}
+.fm sup,.fa sup{top:-.45em;}.fm sub,.fa sub{bottom:-.2em;}
 .vars{list-style:none;margin-top:12px;}
 .vars li{font-size:14px;color:#94a3b8;padding:2px 0;display:flex;gap:8px;align-items:baseline;line-height:1.6;}
-.vars li::before{content:'▸';color:#2a1050;flex-shrink:0;font-size:11px;}
-.vars li code{color:#c4b5fd;font-family:'Courier New',monospace;font-size:13px;background:#0f172a;padding:1px 6px;border-radius:3px;flex-shrink:0;}
+.vars li::before{content:'▸';color:#38bdf8;flex-shrink:0;font-size:11px;opacity:.7;}
+.vars li code{color:#7dd3fc;font-family:'Courier New',monospace;font-size:13px;background:#0f172a;padding:1px 6px;border-radius:3px;flex-shrink:0;}
 .note{font-size:15px;color:#94a3b8;background:#0c1422;border-left:3px solid var(--border);padding:10px 14px;border-radius:0 8px 8px 0;margin-top:12px;line-height:1.7;}
 .right-toc{display:none;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;padding:20px 18px;border-left:1px solid #1e293b;}
 @media(min-width:1200px){.right-toc{display:block;}}
@@ -73,21 +75,219 @@ a{text-decoration:none;}
 </aside>
 <main class="content">
   <h1 class="page-title">🔬 Electrónica</h1>
-  <p class="page-sub">Diodos · BJT · MOSFET · Op-Amp · Filtros · ADC/PWM</p>
+  <p class="page-sub">Pasivos · Circuitos · Teoremas · Activos · Diodos · BJT · FET · Filtros · Rectificadores · Op-Amp</p>
 
+  <!-- COMPONENTES PASIVOS -->
+  <section class="section" id="pasivos">
+    <div class="section-title">Componentes Pasivos</div>
+    <div class="fgroup">
+      <div class="fname">Resistencias</div>
+      <div class="fblock">
+        <div class="fl">Ley de Ohm</div>
+        <div class="fm">V = I · R</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">En Serie</div>
+        <div class="fm">R_total = R₁ + R₂ + R₃ + ...</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">En Paralelo</div>
+        <div class="fm">1/R_total = 1/R₁ + 1/R₂ + 1/R₃ + ...</div>
+        <div class="fa">Dos en paralelo: R_t = R₁·R₂ / (R₁+R₂)</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Condensadores</div>
+      <div class="fblock">
+        <div class="fl">Carga almacenada</div>
+        <div class="fm">Q = C · V</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Corriente</div>
+        <div class="fm">I = C · dV/dt</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">En Serie</div>
+        <div class="fm">1/C_total = 1/C₁ + 1/C₂ + ...</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">En Paralelo</div>
+        <div class="fm">C_total = C₁ + C₂ + C₃ + ...</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Inductores</div>
+      <div class="fblock">
+        <div class="fl">Tensión inducida</div>
+        <div class="fm">V = L · dI/dt</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">En Serie</div>
+        <div class="fm">L_total = L₁ + L₂ + L₃ + ...</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">En Paralelo</div>
+        <div class="fm">1/L_total = 1/L₁ + 1/L₂ + ...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CIRCUITOS ELÉCTRICOS -->
+  <section class="section" id="circuitos">
+    <div class="section-title">Circuitos Eléctricos</div>
+    <div class="fgroup">
+      <div class="fname">Divisor de Tensión</div>
+      <div class="fblock">
+        <div class="fm">V_k = (R_k / R_total) · V_total</div>
+      </div>
+      <ul class="vars">
+        <li><code>V_k</code> — Tensión en la resistencia k [V]</li>
+        <li><code>R_k</code> — Resistencia k [Ω]</li>
+        <li><code>R_total</code> — Resistencia total del circuito [Ω]</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Divisor de Intensidad</div>
+      <div class="fblock">
+        <div class="fm">I_k = (R_total / R_k) · I_total</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Potencia Eléctrica</div>
+      <div class="fblock">
+        <div class="fm">P = V · I = I² · R = V² / R</div>
+      </div>
+      <ul class="vars">
+        <li><code>P</code> — Potencia [W]</li>
+        <li><code>V</code> — Voltaje [V]</li>
+        <li><code>I</code> — Corriente [A]</li>
+        <li><code>R</code> — Resistencia [Ω]</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ANÁLISIS DE CIRCUITOS -->
+  <section class="section" id="analisis">
+    <div class="section-title">Análisis de Circuitos</div>
+    <div class="fgroup">
+      <div class="fname">Ley de Kirchhoff para Corrientes (KCL)</div>
+      <div class="fblock">
+        <div class="fm">ΣI_entrantes − ΣI_salientes = 0</div>
+      </div>
+      <div class="note">La suma algebraica de corrientes que entran y salen de un nodo es igual a cero.</div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Ley de Kirchhoff para Voltajes (KVL)</div>
+      <div class="fblock">
+        <div class="fm">ΣV_lazo = 0</div>
+      </div>
+      <div class="note">La suma algebraica de las diferencias de potencial en cualquier lazo cerrado es cero.</div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Método de Nudos</div>
+      <div class="fblock">
+        <div class="fa">1. Identificar todos los nodos y elegir referencia (tierra).</div>
+        <div class="fa">2. Aplicar KCL en cada nodo no referencia.</div>
+        <div class="fa">3. Resolver el sistema de ecuaciones resultante.</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Método de Mallas</div>
+      <div class="fblock">
+        <div class="fa">1. Identificar todas las mallas independientes del circuito.</div>
+        <div class="fa">2. Aplicar KVL en cada malla.</div>
+        <div class="fa">3. Resolver el sistema de ecuaciones resultante.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEOREMAS -->
+  <section class="section" id="teoremas">
+    <div class="section-title">Teoremas y Sustituciones</div>
+    <div class="fgroup">
+      <div class="fname">Teorema de Superposición</div>
+      <div class="fblock">
+        <div class="fa">En un circuito lineal con múltiples fuentes independientes, la respuesta en cualquier elemento es la suma algebraica de las respuestas debidas a cada fuente actuando sola (con las demás apagadas).</div>
+      </div>
+      <div class="note">Apagar todas menos una → calcular respuesta → repetir → sumar algebraicamente.</div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Teorema de Thévenin</div>
+      <div class="fblock">
+        <div class="fa">Cualquier circuito lineal de dos terminales se reemplaza por V_th en serie con R_th.</div>
+      </div>
+      <ul class="vars">
+        <li><code>V_th</code> — Voltaje de circuito abierto entre terminales [V]</li>
+        <li><code>R_th</code> — Resistencia equivalente (fuentes independientes apagadas) [Ω]</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Teorema de Norton</div>
+      <div class="fblock">
+        <div class="fa">Cualquier circuito lineal de dos terminales se reemplaza por I_n en paralelo con R_n.</div>
+      </div>
+      <ul class="vars">
+        <li><code>I_n</code> — Corriente de cortocircuito entre terminales [A]</li>
+        <li><code>R_n</code> — Resistencia equivalente = R_th [Ω]</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Teorema de Millman</div>
+      <div class="fblock">
+        <div class="fl">Tensión en nodo común</div>
+        <div class="fm">V_out = Σ(V_i/R_i) / Σ(1/R_i)</div>
+      </div>
+      <div class="note">Simplifica circuitos con múltiples fuentes de voltaje en paralelo con resistencias.</div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Valor Eficaz RMS</div>
+      <div class="fblock">
+        <div class="fm">V_rms = V_max / √2  ≈  0.707 · V_max</div>
+        <div class="fa">I_rms = I_max / √2</div>
+      </div>
+      <div class="note">Utilizado en análisis de CA para calcular potencia: P = V_rms · I_rms.</div>
+    </div>
+  </section>
+
+  <!-- DISPOSITIVOS ACTIVOS -->
+  <section class="section" id="activos">
+    <div class="section-title">Dispositivos Electrónicos Activos</div>
+    <div class="fgroup">
+      <div class="fname">Definición</div>
+      <div class="fblock">
+        <div class="fa">Son aquellos que pueden controlar el flujo de corriente en un circuito y proporcionar energía o amplificación.</div>
+        <div class="fa">A diferencia de los componentes pasivos (R, C, L), los activos requieren una fuente de energía externa para funcionar.</div>
+      </div>
+      <div class="note">Ejemplos: diodos, transistores BJT, FET/MOSFET, tiristores, amplificadores operacionales.</div>
+    </div>
+  </section>
+
+  <!-- DIODOS -->
   <section class="section" id="diodos">
     <div class="section-title">Diodos</div>
     <div class="fgroup">
+      <div class="fname">Diodo de Unión PN</div>
+      <div class="fblock">
+        <div class="fa">Permite el flujo de corriente en una dirección (polarización directa) y bloquea en la opuesta.</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Diodo ideal</div>
+        <div class="fm">V_D = 0  si  I_D &gt; 0  (directa)</div>
+        <div class="fa">I_D = 0  si  V_D &lt; 0  (inversa bloqueada)</div>
+      </div>
+    </div>
+    <div class="fgroup">
       <div class="fname">Ecuación de Shockley</div>
       <div class="fblock">
-        <div class="fm">I_D = I_s · (e^(V_D / n·V_T) − 1)</div>
+        <div class="fm">I_D = I_S · (e^(V_D / n·V_T) − 1)</div>
         <div class="fa">V_T = k·T/q ≈ 26 mV  (a 25°C)</div>
       </div>
       <ul class="vars">
-        <li><code>I_s</code> — Corriente de saturación inversa [A]</li>
-        <li><code>V_T</code> — Tensión térmica [V]</li>
+        <li><code>I_S</code> — Corriente de saturación inversa [A]</li>
         <li><code>n</code> — Factor de idealidad (1–2)</li>
-        <li><code>k</code> = 1.38×10⁻²³ J/K · <code>q</code> = 1.6×10⁻¹⁹ C</li>
+        <li><code>V_T</code> — Voltaje térmico [V]</li>
+        <li><code>k</code> — Constante de Boltzmann = 1.38×10⁻²³ J/K</li>
+        <li><code>q</code> — Carga del electrón = 1.6×10⁻¹⁹ C</li>
       </ul>
     </div>
     <div class="fgroup">
@@ -100,6 +300,15 @@ a{text-decoration:none;}
       </div>
     </div>
     <div class="fgroup">
+      <div class="fname">Diodo Zener (regulación de voltaje)</div>
+      <div class="fblock">
+        <div class="fa">Opera en polarización inversa. Mantiene voltaje constante V_Z.</div>
+        <div class="fm">V_salida = V_Z</div>
+        <div class="fa">R_serie = (V_in − V_Z) / I_total</div>
+      </div>
+      <div class="note">La corriente mínima de Zener I_Z_min garantiza regulación estable.</div>
+    </div>
+    <div class="fgroup">
       <div class="fname">Resistencia limitadora para LED</div>
       <div class="fblock">
         <div class="fm">R = (V_cc − V_LED) / I_LED</div>
@@ -110,167 +319,172 @@ a{text-decoration:none;}
         <li><code>I_LED</code> — Corriente deseada [A] (típico 10–20 mA)</li>
       </ul>
     </div>
-    <div class="fgroup">
-      <div class="fname">Rectificadores</div>
-      <div class="fblock">
-        <div class="fl">Media onda</div>
-        <div class="fm">V_dc = V_pico / π = 0.318 · V_pico</div>
-      </div>
-      <div class="fblock">
-        <div class="fl">Onda completa (puente)</div>
-        <div class="fm">V_dc = 2·V_pico / π = 0.636 · V_pico</div>
-        <div class="fa">V_rizado = I_carga / (f · C)  [V_pp]</div>
-      </div>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Diodo Zener (regulación)</div>
-      <div class="fblock">
-        <div class="fm">V_salida = V_Z  (tensión de ruptura)</div>
-        <div class="fa">R_serie = (V_in − V_Z) / I_total</div>
-        <div class="fa">I_Z_min = I_carga_max · 0.1  (margen)</div>
-      </div>
-    </div>
   </section>
 
+  <!-- TRANSISTORES BJT -->
   <section class="section" id="bjt">
-    <div class="section-title">Transistor BJT</div>
+    <div class="section-title">Transistores Bipolares (BJT)</div>
+    <div class="fgroup">
+      <div class="fname">Principio de funcionamiento</div>
+      <div class="fblock">
+        <div class="fa">Dispositivos semiconductores NPN o PNP. Un transistor BJT controla la corriente a través del terminal Colector en función de la corriente de Base.</div>
+      </div>
+    </div>
     <div class="fgroup">
       <div class="fname">Corrientes y ganancia</div>
       <div class="fblock">
         <div class="fm">I_C = β · I_B  =  α · I_E</div>
         <div class="fa">I_E = I_B + I_C = I_B · (1 + β)</div>
-        <div class="fa">α = β / (1 + β)   β = α / (1 − α)</div>
+        <div class="fa">α = β / (1 + β)   |   β = α / (1 − α)</div>
       </div>
       <ul class="vars">
         <li><code>β (hFE)</code> — Ganancia de corriente DC (20–500 típico)</li>
-        <li><code>α</code> — Ganancia en base común (≈0.95–0.999)</li>
+        <li><code>α</code> — Ganancia en base común (≈ 0.95–0.999)</li>
         <li><code>I_C, I_B, I_E</code> — Corrientes colector/base/emisor [A]</li>
       </ul>
     </div>
     <div class="fgroup">
-      <div class="fname">Polarización divisor de tensión</div>
+      <div class="fname">Condiciones de Polarización</div>
+      <div class="fblock">
+        <div class="fl">Polarización directa (activa)</div>
+        <div class="fm">V_BE ≈ 0.6–0.7 V  (silicio NPN)</div>
+        <div class="fa">V_CE &gt; V_CE_sat para modo activo</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Saturación (switch ON)</div>
+        <div class="fm">V_CE_sat ≈ 0.1–0.3 V</div>
+        <div class="fa">I_B_min = I_C_sat / β</div>
+        <div class="fa">I_C_sat = (V_cc − V_CE_sat) / R_C</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Corte (switch OFF)</div>
+        <div class="fm">I_B = 0  →  I_C ≈ 0</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Polarización por divisor de tensión</div>
       <div class="fblock">
         <div class="fm">V_B = V_cc · R₂ / (R₁ + R₂)</div>
-        <div class="fa">V_E = V_B − V_BE  (V_BE ≈ 0.6–0.7 V)</div>
+        <div class="fa">V_E = V_B − V_BE</div>
         <div class="fa">I_C ≈ I_E = V_E / R_E</div>
         <div class="fa">V_CE = V_cc − I_C·(R_C + R_E)</div>
       </div>
     </div>
     <div class="fgroup">
-      <div class="fname">Saturación (switch)</div>
+      <div class="fname">Cálculo de Potencia</div>
       <div class="fblock">
-        <div class="fm">I_B_min = I_C_sat / β</div>
-        <div class="fa">I_C_sat = (V_cc − V_CE_sat) / R_C</div>
-        <div class="fa">V_CE_sat ≈ 0.1–0.3 V</div>
+        <div class="fl">Potencia de salida</div>
+        <div class="fm">P_out = V_CE · I_C</div>
       </div>
-      <div class="note">Sobredimensionar I_B al doble o triple de I_B_min garantiza saturación completa.</div>
+      <div class="fblock">
+        <div class="fl">Potencia disipada en el transistor</div>
+        <div class="fm">P_diss = V_CE · I_C</div>
+      </div>
+      <div class="note">P_diss no debe superar P_max del datasheet. Usar disipador si P_diss &gt; 1 W.</div>
     </div>
     <div class="fgroup">
-      <div class="fname">Ganancia en frecuencia</div>
+      <div class="fname">Configuraciones de Transistor</div>
       <div class="fblock">
-        <div class="fm">f_T = β · f_β = g_m / (2π · C_π)</div>
-        <div class="fa">g_m = I_C / V_T  [A/V]</div>
+        <div class="fl">Emisor Común (CE)</div>
+        <div class="fa">Ganancia de voltaje y corriente alta. Inversión de señal. Uso: amplificación general.</div>
+        <div class="fa">A_v = −g_m · R_C   |   A_i = β</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Colector Común — Seguidor de Emisor (CC)</div>
+        <div class="fa">Alta impedancia de entrada, baja impedancia de salida. Sin inversión.</div>
+        <div class="fa">A_v ≈ 1   |   Útil como buffer de impedancia</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Base Común (CB)</div>
+        <div class="fa">Alta impedancia de salida. Sin inversión. Útil en radiofrecuencia.</div>
+        <div class="fa">A_i ≈ 1   |   A_v = g_m · R_C</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Transconductancia y frecuencia</div>
+      <div class="fblock">
+        <div class="fm">g_m = I_C / V_T  [A/V]</div>
+        <div class="fa">f_T = β · f_β = g_m / (2π · C_π)</div>
       </div>
       <ul class="vars">
-        <li><code>f_T</code> — Frecuencia de transición (unidad-gain)</li>
+        <li><code>f_T</code> — Frecuencia de transición (ganancia = 1)</li>
         <li><code>g_m</code> — Transconductancia [S]</li>
       </ul>
     </div>
   </section>
 
-  <section class="section" id="mosfet">
-    <div class="section-title">Transistor MOSFET</div>
+  <!-- FET / MOSFET -->
+  <section class="section" id="fet">
+    <div class="section-title">Transistores de Efecto de Campo (FET)</div>
     <div class="fgroup">
-      <div class="fname">Zonas de operación (canal N, enriquecimiento)</div>
+      <div class="fname">Tipos de FET</div>
+      <div class="fblock">
+        <div class="fa"><b>JFET</b>: Unión PN para controlar el canal. Alta resistencia de entrada. Controlado por V_GS.</div>
+        <div class="fa"><b>MOSFET</b>: Capa de óxido entre puerta y canal. Mayor flexibilidad. Uso digital y conmutación.</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Regiones de Operación</div>
       <div class="fblock">
         <div class="fl">Corte</div>
         <div class="fm">V_GS &lt; V_th  →  I_D = 0</div>
       </div>
       <div class="fblock">
-        <div class="fl">Lineal / Óhmica  (V_DS &lt; V_GS − V_th)</div>
-        <div class="fm">I_D = Kn·[(V_GS−V_th)·V_DS − V_DS²/2]</div>
+        <div class="fl">Saturación (amplificación)</div>
+        <div class="fm">V_GS &gt; V_th  →  I_D ≈ constante</div>
+        <div class="fa">MOSFET: I_D = (Kn/2) · (V_GS − V_th)²</div>
       </div>
       <div class="fblock">
-        <div class="fl">Saturación  (V_DS ≥ V_GS − V_th)</div>
-        <div class="fm">I_D = (Kn/2) · (V_GS − V_th)²</div>
+        <div class="fl">Triodo / Lineal (V_DS pequeño)</div>
+        <div class="fm">I_D = Kn·[(V_GS−V_th)·V_DS − V_DS²/2]</div>
+        <div class="fa">Comporta como resistencia controlada por V_GS</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Ecuación del JFET (corriente de drenaje)</div>
+      <div class="fblock">
+        <div class="fm">I_D = I_DSS · (1 − V_GS / V_GS_off)²</div>
       </div>
       <ul class="vars">
-        <li><code>V_th</code> — Tensión de umbral [V]</li>
-        <li><code>Kn</code> — Parámetro de proceso [A/V²]</li>
-        <li><code>V_GS, V_DS</code> — Tensiones gate-source / drain-source [V]</li>
+        <li><code>I_DSS</code> — Corriente de saturación con V_GS = 0 [A]</li>
+        <li><code>V_GS_off</code> — Tensión de pinch-off [V]</li>
       </ul>
     </div>
     <div class="fgroup">
-      <div class="fname">Transconductancia y resistencia en ON</div>
+      <div class="fname">Configuraciones de FET</div>
+      <div class="fblock">
+        <div class="fl">Fuente Común (CS) — equivale a Emisor Común</div>
+        <div class="fa">Alta ganancia de voltaje. Inversión de señal. A_v = −g_m · R_D</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Drenaje Común — Seguidor de Fuente (CD)</div>
+        <div class="fa">Alta Rin, baja Rout. A_v ≈ 1. Sin inversión. Equivale a Colector Común.</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Puerta Común (CG)</div>
+        <div class="fa">Baja Rin. Sin inversión. Uso en RF. A_v = g_m · R_D</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">MOSFET: Transconductancia y conmutación</div>
       <div class="fblock">
         <div class="fm">g_m = √(2 · Kn · I_D)  [A/V]</div>
         <div class="fa">R_DS(on) = 1 / (Kn · (V_GS − V_th))  [Ω]</div>
       </div>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Pérdidas en conmutación</div>
       <div class="fblock">
+        <div class="fl">Pérdidas totales en conmutación</div>
         <div class="fm">P_cond = I_D² · R_DS(on)</div>
         <div class="fa">P_sw = ½ · V_DS · I_D · (t_on + t_off) · f_sw</div>
-        <div class="fa">P_total = P_cond + P_sw + P_gate</div>
+        <div class="fa">P_total = P_cond + P_sw</div>
       </div>
     </div>
   </section>
 
-  <section class="section" id="opamp">
-    <div class="section-title">Amplificador Operacional (Op-Amp)</div>
-    <div class="fgroup">
-      <div class="fname">Amplificador inversor</div>
-      <div class="fblock">
-        <div class="fm">A_v = −R_f / R₁</div>
-        <div class="fa">V_sal = −(R_f / R₁) · V_ent</div>
-      </div>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Amplificador no inversor</div>
-      <div class="fblock">
-        <div class="fm">A_v = 1 + R_f / R₁</div>
-        <div class="fa">Seguidor de tensión: A_v = 1 (R_f = 0, R₁ = ∞)</div>
-      </div>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Sumador inversor</div>
-      <div class="fblock">
-        <div class="fm">V_sal = −R_f · (V₁/R₁ + V₂/R₂ + V₃/R₃)</div>
-      </div>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Integrador y derivador</div>
-      <div class="fblock">
-        <div class="fl">Integrador</div>
-        <div class="fm">V_sal = −(1/RC) · ∫V_ent dt</div>
-      </div>
-      <div class="fblock">
-        <div class="fl">Derivador</div>
-        <div class="fm">V_sal = −R·C · dV_ent/dt</div>
-      </div>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Amplificador diferencial</div>
-      <div class="fblock">
-        <div class="fm">V_sal = (R_f/R₁) · (V₂ − V₁)</div>
-        <div class="fa">CMRR = A_dif / A_común  [dB]</div>
-      </div>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Slew rate y ancho de banda</div>
-      <div class="fblock">
-        <div class="fm">SR = dV/dt_max  [V/μs]</div>
-        <div class="fa">f_max = SR / (2π · V_pico)</div>
-        <div class="fa">GBW = A_v · BW = cte  (producto ganancia×ancho de banda)</div>
-      </div>
-    </div>
-  </section>
-
+  <!-- FILTROS Y OSCILADORES -->
   <section class="section" id="filtros">
-    <div class="section-title">Filtros RC y RL</div>
+    <div class="section-title">Filtros y Osciladores</div>
     <div class="fgroup">
-      <div class="fname">Filtro RC pasivo</div>
+      <div class="fname">Filtro RC Pasivo</div>
       <div class="fblock">
         <div class="fl">Frecuencia de corte (−3 dB)</div>
         <div class="fm">f_c = 1 / (2π · R · C)</div>
@@ -290,15 +504,179 @@ a{text-decoration:none;}
       </div>
     </div>
     <div class="fgroup">
-      <div class="fname">Filtro activo Sallen-Key (2º orden)</div>
+      <div class="fname">Filtro Activo Sallen-Key (2º orden)</div>
       <div class="fblock">
         <div class="fm">f_c = 1 / (2π · √(R₁·R₂·C₁·C₂))</div>
         <div class="fa">Q = √(R₁·R₂·C₁·C₂) / (C₂·(R₁+R₂))</div>
-        <div class="fa">Butterworth: Q = 0.707  →  pendiente −40 dB/década</div>
+        <div class="fa">Butterworth: Q = 0.707  →  pendiente −40 dB/dec</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Osciladores</div>
+      <div class="fblock">
+        <div class="fl">Oscilador RC (frecuencia de oscilación)</div>
+        <div class="fm">f = 1 / (2π · R · C)</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Oscilador LC (frecuencia de resonancia)</div>
+        <div class="fm">f = 1 / (2π · √(L · C))</div>
+      </div>
+      <div class="note">Condición de Barkhausen: ganancia de lazo = 1 y desfase = 0° (o múltiplo de 360°).</div>
+    </div>
+  </section>
+
+  <!-- RECTIFICADORES -->
+  <section class="section" id="rectificadores">
+    <div class="section-title">Rectificadores</div>
+    <div class="fgroup">
+      <div class="fname">Rectificador de Media Onda</div>
+      <div class="fblock">
+        <div class="fa">Utiliza un único diodo. Solo pasa un semiciclo de la señal AC.</div>
+        <div class="fm">V_avg = V_max / π  ≈  0.318 · V_max</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Rectificador de Onda Completa (puente)</div>
+      <div class="fblock">
+        <div class="fa">Usa 4 diodos en puente. Pasa ambos semiciclos.</div>
+        <div class="fm">V_avg = 2·V_max / π  ≈  0.636 · V_max</div>
+        <div class="fa">V_rizado ≈ I_carga / (f · C)  [V_pp]</div>
+      </div>
+      <ul class="vars">
+        <li><code>V_max</code> — Tensión pico de entrada [V]</li>
+        <li><code>f</code> — Frecuencia de red [Hz] (50 o 60 Hz)</li>
+        <li><code>C</code> — Capacitor de filtro [F]</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Eficiencia de Rectificación</div>
+      <div class="fblock">
+        <div class="fm">η = (P_out / P_in) · 100%</div>
+        <div class="fa">Media onda: η_max ≈ 40.6%</div>
+        <div class="fa">Onda completa: η_max ≈ 81.2%</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Filtros de Salida</div>
+      <div class="fblock">
+        <div class="fa">Para suavizar la señal rectificada se usan condensadores. Reducen el rizado de la salida.</div>
+        <div class="fm">C = I_carga / (f · V_rizado)</div>
+      </div>
+      <div class="note">Mayor C → menor rizado → más estable la tensión DC de salida.</div>
+    </div>
+  </section>
+
+  <!-- TIPOS DE FILTROS -->
+  <section class="section" id="tiposfiltros">
+    <div class="section-title">Tipos de Filtros</div>
+    <div class="fgroup">
+      <div class="fname">Filtros Pasa Bajos (LPF)</div>
+      <div class="fblock">
+        <div class="fa">Permiten el paso de frecuencias por debajo de la frecuencia de corte f_c.</div>
+        <div class="fm">f_c = 1 / (2π · R · C)</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Filtros Pasa Altos (HPF)</div>
+      <div class="fblock">
+        <div class="fa">Permiten el paso de frecuencias por encima de la frecuencia de corte f_c.</div>
+        <div class="fm">f_c = 1 / (2π · R · C)</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Filtros Pasa Banda (BPF)</div>
+      <div class="fblock">
+        <div class="fa">Permiten el paso de un rango específico de frecuencias.</div>
+        <div class="fl">Frecuencia central</div>
+        <div class="fm">f₀ = √(f_c1 · f_c2)</div>
+        <div class="fl">Ancho de banda</div>
+        <div class="fm">BW = f_c2 − f_c1</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Filtros Rechaza Banda (BSF / Notch)</div>
+      <div class="fblock">
+        <div class="fa">Atenúan un rango específico de frecuencias. Opuesto al BPF.</div>
+        <div class="fm">f_notch = 1 / (2π · √(R₁·R₂·C₁·C₂))</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Filtro RC Pasa Bajos (función de transferencia)</div>
+      <div class="fblock">
+        <div class="fm">H(s) = 1 / (1 + s·R·C)</div>
+        <div class="fa">|H(jω)| = 1 / √(1 + (ω/ω_c)²)</div>
       </div>
     </div>
   </section>
 
+  <!-- AMPLIFICADORES OP-AMP -->
+  <section class="section" id="opamp">
+    <div class="section-title">Amplificadores Operacionales (Op-Amp)</div>
+    <div class="fgroup">
+      <div class="fname">Definición</div>
+      <div class="fblock">
+        <div class="fa">Dispositivos amplificadores de ganancia muy alta. Se usan en configuraciones inversor, no inversor, sumador, diferenciador, integrador, etc.</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Amplificador Inversor</div>
+      <div class="fblock">
+        <div class="fl">Ganancia de voltaje</div>
+        <div class="fm">A_v = −R_f / R_in</div>
+        <div class="fa">V_out = −(R_f / R_in) · V_in</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Amplificador No Inversor</div>
+      <div class="fblock">
+        <div class="fl">Ganancia de voltaje</div>
+        <div class="fm">A_v = 1 + R_f / R_in</div>
+        <div class="fa">V_out = (1 + R_f/R_in) · V_in</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Seguidor de tensión (buffer)</div>
+        <div class="fm">A_v = 1  (R_f = 0, R_in = ∞)</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Sumador Inversor</div>
+      <div class="fblock">
+        <div class="fm">V_out = −R_f · (V₁/R₁ + V₂/R₂ + V₃/R₃)</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Amplificador Diferencial</div>
+      <div class="fblock">
+        <div class="fm">V_out = (R_f/R₁) · (V₂ − V₁)</div>
+        <div class="fa">CMRR = A_dif / A_común  [dB]</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Integrador y Derivador</div>
+      <div class="fblock">
+        <div class="fl">Integrador</div>
+        <div class="fm">V_out = −(1/RC) · ∫V_in dt</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Derivador</div>
+        <div class="fm">V_out = −R·C · dV_in/dt</div>
+      </div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Parámetros importantes</div>
+      <div class="fblock">
+        <div class="fl">Slew Rate (velocidad de cambio)</div>
+        <div class="fm">SR = dV/dt_max  [V/μs]</div>
+        <div class="fa">f_max = SR / (2π · V_pico)</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Producto Ganancia × Ancho de Banda</div>
+        <div class="fm">GBW = A_v · BW = constante</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADC / DAC / PWM -->
   <section class="section" id="adc">
     <div class="section-title">ADC, DAC y PWM</div>
     <div class="fgroup">
@@ -309,12 +687,13 @@ a{text-decoration:none;}
         <div class="fa">n bits → 2ⁿ niveles</div>
       </div>
       <ul class="vars">
-        <li><code>n</code> — Número de bits (8 bits → 256 niveles · 12 bits → 4096)</li>
-        <li>ADC 10 bits, 5 V_ref → resolución = 5/1023 ≈ 4.9 mV</li>
+        <li><code>n</code> — Número de bits</li>
+        <li>8 bits → 256 niveles · 10 bits → 1024 · 12 bits → 4096</li>
+        <li>ADC 10 bits, 5 V_ref → resolución ≈ 4.9 mV</li>
       </ul>
     </div>
     <div class="fgroup">
-      <div class="fname">PWM</div>
+      <div class="fname">PWM (Modulación por Ancho de Pulso)</div>
       <div class="fblock">
         <div class="fm">V_media = V_cc · D</div>
         <div class="fa">D = t_on / T  (duty cycle, 0–1)</div>
@@ -327,15 +706,25 @@ a{text-decoration:none;}
 </main>
 <aside class="right-toc">
   <div class="toc-title">En esta página</div>
+  <a href="#pasivos">Componentes Pasivos</a>
+  <a href="#circuitos">Circuitos Eléctricos</a>
+  <a href="#analisis">Análisis de Circuitos</a>
+  <a href="#teoremas">Teoremas</a>
+  <a href="#activos">Dispositivos Activos</a>
   <a href="#diodos">Diodos</a>
-  <a href="#bjt">Transistor BJT</a>
-  <a href="#mosfet">MOSFET</a>
+  <a href="#bjt">Transistores BJT</a>
+  <a href="#fet">FET / MOSFET</a>
+  <a href="#filtros">Filtros y Osciladores</a>
+  <a href="#rectificadores">Rectificadores</a>
+  <a href="#tiposfiltros">Tipos de Filtros</a>
   <a href="#opamp">Op-Amp</a>
-  <a href="#filtros">Filtros RC y RL</a>
   <a href="#adc">ADC / DAC / PWM</a>
 </aside>
 </div>
-<script>function buscar(q){q=q.toLowerCase().trim();document.querySelectorAll('.section').forEach(s=>{s.style.display=!q||(s.textContent.toLowerCase().includes(q))?'':'none';});}</script>
+<script>
+function renderMath(){document.querySelectorAll('.fm,.fa').forEach(el=>{let h=el.innerHTML;h=h.replace(/_([A-Za-záéíóúüñÁÉÍÓÚ][A-Za-z0-9áéíóúüñÁÉÍÓÚ]*)/g,'<sub>$1</sub>');h=h.replace(/\^([0-9n]+)/g,'<sup>$1</sup>');el.innerHTML=h;});}
+document.addEventListener('DOMContentLoaded',renderMath);
+function buscar(q){q=q.toLowerCase().trim();document.querySelectorAll('.section').forEach(s=>{s.style.display=!q||(s.textContent.toLowerCase().includes(q))?'':'none';});}
+</script>
 </body>
 </html>
-

@@ -1,17 +1,18 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mr. Z — Fórmulas Electromagnetismo</title>
 <style>
-:root{--accent:#fbbf24;--accent-b:#1c1500;--border:#2a1e00;}
+:root{--accent:#fbbf24;--accent-b:#1a1204;--border:#3a2a08;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#070b14;color:#cbd5e1;font-family:system-ui,sans-serif;font-size:15px;line-height:1.7;}
 a{text-decoration:none;}
 .top-nav{position:fixed;top:0;left:0;right:0;height:52px;background:rgba(7,11,20,.97);backdrop-filter:blur(10px);border-bottom:1px solid #1e293b;z-index:50;display:flex;align-items:center;padding:0 20px;gap:12px;}
-.top-nav .brand{font-size:18px;font-weight:900;background:linear-gradient(90deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.top-nav a{font-size:12px;color:#475569;}.top-nav a:hover{color:#e2e8f0;}
+.top-nav .brand{font-size:18px;font-weight:900;background:linear-gradient(90deg,#fbbf24,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.top-nav a{font-size:12px;color:#475569;}
+.top-nav a:hover{color:#e2e8f0;}
 .search-box{margin-left:auto;background:#0f172a;border:1px solid #1e293b;color:#e2e8f0;border-radius:8px;padding:5px 12px;font-size:13px;outline:none;width:180px;}
 .search-box:focus{border-color:var(--accent);}
 .layout{display:grid;grid-template-columns:220px 1fr;padding-top:52px;min-height:100vh;}
@@ -21,7 +22,8 @@ a{text-decoration:none;}
 .left-nav a:hover{color:#e2e8f0;background:#0f172a;}
 .left-nav a.active{color:var(--accent);font-weight:700;background:var(--accent-b);border-left:2px solid var(--accent);padding-left:16px;}
 .nav-cat{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#475569;padding:14px 18px 4px;}
-.nav-back{font-size:12px;color:#334155;padding:6px 18px;display:block;}.nav-back:hover{color:#94a3b8!important;}
+.nav-back{font-size:12px;color:#334155;padding:6px 18px;display:block;}
+.nav-back:hover{color:#94a3b8!important;}
 .content{padding:40px 52px;max-width:860px;margin:0 auto;}
 @media(max-width:900px){.content{padding:24px 20px;}}
 .page-title{font-size:26px;font-weight:900;color:#e2e8f0;margin-bottom:4px;}
@@ -31,12 +33,14 @@ a{text-decoration:none;}
 .fgroup{margin-bottom:30px;}
 .fname{font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:10px;}
 .fblock{background:#0c1422;border:1px solid var(--border);border-radius:10px;padding:20px 28px;margin:8px 0;text-align:center;}
-.fl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:8px;text-align:left;}
-.fm{font-size:22px;font-family:'Courier New',monospace;color:#f1f5f9;font-weight:700;line-height:1.5;}
-.fa{font-size:15px;font-family:'Courier New',monospace;color:#94a3b8;margin-top:7px;line-height:1.6;}
+.fl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);opacity:.7;margin-bottom:8px;text-align:left;}
+.fm{font-size:24px;font-family:Georgia,'Times New Roman',serif;font-style:italic;color:#f1f5f9;font-weight:400;line-height:1.9;}
+.fa{font-size:15px;font-family:Georgia,'Times New Roman',serif;font-style:italic;color:#94a3b8;margin-top:7px;line-height:1.7;}
+.fm sub,.fm sup,.fa sub,.fa sup{font-size:68%;font-style:normal;position:relative;}
+.fm sup,.fa sup{top:-.45em;}.fm sub,.fa sub{bottom:-.2em;}
 .vars{list-style:none;margin-top:12px;}
 .vars li{font-size:14px;color:#94a3b8;padding:2px 0;display:flex;gap:8px;align-items:baseline;line-height:1.6;}
-.vars li::before{content:'▸';color:#64748b;flex-shrink:0;font-size:11px;}
+.vars li::before{content:'▸';color:var(--accent);flex-shrink:0;font-size:11px;opacity:.7;}
 .vars li code{color:#fde68a;font-family:'Courier New',monospace;font-size:13px;background:#0f172a;padding:1px 6px;border-radius:3px;flex-shrink:0;}
 .note{font-size:15px;color:#94a3b8;background:#0c1422;border-left:3px solid var(--border);padding:10px 14px;border-radius:0 8px 8px 0;margin-top:12px;line-height:1.7;}
 .right-toc{display:none;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;padding:20px 18px;border-left:1px solid #1e293b;}
@@ -44,16 +48,21 @@ a{text-decoration:none;}
 .toc-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#475569;margin-bottom:10px;}
 .right-toc a{display:block;font-size:12px;color:#64748b;padding:4px 0 4px 10px;border-left:1px solid #1e293b;margin-bottom:2px;line-height:1.4;transition:color .15s,border-color .15s;}
 .right-toc a:hover{color:#e2e8f0;border-color:var(--accent);}
+.fsub{font-size:13px;font-weight:700;color:#fde68a;margin:18px 0 8px;}
+.fdesc{font-size:14px;color:#94a3b8;margin:6px 0 10px;line-height:1.7;}
+.tip{font-size:14px;color:#94a3b8;background:#0c1422;border-left:3px solid #fbbf24;padding:10px 14px;border-radius:0 8px 8px 0;margin-top:10px;line-height:1.7;}
 </style>
 </head>
 <body>
+
 <nav class="top-nav">
   <span class="brand">Mr.Z</span>
   <a href="index.html">Inicio</a>
   <a href="formulas-hub.html">Fórmulas</a>
   <a href="laboratorio.html">Laboratorio</a><a href="componentes.html">Componentes</a>
-  <input class="search-box" type="text" placeholder="Buscar..." oninput="buscar(this.value)">
+  <input class="search-box" type="text" placeholder="Buscar en la página..." oninput="buscar(this.value)">
 </nav>
+
 <div class="layout">
 <aside class="left-nav">
   <a class="nav-back" href="index.html">← Inicio</a>
@@ -71,260 +80,302 @@ a{text-decoration:none;}
   <div class="nav-cat">Energía</div>
   <a href="formulas-fotovoltaica.html">☀ Fotovoltaica</a>
 </aside>
+
 <main class="content">
   <h1 class="page-title">📡 Electromagnetismo</h1>
-  <p class="page-sub">Ecuaciones de Maxwell · Ondas EM · Campos · Energía · Antenas</p>
+  <p class="page-sub">Campo E · Coulomb · Potencial · Gauss · Ampère · Inducción · Campo B · Fuerzas · Maxwell · Ondas EM</p>
+
+  <section class="section" id="campo-e">
+    <div class="section-title">Campo Eléctrico</div>
+    <div class="fgroup">
+      <div class="fname">Campo eléctrico de una carga puntual</div>
+      <div class="fblock"><div class="fm">E = ke · |q| / r²</div></div>
+      <ul class="vars">
+        <li><code>E</code> — Campo eléctrico [N/C o V/m]</li>
+        <li><code>ke</code> — Constante de Coulomb (8.99×10⁹ N·m²/C²)</li>
+        <li><code>q</code> — Carga eléctrica [C]</li>
+        <li><code>r</code> — Distancia a la carga [m]</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Principio de superposición</div>
+      <div class="fdesc">El campo eléctrico total es la suma vectorial de los campos individuales de cada carga.</div>
+      <div class="fblock"><div class="fm">E_total = Σ Eᵢ = ke · Σ(qᵢ/rᵢ²)</div></div>
+    </div>
+  </section>
+
+  <section class="section" id="coulomb">
+    <div class="section-title">Ley de Coulomb</div>
+    <div class="fgroup">
+      <div class="fname">Fuerza entre cargas</div>
+      <div class="fdesc">La fuerza entre dos cargas puntuales es proporcional al producto de las cargas e inversamente proporcional al cuadrado de la distancia.</div>
+      <div class="fblock"><div class="fm">F = ke · |q₁ · q₂| / r²</div></div>
+      <ul class="vars">
+        <li><code>F</code> — Fuerza eléctrica [N]</li>
+        <li><code>q₁, q₂</code> — Cargas eléctricas [C]</li>
+        <li><code>r</code> — Distancia entre cargas [m]</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="potencial">
+    <div class="section-title">Potencial Eléctrico</div>
+    <div class="fgroup">
+      <div class="fname">Potencial de una carga puntual</div>
+      <div class="fblock"><div class="fm">V = ke · q / r</div></div>
+      <ul class="vars">
+        <li><code>V</code> — Potencial eléctrico [V]</li>
+        <li><code>q</code> — Carga que genera el potencial [C]</li>
+        <li><code>r</code> — Distancia a la carga [m]</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Potencial por múltiples cargas (superposición)</div>
+      <div class="fblock"><div class="fm">V_total = Σ Vᵢ = ke · Σ(qᵢ/rᵢ)</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Relación con el campo eléctrico</div>
+      <div class="fdesc">El campo eléctrico es el gradiente negativo del potencial.</div>
+      <div class="fblock"><div class="fm">E = −∇V</div></div>
+    </div>
+  </section>
+
+  <section class="section" id="gauss">
+    <div class="section-title">Ley de Gauss</div>
+    <div class="fgroup">
+      <div class="fname">Flujo eléctrico Φ_E</div>
+      <div class="fdesc">El flujo eléctrico a través de una superficie cerrada es proporcional a la carga encerrada.</div>
+      <div class="fblock"><div class="fm">Φ_E = Q_enc / ε₀</div></div>
+      <ul class="vars">
+        <li><code>Φ_E</code> — Flujo eléctrico [N·m²/C]</li>
+        <li><code>Q_enc</code> — Carga encerrada en la superficie [C]</li>
+        <li><code>ε₀</code> — Permitividad del vacío (8.85×10⁻¹² F/m)</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="ampere-faraday">
+    <div class="section-title">Ley de Ampère y Ley de Faraday</div>
+    <div class="fgroup">
+      <div class="fname">Ley de Ampère</div>
+      <div class="fdesc">La circulación del campo magnético alrededor de un circuito cerrado es proporcional a la corriente encerrada.</div>
+      <div class="fblock"><div class="fm">∮ B · dl = μ₀ · I_enc</div></div>
+      <ul class="vars">
+        <li><code>B</code> — Campo magnético [T]</li>
+        <li><code>μ₀</code> — Permeabilidad del vacío (4π×10⁻⁷ T·m/A)</li>
+        <li><code>I_enc</code> — Corriente encerrada [A]</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Campo magnético de un hilo recto</div>
+      <div class="fblock"><div class="fm">B = μ₀ · I / (2π · r)</div></div>
+      <ul class="vars">
+        <li><code>r</code> — Distancia radial desde el hilo [m]</li>
+        <li><code>I</code> — Corriente en el hilo [A]</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Ley de Faraday — FEM inducida</div>
+      <div class="fdesc">Una variación del flujo magnético induce una fuerza electromotriz (FEM).</div>
+      <div class="fblock"><div class="fm">ε = −dΦ_B / dt</div></div>
+      <ul class="vars">
+        <li><code>ε</code> — FEM inducida [V]</li>
+        <li><code>Φ_B</code> — Flujo magnético [Wb = T·m²]</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="induccion">
+    <div class="section-title">Inducción Electromagnética</div>
+    <div class="fgroup">
+      <div class="fname">Flujo magnético</div>
+      <div class="fblock"><div class="fm">Φ_B = B · A · cos(θ)</div></div>
+      <ul class="vars">
+        <li><code>Φ_B</code> — Flujo magnético [Wb]</li>
+        <li><code>B</code> — Campo magnético [T]</li>
+        <li><code>A</code> — Área de la superficie [m²]</li>
+        <li><code>θ</code> — Ángulo entre B y la normal a la superficie</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Ley de Lenz</div>
+      <div class="fdesc">La corriente inducida se opone al cambio en el flujo magnético que la origina (signo negativo en la Ley de Faraday).</div>
+      <div class="fblock"><div class="fm">ε = −N · dΦ_B / dt</div></div>
+      <ul class="vars">
+        <li><code>N</code> — Número de espiras</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="campo-b">
+    <div class="section-title">Campo Magnético</div>
+    <div class="fgroup">
+      <div class="fname">Campo de una carga en movimiento</div>
+      <div class="fblock"><div class="fm">B = (μ₀/4π) · q·v×r̂ / r²</div></div>
+      <ul class="vars">
+        <li><code>q</code> — Carga [C]</li>
+        <li><code>v</code> — Velocidad [m/s]</li>
+        <li><code>r</code> — Distancia [m]</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Ley de Biot-Savart</div>
+      <div class="fdesc">Campo magnético en un punto debido a un elemento de corriente:</div>
+      <div class="fblock"><div class="fm">dB = (μ₀/4π) · I·dL×r̂ / r²</div></div>
+    </div>
+  </section>
+
+  <section class="section" id="fuerzas">
+    <div class="section-title">Fuerzas</div>
+    <div class="fgroup">
+      <div class="fname">Fuerza de Lorentz</div>
+      <div class="fdesc">Fuerza sobre una carga en movimiento en campos eléctrico y magnético:</div>
+      <div class="fblock"><div class="fm">F = q · (E + v × B)</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Fuerza sobre conductor en campo magnético</div>
+      <div class="fblock"><div class="fm">F = I · L × B</div></div>
+      <ul class="vars">
+        <li><code>I</code> — Corriente [A]</li>
+        <li><code>L</code> — Longitud del conductor [m]</li>
+        <li><code>B</code> — Campo magnético [T]</li>
+      </ul>
+    </div>
+  </section>
 
   <section class="section" id="maxwell">
     <div class="section-title">Ecuaciones de Maxwell</div>
     <div class="fgroup">
-      <div class="fname">Ley de Gauss (campo eléctrico)</div>
+      <div class="fname">Las cuatro ecuaciones de Maxwell</div>
       <div class="fblock">
-        <div class="fl">Forma integral</div>
-        <div class="fm">∮ E·dA = Q_enc / ε₀</div>
-        <div class="fl" style="margin-top:12px;">Forma diferencial</div>
-        <div class="fm">∇·E = ρ / ε₀</div>
+        <div class="fl">Ley de Gauss eléctrica</div>
+        <div class="fm">∇·E = ρ/ε₀</div>
       </div>
-      <ul class="vars">
-        <li><code>Q_enc</code> — Carga encerrada [C]</li>
-        <li><code>ε₀</code> = 8.85×10⁻¹² F/m</li>
-        <li><code>ρ</code> — Densidad volumétrica de carga [C/m³]</li>
-      </ul>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Ley de Gauss (campo magnético)</div>
       <div class="fblock">
-        <div class="fl">Forma integral</div>
-        <div class="fm">∮ B·dA = 0</div>
-        <div class="fl" style="margin-top:12px;">Forma diferencial</div>
+        <div class="fl">Ley de Gauss magnética</div>
         <div class="fm">∇·B = 0</div>
       </div>
-      <div class="note">No existen monopolos magnéticos: las líneas de B siempre son cerradas.</div>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Ley de Faraday (inducción)</div>
       <div class="fblock">
-        <div class="fl">Forma integral</div>
-        <div class="fm">∮ E·dl = −dΦ_B/dt</div>
-        <div class="fl" style="margin-top:12px;">Forma diferencial</div>
+        <div class="fl">Ley de Faraday</div>
         <div class="fm">∇×E = −∂B/∂t</div>
       </div>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Ley de Ampère-Maxwell</div>
       <div class="fblock">
-        <div class="fl">Forma integral</div>
-        <div class="fm">∮ B·dl = μ₀·(I + ε₀·dΦ_E/dt)</div>
-        <div class="fl" style="margin-top:12px;">Forma diferencial</div>
-        <div class="fm">∇×B = μ₀·J + μ₀·ε₀·∂E/∂t</div>
+        <div class="fl">Ley de Ampère-Maxwell</div>
+        <div class="fm">∇×B = μ₀J + μ₀ε₀·∂E/∂t</div>
       </div>
-      <ul class="vars">
-        <li><code>μ₀</code> = 4π×10⁻⁷ H/m</li>
-        <li><code>J</code> — Densidad de corriente [A/m²]</li>
-      </ul>
     </div>
   </section>
 
   <section class="section" id="ondas">
     <div class="section-title">Ondas Electromagnéticas</div>
     <div class="fgroup">
-      <div class="fname">Velocidad de la luz y longitud de onda</div>
+      <div class="fname">Velocidad de la luz en el vacío</div>
+      <div class="fblock"><div class="fm">c = 1 / √(μ₀·ε₀) ≈ 3×10⁸ m/s</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Ecuación de onda</div>
       <div class="fblock">
-        <div class="fm">c = 1 / √(μ₀·ε₀) = 3×10⁸ m/s</div>
-        <div class="fa">v = c / √(μᵣ·εᵣ)  (en un medio)</div>
-        <div class="fa">λ = v / f = c / f  (en vacío)</div>
+        <div class="fl">Para campo E</div>
+        <div class="fm">∇²E = (1/c²) · ∂²E/∂t²</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Para campo B</div>
+        <div class="fm">∇²B = (1/c²) · ∂²B/∂t²</div>
       </div>
     </div>
     <div class="fgroup">
-      <div class="fname">Vector de Poynting (densidad de potencia)</div>
-      <div class="fblock">
-        <div class="fm">S = E × H  [W/m²]</div>
-        <div class="fa">|S| = E · H = E² / η = H² · η</div>
-        <div class="fa">η₀ = √(μ₀/ε₀) ≈ 377 Ω  (impedancia del vacío)</div>
-      </div>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Efecto pelicular (skin depth)</div>
-      <div class="fblock">
-        <div class="fm">δ = √(2 / (ω·μ·σ)) = √(ρ / (π·f·μ))</div>
-      </div>
+      <div class="fname">Longitud de onda</div>
+      <div class="fblock"><div class="fm">λ = c / f</div></div>
       <ul class="vars">
-        <li><code>δ</code> — Profundidad de penetración [m]</li>
-        <li><code>σ</code> — Conductividad eléctrica [S/m]</li>
-        <li><code>ρ</code> — Resistividad [Ω·m]</li>
-        <li>Cu a 1 MHz: δ ≈ 66 μm · Cu a 100 MHz: δ ≈ 6.6 μm</li>
-      </ul>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Efecto Doppler</div>
-      <div class="fblock">
-        <div class="fm">f_obs = f_emit · (c ± v_obs) / (c ∓ v_fuente)</div>
-      </div>
-      <div class="note">+ cuando se acercan, − cuando se alejan. Para radar: Δf = 2·v·f/c (velocidad radial v).</div>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Espectro electromagnético</div>
-      <div class="fblock">
-        <div class="fa">Radio: λ &gt; 1 mm  (f &lt; 300 GHz)</div>
-        <div class="fa">Microondas: 1 mm – 1 m  (300 MHz – 300 GHz)</div>
-        <div class="fa">Infrarrojo: 700 nm – 1 mm</div>
-        <div class="fa">Visible: 380 – 700 nm</div>
-        <div class="fa">UV: 10 – 380 nm · X: 0.01 – 10 nm · γ: &lt; 0.01 nm</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="campo-e">
-    <div class="section-title">Campo Eléctrico — Geometrías</div>
-    <div class="fgroup">
-      <div class="fname">Carga puntual</div>
-      <div class="fblock">
-        <div class="fm">E = k·Q / r²  =  Q / (4πε₀·r²)</div>
-        <div class="fa">V = k·Q / r</div>
-      </div>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Esfera conductora cargada</div>
-      <div class="fblock">
-        <div class="fl">Fuera (r &gt; R)</div>
-        <div class="fm">E = Q / (4πε₀·r²)</div>
-        <div class="fl" style="margin-top:10px;">Dentro (r &lt; R)</div>
-        <div class="fm">E = 0</div>
-      </div>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Plano infinito cargado</div>
-      <div class="fblock">
-        <div class="fm">E = σ / (2ε₀)  [V/m]</div>
-        <div class="fa">σ — densidad superficial de carga [C/m²]</div>
-      </div>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Cilindro conductor</div>
-      <div class="fblock">
-        <div class="fm">E = λ / (2πε₀·r)  [V/m]</div>
-        <div class="fa">λ — densidad lineal de carga [C/m]</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="campo-b">
-    <div class="section-title">Campo Magnético — Geometrías</div>
-    <div class="fgroup">
-      <div class="fname">Conductor recto infinito</div>
-      <div class="fblock">
-        <div class="fm">B = μ₀·I / (2π·r)  [T]</div>
-      </div>
-      <ul class="vars">
-        <li><code>r</code> — distancia perpendicular al conductor [m]</li>
-        <li><code>I</code> — corriente [A]</li>
-      </ul>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Solenoide</div>
-      <div class="fblock">
-        <div class="fm">B = μ₀·μᵣ·N·I / l  =  μ₀·μᵣ·n·I</div>
-        <div class="fa">n = N/l  (espiras por metro)</div>
-      </div>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Toroide</div>
-      <div class="fblock">
-        <div class="fm">B = μ₀·μᵣ·N·I / (2π·R)</div>
-        <div class="fa">R — radio medio del toroide [m]</div>
-      </div>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Fuerza entre conductores paralelos</div>
-      <div class="fblock">
-        <div class="fm">F/L = μ₀·I₁·I₂ / (2π·d)  [N/m]</div>
-        <div class="fa">Corrientes iguales → atracción · opuestas → repulsión</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="energia-em">
-    <div class="section-title">Energía Electromagnética</div>
-    <div class="fgroup">
-      <div class="fname">Energía almacenada en campos</div>
-      <div class="fblock">
-        <div class="fl">En campo eléctrico</div>
-        <div class="fm">u_E = ½·ε₀·E²  [J/m³]</div>
-      </div>
-      <div class="fblock">
-        <div class="fl">En campo magnético</div>
-        <div class="fm">u_B = B² / (2μ₀)  [J/m³]</div>
-      </div>
-      <div class="fblock">
-        <div class="fl">En un inductor</div>
-        <div class="fm">W_L = ½·L·I²  [J]</div>
-      </div>
-      <div class="fblock">
-        <div class="fl">En un condensador</div>
-        <div class="fm">W_C = ½·C·V²  =  Q²/(2C)  [J]</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="antenas">
-    <div class="section-title">Antenas y Líneas de Transmisión</div>
-    <div class="fgroup">
-      <div class="fname">Longitud de antena dipolo</div>
-      <div class="fblock">
-        <div class="fl">Dipolo de media onda (λ/2)</div>
-        <div class="fm">L = λ/2 = c / (2·f)</div>
-        <div class="fl" style="margin-top:10px;">Monopulo de cuarto de onda (λ/4)</div>
-        <div class="fm">L = λ/4 = c / (4·f)</div>
-      </div>
-      <div class="note">Factor de velocidad del cable coaxial típico: 0.66–0.85 → longitud eléctrica real = L / V_f.</div>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Ecuación de Friis (enlace de radio)</div>
-      <div class="fblock">
-        <div class="fm">P_r = P_t · G_t · G_r · (λ/4πd)²</div>
-        <div class="fa">P_r/P_t [dB] = G_t + G_r − 20·log(4πd/λ)</div>
-      </div>
-      <ul class="vars">
-        <li><code>P_t, P_r</code> — Potencia transmitida/recibida [W]</li>
-        <li><code>G_t, G_r</code> — Ganancia antenas TX/RX (lineal)</li>
-        <li><code>d</code> — Distancia [m]</li>
         <li><code>λ</code> — Longitud de onda [m]</li>
+        <li><code>f</code> — Frecuencia [Hz]</li>
       </ul>
-    </div>
-    <div class="fgroup">
-      <div class="fname">ROE / VSWR (líneas de transmisión)</div>
-      <div class="fblock">
-        <div class="fm">Γ = (Z_carga − Z₀) / (Z_carga + Z₀)</div>
-        <div class="fa">VSWR = (1 + |Γ|) / (1 − |Γ|)</div>
-        <div class="fa">P_reflejada = |Γ|² · P_incidente</div>
-        <div class="fa">RL = −20·log|Γ|  [dB]  (pérdida de retorno)</div>
-      </div>
-      <ul class="vars">
-        <li><code>Z₀</code> — Impedancia característica de la línea (típico 50 Ω)</li>
-        <li><code>Γ</code> — Coeficiente de reflexión (0 = sin reflexión)</li>
-        <li>VSWR = 1 → adaptación perfecta · VSWR &lt; 2 aceptable</li>
-      </ul>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Impedancia característica de línea coaxial</div>
-      <div class="fblock">
-        <div class="fm">Z₀ = (138 / √εᵣ) · log₁₀(D/d)  [Ω]</div>
-        <div class="fa">D — diámetro interior del escudo · d — diámetro del conductor</div>
-      </div>
     </div>
   </section>
+
+  <section class="section" id="energia">
+    <div class="section-title">Energía en Campos E y M</div>
+    <div class="fgroup">
+      <div class="fname">Densidad de energía campo eléctrico</div>
+      <div class="fblock"><div class="fm">u_E = ε₀ · E² / 2</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Densidad de energía campo magnético</div>
+      <div class="fblock"><div class="fm">u_B = B² / (2·μ₀)</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Capacitancia de condensador plano</div>
+      <div class="fblock"><div class="fm">C = ε₀ · A / d</div></div>
+      <ul class="vars">
+        <li><code>A</code> — Área de las placas [m²]</li>
+        <li><code>d</code> — Distancia entre placas [m]</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="polarizacion">
+    <div class="section-title">Polarización Eléctrica</div>
+    <div class="fgroup">
+      <div class="fname">Polarización (P)</div>
+      <div class="fdesc">La polarización es la separación de cargas en un dieléctrico cuando se aplica un campo eléctrico externo.</div>
+      <div class="fblock"><div class="fm">P = ε₀ · χ_e · E</div></div>
+      <ul class="vars">
+        <li><code>P</code> — Polarización [C/m²]</li>
+        <li><code>χ_e</code> — Susceptibilidad eléctrica</li>
+        <li><code>E</code> — Campo eléctrico aplicado [V/m]</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="imanacion">
+    <div class="section-title">Imanación (Magnetización)</div>
+    <div class="fgroup">
+      <div class="fname">Campo B en material magnético</div>
+      <div class="fblock"><div class="fm">B = μ₀ · (H + M)</div></div>
+      <ul class="vars">
+        <li><code>H</code> — Intensidad de campo magnético [A/m]</li>
+        <li><code>M</code> — Magnetización [A/m]</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Permeabilidad magnética</div>
+      <div class="fblock"><div class="fm">μ = μ₀ · (1 + χ_m)</div></div>
+      <ul class="vars">
+        <li><code>μ</code> — Permeabilidad magnética [H/m]</li>
+        <li><code>χ_m</code> — Susceptibilidad magnética</li>
+      </ul>
+    </div>
+  </section>
+
 </main>
+
 <aside class="right-toc">
   <div class="toc-title">En esta página</div>
-  <a href="#maxwell">Ecuaciones de Maxwell</a>
-  <a href="#ondas">Ondas EM</a>
   <a href="#campo-e">Campo Eléctrico</a>
+  <a href="#coulomb">Ley de Coulomb</a>
+  <a href="#potencial">Potencial Eléctrico</a>
+  <a href="#gauss">Ley de Gauss</a>
+  <a href="#ampere-faraday">Ley de Ampère y Faraday</a>
+  <a href="#induccion">Inducción electromagnética</a>
   <a href="#campo-b">Campo Magnético</a>
-  <a href="#energia-em">Energía EM</a>
-  <a href="#antenas">Antenas y Líneas TX</a>
+  <a href="#fuerzas">Fuerzas</a>
+  <a href="#maxwell">Ecuaciones de Maxwell</a>
+  <a href="#ondas">Ondas Electromagnéticas</a>
+  <a href="#energia">Energía en campos E y M</a>
+  <a href="#polarizacion">Polarización Eléctrica</a>
+  <a href="#imanacion">Imanación (Magnetización)</a>
 </aside>
+
 </div>
-<script>function buscar(q){q=q.toLowerCase().trim();document.querySelectorAll('.section').forEach(s=>{s.style.display=!q||(s.textContent.toLowerCase().includes(q))?'':'none';});}</script>
+<script>
+function renderMath(){document.querySelectorAll('.fm,.fa').forEach(el=>{let h=el.innerHTML;h=h.replace(/_([A-Za-záéíóúüñÁÉÍÓÚ][A-Za-z0-9áéíóúüñÁÉÍÓÚ]*)/g,'<sub>$1</sub>');h=h.replace(/\^([0-9n]+)/g,'<sup>$1</sup>');el.innerHTML=h;});}
+document.addEventListener('DOMContentLoaded',renderMath);
+function buscar(q){
+  q=q.toLowerCase().trim();
+  document.querySelectorAll('.section').forEach(s=>{
+    s.style.display=!q||(s.textContent.toLowerCase().includes(q))?'':'none';
+  });
+}
+</script>
 </body>
 </html>
-

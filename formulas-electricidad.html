@@ -35,12 +35,14 @@ a{text-decoration:none;}
 .fgroup{margin-bottom:30px;}
 .fname{font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:10px;}
 .fblock{background:#0c1422;border:1px solid var(--border);border-radius:10px;padding:20px 28px;margin:8px 0;text-align:center;}
-.fl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#1e3a50;margin-bottom:8px;text-align:left;}
-.fm{font-size:22px;font-family:'Courier New',monospace;color:#f1f5f9;font-weight:700;line-height:1.5;}
-.fa{font-size:15px;font-family:'Courier New',monospace;color:#94a3b8;margin-top:7px;line-height:1.6;}
+.fl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);opacity:.7;margin-bottom:8px;text-align:left;}
+.fm{font-size:24px;font-family:Georgia,'Times New Roman',serif;font-style:italic;color:#f1f5f9;font-weight:400;line-height:1.9;}
+.fa{font-size:15px;font-family:Georgia,'Times New Roman',serif;font-style:italic;color:#94a3b8;margin-top:7px;line-height:1.7;}
+.fm sub,.fm sup,.fa sub,.fa sup{font-size:68%;font-style:normal;position:relative;}
+.fm sup,.fa sup{top:-.45em;}.fm sub,.fa sub{bottom:-.2em;}
 .vars{list-style:none;margin-top:12px;}
 .vars li{font-size:14px;color:#94a3b8;padding:2px 0;display:flex;gap:8px;align-items:baseline;line-height:1.6;}
-.vars li::before{content:'▸';color:#1e3a50;flex-shrink:0;font-size:11px;}
+.vars li::before{content:'▸';color:var(--accent);flex-shrink:0;font-size:11px;opacity:.7;}
 .vars li code{color:#7dd3fc;font-family:'Courier New',monospace;font-size:13px;background:#0f172a;padding:1px 6px;border-radius:3px;flex-shrink:0;}
 .note{font-size:15px;color:#94a3b8;background:#0c1422;border-left:3px solid var(--border);padding:10px 14px;border-radius:0 8px 8px 0;margin-top:12px;line-height:1.7;}
 /* RIGHT TOC */
@@ -49,6 +51,9 @@ a{text-decoration:none;}
 .toc-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#475569;margin-bottom:10px;}
 .right-toc a{display:block;font-size:12px;color:#64748b;padding:4px 0 4px 10px;border-left:1px solid #1e293b;margin-bottom:2px;line-height:1.4;transition:color .15s,border-color .15s;}
 .right-toc a:hover{color:#e2e8f0;border-color:var(--accent);}
+.fsub{font-size:13px;font-weight:700;color:#7dd3fc;margin:18px 0 8px;}
+.fdesc{font-size:14px;color:#94a3b8;margin:6px 0 10px;line-height:1.7;}
+.tip{font-size:14px;color:#94a3b8;background:#0c1422;border-left:3px solid #22c55e;padding:10px 14px;border-radius:0 8px 8px 0;margin-top:10px;line-height:1.7;}
 </style>
 </head>
 <body>
@@ -84,17 +89,132 @@ a{text-decoration:none;}
 <!-- ── MAIN ── -->
 <main class="content">
   <h1 class="page-title">⚡ Electricidad</h1>
-  <p class="page-sub">Ley de Ohm · Kirchhoff · Circuitos · Corriente alterna · Magnetismo</p>
+  <p class="page-sub">Conceptos · Kirchhoff · Componentes · CC · CA monofásica · CA trifásica</p>
 
   <!-- 1 -->
-  <section class="section" id="ohm">
-    <div class="section-title">Ley de Ohm y Potencia</div>
+  <section class="section" id="conceptos">
+    <div class="section-title">Conceptos Fundamentales</div>
+    <div class="fgroup">
+      <div class="fname">Tensión (V)</div>
+      <div class="fdesc">Diferencia de potencial eléctrico entre dos puntos. Se mide en voltios (V).</div>
+      <div class="fblock"><div class="fm">1 V = 1 J/C</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Carga (Q)</div>
+      <div class="fdesc">Cantidad de electricidad que pasa a través de un punto en un tiempo determinado. Se mide en coulombs (C).</div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Corriente (I)</div>
+      <div class="fdesc">Movimiento de cargas eléctricas. Se mide en amperios (A).</div>
+      <div class="fblock"><div class="fm">1 A = 1 C/s</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Resistencia (R)</div>
+      <div class="fdesc">Oposición que presenta un cuerpo al paso de la corriente eléctrica. Se mide en ohmios (Ω).</div>
+      <div class="fblock"><div class="fm">1 Ω = 1 V/A</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Potencia (P)</div>
+      <div class="fdesc">Tasa de transferencia de energía en un circuito eléctrico. Se mide en vatios (W).</div>
+      <div class="fblock"><div class="fm">1 W = 1 J/s</div></div>
+    </div>
+  </section>
 
+  <!-- 2 -->
+  <section class="section" id="generales">
+    <div class="section-title">Fórmulas Generales</div>
     <div class="fgroup">
       <div class="fname">Ley de Ohm</div>
+      <div class="fdesc">La corriente que pasa a través de un conductor entre dos puntos es proporcional a la tensión e inversamente proporcional a la resistencia.</div>
+      <div class="fblock"><div class="fm">V = I · R</div></div>
+      <ul class="vars">
+        <li><code>V</code> — Tensión [V]</li>
+        <li><code>I</code> — Corriente [A]</li>
+        <li><code>R</code> — Resistencia [Ω]</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Ley de Kirchhoff</div>
+      <div class="fdesc">Las leyes de Kirchhoff son herramientas para el análisis de circuitos eléctricos. Son consecuencia de la conservación de la energía.</div>
+      <div class="fsub">Primera ley — Ley de corrientes</div>
+      <div class="fdesc">La suma algebraica de las corrientes en un nodo es igual a cero.</div>
+      <div class="fblock"><div class="fm">Σ I_entrante = Σ I_saliente</div></div>
+      <div class="fsub">Segunda ley — Ley de tensiones</div>
+      <div class="fdesc">La suma algebraica de las tensiones en un circuito cerrado es igual a cero.</div>
+      <div class="fblock"><div class="fm">Σ V_fuentes = Σ V_caídas</div></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="section" id="componentes">
+    <div class="section-title">Componentes Eléctricos</div>
+
+    <div class="fsub">Resistencias (R)</div>
+    <div class="fgroup">
+      <div class="fname">Relación entre Corriente y Tensión</div>
+      <div class="fdesc">Es la ley de Ohm.</div>
+      <div class="fblock"><div class="fm">V = I · R</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Resistencias en Serie</div>
+      <div class="fblock"><div class="fm">R_total = R₁ + R₂ + R₃ + ...</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Resistencias en Paralelo</div>
+      <div class="fblock"><div class="fm">1/R_total = 1/R₁ + 1/R₂ + 1/R₃ + ...</div></div>
+    </div>
+
+    <div class="fsub">Condensadores (C)</div>
+    <div class="fgroup">
+      <div class="fname">Relación entre Corriente y Tensión</div>
+      <div class="fdesc">Capacitancia: se mide en faradios (F).</div>
+      <div class="fblock"><div class="fm">I = C · dV/dt</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Condensadores en Serie</div>
+      <div class="fblock"><div class="fm">1/C_total = 1/C₁ + 1/C₂ + ...</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Condensadores en Paralelo</div>
+      <div class="fblock"><div class="fm">C_total = C₁ + C₂ + ...</div></div>
+    </div>
+
+    <div class="fsub">Inductores (L)</div>
+    <div class="fgroup">
+      <div class="fname">Relación entre Tensión y Corriente</div>
+      <div class="fdesc">Inductancia: se mide en henrios (H).</div>
+      <div class="fblock"><div class="fm">V = L · dI/dt</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Inductores en Serie</div>
+      <div class="fblock"><div class="fm">L_total = L₁ + L₂ + ...</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Inductores en Paralelo</div>
+      <div class="fblock"><div class="fm">1/L_total = 1/L₁ + 1/L₂ + ...</div></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section class="section" id="cc">
+    <div class="section-title">Electricidad en Corriente Continua (CC)</div>
+
+    <div class="fgroup">
+      <div class="fname">División de tensión</div>
+      <div class="fblock"><div class="fm">Vₖ = (Rₖ / R_total) · V_total</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">División de corriente</div>
+      <div class="fblock"><div class="fm">Iₖ = (R_total / Rₖ) · I_total</div></div>
+    </div>
+
+    <div class="fsub">Potencia en circuitos de corriente continua</div>
+    <div class="fgroup">
+      <div class="fname">Potencia eléctrica</div>
+      <div class="fdesc">La potencia es la tasa de transferencia de energía en un circuito eléctrico. Se mide en vatios (W).</div>
       <div class="fblock">
-        <div class="fm">V = I · R</div>
-        <div class="fa">I = V / R &nbsp;·&nbsp; R = V / I</div>
+        <div class="fm">P = V · I</div>
+        <div class="fa">Usando la ley de Ohm: P = I² · R = V² / R</div>
       </div>
       <ul class="vars">
         <li><code>V</code> — Tensión [V]</li>
@@ -102,306 +222,228 @@ a{text-decoration:none;}
         <li><code>R</code> — Resistencia [Ω]</li>
       </ul>
     </div>
-
     <div class="fgroup">
-      <div class="fname">Potencia eléctrica</div>
-      <div class="fblock">
-        <div class="fm">P = V · I = I² · R = V² / R</div>
-      </div>
+      <div class="fname">Calor generado por corriente (Efecto Joule)</div>
+      <div class="fblock"><div class="fm">Q = I² · R · t</div></div>
       <ul class="vars">
-        <li><code>P</code> — Potencia [W]</li>
+        <li><code>Q</code> — Calor [J]</li>
+        <li><code>I</code> — Corriente [A]</li>
+        <li><code>R</code> — Resistencia [Ω]</li>
+        <li><code>t</code> — Tiempo [s]</li>
       </ul>
-    </div>
-
-    <div class="fgroup">
-      <div class="fname">Energía eléctrica</div>
-      <div class="fblock">
-        <div class="fm">E = P · t = V · I · t</div>
-        <div class="fa">E [kWh] = P [kW] × t [h]</div>
-      </div>
-      <ul class="vars">
-        <li><code>E</code> — Energía [J] o [kWh]</li>
-        <li><code>t</code> — Tiempo [s] o [h]</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- 2 -->
-  <section class="section" id="resistencias">
-    <div class="section-title">Resistencias y Condensadores</div>
-
-    <div class="fgroup">
-      <div class="fname">Resistencias en serie</div>
-      <div class="fblock">
-        <div class="fm">R_eq = R₁ + R₂ + ... + Rₙ</div>
-      </div>
-      <div class="note">En serie la corriente es igual en todos. La tensión se reparte.</div>
-    </div>
-
-    <div class="fgroup">
-      <div class="fname">Resistencias en paralelo</div>
-      <div class="fblock">
-        <div class="fm">1/R_eq = 1/R₁ + 1/R₂ + ... + 1/Rₙ</div>
-        <div class="fa">R_eq = (R₁ · R₂) / (R₁ + R₂)  [para 2 resistencias]</div>
-      </div>
-      <div class="note">En paralelo la tensión es igual en todos. La corriente se reparte.</div>
-    </div>
-
-    <div class="fgroup">
-      <div class="fname">Condensadores en serie / paralelo</div>
-      <div class="fblock">
-        <div class="fl">Serie</div>
-        <div class="fm">1/C_eq = 1/C₁ + 1/C₂ + ... + 1/Cₙ</div>
-      </div>
-      <div class="fblock">
-        <div class="fl">Paralelo</div>
-        <div class="fm">C_eq = C₁ + C₂ + ... + Cₙ</div>
-      </div>
-      <ul class="vars">
-        <li><code>C</code> — Capacidad [F]</li>
-      </ul>
-    </div>
-
-    <div class="fgroup">
-      <div class="fname">Inductores en serie / paralelo</div>
-      <div class="fblock">
-        <div class="fl">Serie (sin acoplamiento mutuo)</div>
-        <div class="fm">L_eq = L₁ + L₂ + ... + Lₙ</div>
-      </div>
-      <div class="fblock">
-        <div class="fl">Paralelo</div>
-        <div class="fm">1/L_eq = 1/L₁ + 1/L₂ + ... + 1/Lₙ</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 3 -->
-  <section class="section" id="kirchhoff">
-    <div class="section-title">Leyes de Kirchhoff</div>
-
-    <div class="fgroup">
-      <div class="fname">Ley de Corrientes (LCK) — 1ª ley</div>
-      <div class="fblock">
-        <div class="fm">Σ Iₑₙₜᵣₐₙ = Σ Iₛₐₗₑₙ</div>
-        <div class="fa">Σ I = 0 (en un nodo)</div>
-      </div>
-      <div class="note">La suma algebraica de corrientes en un nodo es cero. Corriente que entra = corriente que sale.</div>
-    </div>
-
-    <div class="fgroup">
-      <div class="fname">Ley de Tensiones (LTK) — 2ª ley</div>
-      <div class="fblock">
-        <div class="fm">Σ V = 0 (en una malla cerrada)</div>
-        <div class="fa">Σ V_fuentes = Σ V_caídas</div>
-      </div>
-      <div class="note">La suma algebraica de tensiones en cualquier malla cerrada es cero.</div>
-    </div>
-
-    <div class="fgroup">
-      <div class="fname">Teorema de Thévenin</div>
-      <div class="fblock">
-        <div class="fm">V_th = V_circuito_abierto</div>
-        <div class="fa">R_th = R_equivalente (fuentes apagadas)</div>
-        <div class="fa">I_carga = V_th / (R_th + R_carga)</div>
-      </div>
-    </div>
-
-    <div class="fgroup">
-      <div class="fname">Teorema de Norton</div>
-      <div class="fblock">
-        <div class="fm">I_N = I_cortocircuito</div>
-        <div class="fa">R_N = R_th (igual que Thévenin)</div>
-        <div class="fa">V_th = I_N · R_N</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 4 -->
-  <section class="section" id="divisores">
-    <div class="section-title">Divisores de Tensión y Corriente</div>
-
-    <div class="fgroup">
-      <div class="fname">Divisor de tensión</div>
-      <div class="fblock">
-        <div class="fm">Vₓ = V_total · Rₓ / (R₁ + R₂ + ...)</div>
-      </div>
-      <div class="note">Aplicación: tensiones de referencia, polarización de transistores, potenciómetros.</div>
-    </div>
-
-    <div class="fgroup">
-      <div class="fname">Divisor de corriente</div>
-      <div class="fblock">
-        <div class="fm">Iₓ = I_total · R_eq / Rₓ</div>
-        <div class="fa">I₁ = I_total · R₂ / (R₁ + R₂)  [para 2 ramas]</div>
-      </div>
     </div>
   </section>
 
   <!-- 5 -->
-  <section class="section" id="ac">
-    <div class="section-title">Corriente Alterna (CA)</div>
+  <section class="section" id="monofasico">
+    <div class="section-title">Circuitos Monofásicos de Corriente Alterna (CA)</div>
+    <div class="fdesc">Estos valores eficaces son útiles para medir el comportamiento de las señales de CA en términos de su capacidad de generar calor (potencia).</div>
 
     <div class="fgroup">
-      <div class="fname">Valores eficaces y pico</div>
-      <div class="fblock">
-        <div class="fm">V_rms = V_pico / √2 = 0.707 · V_pico</div>
-        <div class="fa">I_rms = I_pico / √2</div>
-        <div class="fa">V_pico = V_rms · √2 ≈ 311 V  (para 220 V_rms)</div>
-      </div>
+      <div class="fname">Phi — Ángulo de fase (φ)</div>
+      <div class="fdesc">El ángulo de fase representa el desfase temporal entre la corriente y la tensión, originado por las cargas reactivas (capacitivas e inductivas).</div>
     </div>
 
     <div class="fgroup">
-      <div class="fname">Reactancias</div>
+      <div class="fname">Valores eficaces (RMS)</div>
       <div class="fblock">
-        <div class="fl">Reactancia inductiva</div>
-        <div class="fm">X_L = 2π · f · L  [Ω]</div>
+        <div class="fl">Voltaje eficaz</div>
+        <div class="fm">V_rms = V_máx / √2</div>
       </div>
       <div class="fblock">
-        <div class="fl">Reactancia capacitiva</div>
-        <div class="fm">X_C = 1 / (2π · f · C)  [Ω]</div>
+        <div class="fl">Corriente eficaz</div>
+        <div class="fm">I_rms = I_máx / √2</div>
+      </div>
+    </div>
+
+    <div class="fsub">Análisis de Frecuencia y Angular</div>
+    <div class="fgroup">
+      <div class="fname">Frecuencia (f)</div>
+      <div class="fdesc">Número de ciclos por segundo, medida en hertz (Hz).</div>
+      <div class="fblock"><div class="fm">f = 1 / T</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Frecuencia Angular</div>
+      <div class="fblock"><div class="fm">ω = 2π · f</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Periodo (T)</div>
+      <div class="fdesc">Tiempo que tarda en completarse un ciclo.</div>
+      <div class="fblock"><div class="fm">T = 1 / f</div></div>
+    </div>
+
+    <div class="fsub">Impedancias</div>
+    <div class="fgroup">
+      <div class="fname">Relación entre Impedancia, Resistencia y Reactancia</div>
+      <div class="fdesc">La impedancia Z es la medida de la oposición total que presenta un circuito al flujo de corriente alterna. Se compone de resistencia R y reactancia X.</div>
+      <div class="fblock">
+        <div class="fm">Z = √(R² + X²)</div>
       </div>
       <ul class="vars">
-        <li><code>f</code> — Frecuencia [Hz]</li>
-        <li><code>L</code> — Inductancia [H]</li>
-        <li><code>C</code> — Capacidad [F]</li>
+        <li><code>Z</code> — Impedancia [Ω]</li>
+        <li><code>R</code> — Resistencia [Ω]</li>
+        <li><code>X</code> — Reactancia total (X_L o X_C) [Ω]</li>
       </ul>
     </div>
-
     <div class="fgroup">
-      <div class="fname">Impedancia</div>
+      <div class="fname">Reactancia</div>
       <div class="fblock">
-        <div class="fm">Z = √(R² + (X_L − X_C)²)  [Ω]</div>
-        <div class="fa">φ = arctan((X_L − X_C) / R)</div>
+        <div class="fl">Reactancia Inductiva X_L</div>
+        <div class="fm">X_L = ω · L = 2π · f · L</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Reactancia Capacitiva X_C</div>
+        <div class="fm">X_C = 1 / (ω · C) = 1 / (2π · f · C)</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Composición de la Reactancia</div>
+        <div class="fm">X = X_L − X_C</div>
       </div>
     </div>
 
+    <div class="fsub">Impedancias de circuitos</div>
     <div class="fgroup">
-      <div class="fname">Potencias en CA</div>
+      <div class="fname">Circuito RL (Resistencia + Bobina)</div>
+      <div class="fblock"><div class="fm">Z = √(R² + X_L²)</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Circuito RC (Resistencia + Condensador)</div>
+      <div class="fblock"><div class="fm">Z = √(R² + X_C²)</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Circuito RLC</div>
+      <div class="fblock"><div class="fm">Z = √(R² + (X_L − X_C)²)</div></div>
+    </div>
+
+    <div class="fsub">Efecto de la Carga en Circuitos</div>
+    <div class="fgroup">
+      <div class="fname">Tipos de carga</div>
       <div class="fblock">
-        <div class="fl">Potencia activa</div>
-        <div class="fm">P = V · I · cos(φ)  [W]</div>
+        <div class="fl">Carga Resistiva</div>
+        <div class="fm">φ = 0  (factor de potencia = 1)</div>
       </div>
       <div class="fblock">
-        <div class="fl">Potencia aparente</div>
-        <div class="fm">S = V · I  [VA]</div>
+        <div class="fl">Carga Inductiva</div>
+        <div class="fm">φ &gt; 0  (desfase positivo)</div>
       </div>
       <div class="fblock">
-        <div class="fl">Potencia reactiva</div>
-        <div class="fm">Q = V · I · sin(φ)  [VAR]</div>
-      </div>
-      <div class="fblock">
-        <div class="fl">Factor de potencia</div>
-        <div class="fm">FP = cos(φ) = P / S</div>
+        <div class="fl">Carga Capacitiva</div>
+        <div class="fm">φ &lt; 0  (desfase negativo)</div>
       </div>
     </div>
 
+    <div class="fsub">Potencia en circuitos monofásicos</div>
     <div class="fgroup">
-      <div class="fname">Resonancia en serie (circuito RLC)</div>
-      <div class="fblock">
-        <div class="fm">f₀ = 1 / (2π · √(L · C))</div>
-        <div class="fa">X_L = X_C  →  Z = R (mínimo, solo resistivo)</div>
-        <div class="fa">Q = (1/R) · √(L/C)  (factor de calidad)</div>
-      </div>
+      <div class="fname">Potencia activa (real)</div>
+      <div class="fdesc">La potencia que realiza trabajo útil. Se mide en watts (W).</div>
+      <div class="fblock"><div class="fm">P = V_rms · I_rms · cos(φ)</div></div>
     </div>
-
     <div class="fgroup">
-      <div class="fname">Sistema trifásico</div>
-      <div class="fblock">
-        <div class="fl">Tensión de línea vs. fase (conexión Y)</div>
-        <div class="fm">V_línea = √3 · V_fase ≈ 1.732 · V_fase</div>
-      </div>
-      <div class="fblock">
-        <div class="fl">Potencia trifásica</div>
-        <div class="fm">P = √3 · V_L · I_L · cos(φ)</div>
-        <div class="fa">P = 3 · V_fase · I_fase · cos(φ)</div>
-      </div>
+      <div class="fname">Potencia reactiva</div>
+      <div class="fdesc">Asociada a los componentes inductivos y capacitivos. Se mide en volt-amperios reactivos (VAR).</div>
+      <div class="fblock"><div class="fm">Q = V_rms · I_rms · sin(φ)</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Potencia aparente</div>
+      <div class="fdesc">Combinación de potencia activa y reactiva. Se mide en volt-amperios (VA).</div>
+      <div class="fblock"><div class="fm">S = V_rms · I_rms = √(P² + Q²)</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Relación entre potencias</div>
+      <div class="fblock"><div class="fm">P² + Q² = S²</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Factor de potencia (Coseno de Phi)</div>
+      <div class="fdesc">Indica la eficiencia en el uso de la potencia activa. Un valor cercano a 1 indica uso eficiente.</div>
+      <div class="fblock"><div class="fm">FP = P / S = cos(φ)</div></div>
+      <div class="tip">Un coseno de phi cercano a 1 indica uso eficiente de la energía. Valores bajos sugieren pérdidas por componentes reactivos.</div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Corrección del factor de potencia</div>
+      <div class="fdesc">Para corregir el FP se agrega capacitancia al sistema. La capacitancia necesaria se calcula a partir de la potencia reactiva a corregir.</div>
+      <div class="fblock"><div class="fm">Q_c = Q_original − Q_nuevo</div></div>
+      <ul class="vars">
+        <li><code>Q_c</code> — Potencia reactiva a compensar [VAR]</li>
+      </ul>
     </div>
   </section>
 
   <!-- 6 -->
-  <section class="section" id="magnetismo">
-    <div class="section-title">Magnetismo y Electromagnetismo básico</div>
+  <section class="section" id="trifasico">
+    <div class="section-title">Circuitos Trifásicos de Corriente Alterna (CA)</div>
 
     <div class="fgroup">
-      <div class="fname">Fuerza sobre conductor (Ley de Lorentz)</div>
+      <div class="fname">Ángulo de desfasaje</div>
+      <div class="fdesc">En un sistema trifásico, las tensiones de línea están desfasadas 120° entre sí.</div>
       <div class="fblock">
-        <div class="fm">F = q · v · B · sin(θ)</div>
-        <div class="fa">F = I · L · B · sin(θ)  (conductor)</div>
+        <div class="fl">Tensión de fase B</div>
+        <div class="fm">V_B = V_A ∠ −120°</div>
       </div>
+      <div class="fblock">
+        <div class="fl">Tensión de fase C</div>
+        <div class="fm">V_C = V_A ∠ +120°</div>
+      </div>
+    </div>
+
+    <div class="fsub">Sistema Estrella (Y)</div>
+    <div class="fgroup">
+      <div class="fname">Tensión de línea y tensión de fase</div>
+      <div class="fblock"><div class="fm">V_L = √3 · V_F</div></div>
       <ul class="vars">
-        <li><code>q</code> — Carga [C]</li>
-        <li><code>v</code> — Velocidad [m/s]</li>
-        <li><code>B</code> — Densidad de flujo magnético [T]</li>
-        <li><code>L</code> — Longitud del conductor [m]</li>
+        <li><code>V_L</code> — Tensión de línea</li>
+        <li><code>V_F</code> — Tensión de fase</li>
       </ul>
     </div>
-
     <div class="fgroup">
-      <div class="fname">Ley de Faraday — FEM inducida</div>
-      <div class="fblock">
-        <div class="fm">e = −N · dΦ/dt</div>
-        <div class="fa">e = −N · (ΔΦ / Δt)  [aproximación]</div>
-      </div>
-      <ul class="vars">
-        <li><code>N</code> — Número de vueltas del bobinado</li>
-        <li><code>Φ</code> — Flujo magnético [Wb]</li>
-      </ul>
+      <div class="fname">Corriente de línea y corriente de fase</div>
+      <div class="fblock"><div class="fm">I_L = I_F</div></div>
     </div>
 
+    <div class="fsub">Sistema Delta (Δ)</div>
     <div class="fgroup">
-      <div class="fname">Campo magnético de un solenoide</div>
-      <div class="fblock">
-        <div class="fm">B = μ₀ · μᵣ · N/L · I</div>
-        <div class="fa">B = μ₀ · μᵣ · n · I  (n = N/L espiras/metro)</div>
-      </div>
-      <ul class="vars">
-        <li><code>μ₀</code> = 4π × 10⁻⁷ H/m (permeabilidad del vacío)</li>
-        <li><code>μᵣ</code> — permeabilidad relativa del núcleo</li>
-        <li><code>n</code> — espiras por metro [1/m]</li>
-      </ul>
+      <div class="fname">Tensión de línea y tensión de fase</div>
+      <div class="fblock"><div class="fm">V_L = V_F</div></div>
     </div>
-  </section>
-
-  <!-- 7 -->
-  <section class="section" id="campo">
-    <div class="section-title">Campo Eléctrico y Potencial</div>
-
     <div class="fgroup">
-      <div class="fname">Ley de Coulomb</div>
-      <div class="fblock">
-        <div class="fm">F = k · q₁ · q₂ / r²</div>
-        <div class="fa">k = 8.99 × 10⁹ N·m²/C²  = 1/(4πε₀)</div>
-      </div>
+      <div class="fname">Corriente de línea y corriente de fase</div>
+      <div class="fblock"><div class="fm">I_L = √3 · I_F</div></div>
     </div>
 
+    <div class="fsub">Potencia en circuitos trifásicos</div>
     <div class="fgroup">
-      <div class="fname">Campo eléctrico</div>
+      <div class="fname">Potencias trifásicas</div>
       <div class="fblock">
-        <div class="fm">E = F / q = k · Q / r²  [N/C = V/m]</div>
+        <div class="fl">Potencia activa (real)</div>
+        <div class="fm">P = √3 · V_L · I_L · cos(φ)</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Potencia reactiva</div>
+        <div class="fm">Q = √3 · V_L · I_L · sin(φ)</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Potencia aparente</div>
+        <div class="fm">S = √3 · V_L · I_L</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Relación entre potencias</div>
+        <div class="fm">P² + Q² = S²</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Circuito balanceado</div>
+        <div class="fm">P_total = 3 · P_fase</div>
       </div>
     </div>
 
+    <div class="fsub">Impedancias y cargas</div>
     <div class="fgroup">
-      <div class="fname">Potencial eléctrico</div>
-      <div class="fblock">
-        <div class="fm">V = k · Q / r  [V]</div>
-        <div class="fa">E = −dV/dr  (relación campo-potencial)</div>
-        <div class="fa">W = q · V  (trabajo para mover carga)</div>
-      </div>
+      <div class="fname">Impedancia de fase</div>
+      <div class="fdesc">Para una fase de un sistema trifásico, la impedancia Z se puede calcular como:</div>
+      <div class="fblock"><div class="fm">Z = V_F / I_F</div></div>
     </div>
-
     <div class="fgroup">
-      <div class="fname">Condensador plano</div>
-      <div class="fblock">
-        <div class="fm">C = ε₀ · εᵣ · A / d  [F]</div>
-        <div class="fa">Q = C · V  [C]</div>
-        <div class="fa">E_almacenada = ½ · C · V²  [J]</div>
-      </div>
-      <ul class="vars">
-        <li><code>ε₀</code> = 8.85 × 10⁻¹² F/m (permitividad del vacío)</li>
-        <li><code>A</code> — área de las placas [m²]</li>
-        <li><code>d</code> — separación entre placas [m]</li>
-      </ul>
+      <div class="fname">Carga balanceada</div>
+      <div class="fdesc">En un sistema trifásico balanceado, todas las impedancias de las fases son iguales.</div>
+      <div class="fblock"><div class="fm">Z_A = Z_B = Z_C</div></div>
     </div>
   </section>
 
@@ -410,17 +452,18 @@ a{text-decoration:none;}
 <!-- ── RIGHT TOC ── -->
 <aside class="right-toc">
   <div class="toc-title">En esta página</div>
-  <a href="#ohm">Ley de Ohm y Potencia</a>
-  <a href="#resistencias">Resistencias y Condensadores</a>
-  <a href="#kirchhoff">Leyes de Kirchhoff</a>
-  <a href="#divisores">Divisores</a>
-  <a href="#ac">Corriente Alterna</a>
-  <a href="#magnetismo">Magnetismo</a>
-  <a href="#campo">Campo Eléctrico</a>
+  <a href="#conceptos">Conceptos Fundamentales</a>
+  <a href="#generales">Fórmulas generales</a>
+  <a href="#componentes">Componentes Eléctricos</a>
+  <a href="#cc">Electricidad CC</a>
+  <a href="#monofasico">CA Monofásica</a>
+  <a href="#trifasico">CA Trifásica</a>
 </aside>
 
 </div><!-- layout -->
 <script>
+function renderMath(){document.querySelectorAll('.fm,.fa').forEach(el=>{let h=el.innerHTML;h=h.replace(/_([A-Za-záéíóúüñÁÉÍÓÚ][A-Za-z0-9áéíóúüñÁÉÍÓÚ]*)/g,'<sub>$1</sub>');h=h.replace(/\^([0-9n]+)/g,'<sup>$1</sup>');el.innerHTML=h;});}
+document.addEventListener('DOMContentLoaded',renderMath);
 function buscar(q){
   q=q.toLowerCase().trim();
   document.querySelectorAll('.section').forEach(s=>{

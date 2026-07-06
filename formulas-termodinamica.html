@@ -1,18 +1,20 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mr. Z — Fórmulas Termodinámica</title>
 <style>
-:root{--accent:#f87171;--accent-b:#1c0505;--border:#2a0808;}
+:root{--accent:#f87171;--accent-b:#1e0808;--border:#3a1010;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#070b14;color:#cbd5e1;font-family:system-ui,sans-serif;font-size:15px;line-height:1.7;}
 a{text-decoration:none;}
 .top-nav{position:fixed;top:0;left:0;right:0;height:52px;background:rgba(7,11,20,.97);backdrop-filter:blur(10px);border-bottom:1px solid #1e293b;z-index:50;display:flex;align-items:center;padding:0 20px;gap:12px;}
-.top-nav .brand{font-size:18px;font-weight:900;background:linear-gradient(90deg,#38bdf8,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.top-nav a{font-size:12px;color:#475569;}.top-nav a:hover{color:#e2e8f0;}
+.top-nav .brand{font-size:18px;font-weight:900;background:linear-gradient(90deg,#f87171,#fb923c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.top-nav a{font-size:12px;color:#475569;}
+.top-nav a:hover{color:#e2e8f0;}
 .search-box{margin-left:auto;background:#0f172a;border:1px solid #1e293b;color:#e2e8f0;border-radius:8px;padding:5px 12px;font-size:13px;outline:none;width:180px;}
+.search-box:focus{border-color:var(--accent);}
 .layout{display:grid;grid-template-columns:220px 1fr;padding-top:52px;min-height:100vh;}
 @media(min-width:1200px){.layout{grid-template-columns:220px 1fr 220px;}}
 .left-nav{position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;border-right:1px solid #1e293b;padding:16px 0 40px;}
@@ -20,7 +22,8 @@ a{text-decoration:none;}
 .left-nav a:hover{color:#e2e8f0;background:#0f172a;}
 .left-nav a.active{color:var(--accent);font-weight:700;background:var(--accent-b);border-left:2px solid var(--accent);padding-left:16px;}
 .nav-cat{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#475569;padding:14px 18px 4px;}
-.nav-back{font-size:12px;color:#334155;padding:6px 18px;display:block;}.nav-back:hover{color:#94a3b8!important;}
+.nav-back{font-size:12px;color:#334155;padding:6px 18px;display:block;}
+.nav-back:hover{color:#94a3b8!important;}
 .content{padding:40px 52px;max-width:860px;margin:0 auto;}
 @media(max-width:900px){.content{padding:24px 20px;}}
 .page-title{font-size:26px;font-weight:900;color:#e2e8f0;margin-bottom:4px;}
@@ -30,12 +33,14 @@ a{text-decoration:none;}
 .fgroup{margin-bottom:30px;}
 .fname{font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:10px;}
 .fblock{background:#0c1422;border:1px solid var(--border);border-radius:10px;padding:20px 28px;margin:8px 0;text-align:center;}
-.fl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#3a1010;margin-bottom:8px;text-align:left;}
-.fm{font-size:22px;font-family:'Courier New',monospace;color:#f1f5f9;font-weight:700;line-height:1.5;}
-.fa{font-size:15px;font-family:'Courier New',monospace;color:#94a3b8;margin-top:7px;line-height:1.6;}
+.fl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);opacity:.7;margin-bottom:8px;text-align:left;}
+.fm{font-size:24px;font-family:Georgia,'Times New Roman',serif;font-style:italic;color:#f1f5f9;font-weight:400;line-height:1.9;}
+.fa{font-size:15px;font-family:Georgia,'Times New Roman',serif;font-style:italic;color:#94a3b8;margin-top:7px;line-height:1.7;}
+.fm sub,.fm sup,.fa sub,.fa sup{font-size:68%;font-style:normal;position:relative;}
+.fm sup,.fa sup{top:-.45em;}.fm sub,.fa sub{bottom:-.2em;}
 .vars{list-style:none;margin-top:12px;}
 .vars li{font-size:14px;color:#94a3b8;padding:2px 0;display:flex;gap:8px;align-items:baseline;line-height:1.6;}
-.vars li::before{content:'▸';color:#3a1010;flex-shrink:0;font-size:11px;}
+.vars li::before{content:'▸';color:var(--accent);flex-shrink:0;font-size:11px;opacity:.7;}
 .vars li code{color:#fca5a5;font-family:'Courier New',monospace;font-size:13px;background:#0f172a;padding:1px 6px;border-radius:3px;flex-shrink:0;}
 .note{font-size:15px;color:#94a3b8;background:#0c1422;border-left:3px solid var(--border);padding:10px 14px;border-radius:0 8px 8px 0;margin-top:12px;line-height:1.7;}
 .right-toc{display:none;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;padding:20px 18px;border-left:1px solid #1e293b;}
@@ -43,16 +48,21 @@ a{text-decoration:none;}
 .toc-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#475569;margin-bottom:10px;}
 .right-toc a{display:block;font-size:12px;color:#64748b;padding:4px 0 4px 10px;border-left:1px solid #1e293b;margin-bottom:2px;line-height:1.4;transition:color .15s,border-color .15s;}
 .right-toc a:hover{color:#e2e8f0;border-color:var(--accent);}
+.fsub{font-size:13px;font-weight:700;color:#fca5a5;margin:18px 0 8px;}
+.fdesc{font-size:14px;color:#94a3b8;margin:6px 0 10px;line-height:1.7;}
+.tip{font-size:14px;color:#94a3b8;background:#0c1422;border-left:3px solid #f87171;padding:10px 14px;border-radius:0 8px 8px 0;margin-top:10px;line-height:1.7;}
 </style>
 </head>
 <body>
+
 <nav class="top-nav">
   <span class="brand">Mr.Z</span>
   <a href="index.html">Inicio</a>
   <a href="formulas-hub.html">Fórmulas</a>
   <a href="laboratorio.html">Laboratorio</a><a href="componentes.html">Componentes</a>
-  <input class="search-box" type="text" placeholder="Buscar..." oninput="buscar(this.value)">
+  <input class="search-box" type="text" placeholder="Buscar en la página..." oninput="buscar(this.value)">
 </nav>
+
 <div class="layout">
 <aside class="left-nav">
   <a class="nav-back" href="index.html">← Inicio</a>
@@ -70,109 +80,76 @@ a{text-decoration:none;}
   <div class="nav-cat">Energía</div>
   <a href="formulas-fotovoltaica.html">☀ Fotovoltaica</a>
 </aside>
+
 <main class="content">
   <h1 class="page-title">🌡 Termodinámica</h1>
-  <p class="page-sub">Temperatura · Leyes · Gases ideales · Procesos · Ciclos · Transferencia de calor</p>
-
-  <section class="section" id="temperatura">
-    <div class="section-title">Temperatura y Calor</div>
-    <div class="fgroup">
-      <div class="fname">Conversión de escalas</div>
-      <div class="fblock">
-        <div class="fm">K = °C + 273.15</div>
-        <div class="fa">°F = °C × 9/5 + 32</div>
-        <div class="fa">°C = (°F − 32) × 5/9</div>
-      </div>
-      <ul class="vars"><li>0 K = −273.15 °C (cero absoluto)</li><li>0 °C = 32 °F · 100 °C = 212 °F</li></ul>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Calor sensible</div>
-      <div class="fblock"><div class="fm">Q = m · c · ΔT</div></div>
-      <ul class="vars">
-        <li><code>m</code> — Masa [kg]</li>
-        <li><code>c</code> — Calor específico [J/kg·K]</li>
-        <li><code>ΔT</code> — Variación de temperatura [K]</li>
-      </ul>
-      <div class="note">c_agua = 4186 · c_Al = 900 · c_Cu = 385 · c_Fe = 450 · c_aire = 1005 [J/kg·K]</div>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Calor latente</div>
-      <div class="fblock"><div class="fm">Q = m · L</div></div>
-      <ul class="vars"><li><code>L</code> — Calor latente [J/kg]</li><li>L_fusión agua = 334 kJ/kg · L_vaporización agua = 2260 kJ/kg</li></ul>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Dilatación térmica</div>
-      <div class="fblock">
-        <div class="fl">Lineal</div>
-        <div class="fm">ΔL = α · L₀ · ΔT</div>
-        <div class="fl" style="margin-top:10px">Volumétrica</div>
-        <div class="fm">ΔV = β · V₀ · ΔT ≈ 3α · V₀ · ΔT</div>
-      </div>
-      <ul class="vars"><li>α_Al = 23×10⁻⁶ · α_Cu = 17×10⁻⁶ · α_Fe = 12×10⁻⁶ [1/K]</li></ul>
-    </div>
-  </section>
+  <p class="page-sub">Leyes · Propiedades del estado · Procesos · Equilibrio · Ecuaciones · Trabajo y Calor · Ciclos</p>
 
   <section class="section" id="leyes">
     <div class="section-title">Leyes de la Termodinámica</div>
     <div class="fgroup">
-      <div class="fname">1ª Ley — Conservación de energía</div>
-      <div class="fblock">
-        <div class="fm">ΔU = Q − W</div>
-        <div class="fa">Q = ΔU + W</div>
-        <div class="fa">W = P · ΔV  (presión constante)</div>
-      </div>
+      <div class="fname">Ley Cero</div>
+      <div class="fdesc">Si dos sistemas están en equilibrio térmico con un tercero, están en equilibrio entre sí.</div>
+      <div class="fblock"><div class="fm">T_A = T_B = T_C</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Primera Ley — Conservación de la energía</div>
+      <div class="fdesc">La energía interna de un sistema cambia según el calor absorbido menos el trabajo realizado.</div>
+      <div class="fblock"><div class="fm">ΔU = Q − W</div></div>
       <ul class="vars">
         <li><code>ΔU</code> — Variación de energía interna [J]</li>
-        <li><code>Q</code> — Calor absorbido [J] (+ entra al sistema)</li>
-        <li><code>W</code> — Trabajo realizado [J] (+ expande)</li>
+        <li><code>Q</code> — Calor absorbido por el sistema [J]</li>
+        <li><code>W</code> — Trabajo realizado por el sistema [J]</li>
       </ul>
     </div>
     <div class="fgroup">
-      <div class="fname">2ª Ley — Entropía</div>
-      <div class="fblock">
-        <div class="fm">ΔS ≥ Q / T</div>
-        <div class="fa">ΔS = Q_rev / T  (proceso reversible)</div>
-        <div class="fa">S = k_B · ln(W)  (Boltzmann)</div>
-      </div>
-      <ul class="vars">
-        <li><code>S</code> — Entropía [J/K]</li>
-        <li><code>k_B</code> = 1.38×10⁻²³ J/K</li>
-      </ul>
-      <div class="note">En un sistema aislado la entropía nunca decrece: ΔS_universo ≥ 0.</div>
+      <div class="fname">Segunda Ley — Entropía</div>
+      <div class="fdesc">En un proceso irreversible, la entropía total del universo siempre aumenta. El calor no fluye espontáneamente de un cuerpo frío a uno caliente.</div>
+      <div class="fblock"><div class="fm">ΔS_universo ≥ 0</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Tercera Ley</div>
+      <div class="fdesc">La entropía de un cristal perfecto a temperatura absoluta cero es cero.</div>
+      <div class="fblock"><div class="fm">S → 0  cuando  T → 0 K</div></div>
     </div>
   </section>
 
-  <section class="section" id="gases">
-    <div class="section-title">Gases Ideales</div>
+  <section class="section" id="propiedades">
+    <div class="section-title">Propiedades del Estado</div>
     <div class="fgroup">
-      <div class="fname">Ley del gas ideal</div>
-      <div class="fblock">
-        <div class="fm">P · V = n · R · T</div>
-        <div class="fa">P · V = N · k_B · T</div>
-      </div>
+      <div class="fname">Energía interna</div>
+      <div class="fblock"><div class="fm">U = U(T, V, n)</div></div>
       <ul class="vars">
-        <li><code>P</code> — Presión [Pa] · <code>V</code> — Volumen [m³]</li>
-        <li><code>n</code> — Moles [mol] · <code>R</code> = 8.314 J/mol·K</li>
-        <li><code>N</code> — Número de moléculas</li>
+        <li><code>T</code> — Temperatura [K]</li>
+        <li><code>V</code> — Volumen [m³]</li>
+        <li><code>n</code> — Número de moles [mol]</li>
       </ul>
     </div>
     <div class="fgroup">
-      <div class="fname">Leyes de gases</div>
-      <div class="fblock">
-        <div class="fl">Boyle (T = cte)</div><div class="fm">P₁V₁ = P₂V₂</div>
-        <div class="fl" style="margin-top:10px">Charles (P = cte)</div><div class="fm">V₁/T₁ = V₂/T₂</div>
-        <div class="fl" style="margin-top:10px">Gay-Lussac (V = cte)</div><div class="fm">P₁/T₁ = P₂/T₂</div>
-        <div class="fl" style="margin-top:10px">Combinada</div><div class="fm">P₁V₁/T₁ = P₂V₂/T₂</div>
-      </div>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Energía cinética y velocidad molecular</div>
-      <div class="fblock">
-        <div class="fm">E_k = (3/2) · n · R · T</div>
-        <div class="fa">v_rms = √(3RT/M) = √(3k_BT/m)</div>
-      </div>
+      <div class="fname">Entalpía</div>
+      <div class="fblock"><div class="fm">H = U + PV</div></div>
       <ul class="vars">
-        <li><code>M</code> — Masa molar [kg/mol] · <code>m</code> — Masa de molécula [kg]</li>
+        <li><code>H</code> — Entalpía [J]</li>
+        <li><code>P</code> — Presión [Pa]</li>
+      </ul>
+    </div>
+    <div class="fsub">Entropía</div>
+    <div class="fgroup">
+      <div class="fname">Variación de entropía</div>
+      <div class="fblock"><div class="fm">ΔS = Q_rev / T</div></div>
+      <ul class="vars">
+        <li><code>Q_rev</code> — Calor absorbido en proceso reversible [J]</li>
+        <li><code>T</code> — Temperatura absoluta [K]</li>
+      </ul>
+    </div>
+    <div class="fsub">Entropía en Procesos Isotérmicos</div>
+    <div class="fgroup">
+      <div class="fname">Cambio de entropía en gas ideal</div>
+      <div class="fblock"><div class="fm">ΔS = n · R · ln(V_f / V_i)</div></div>
+      <ul class="vars">
+        <li><code>n</code> — Moles [mol]</li>
+        <li><code>R</code> — Constante de los gases (8.314 J/mol·K)</li>
+        <li><code>V_f, V_i</code> — Volumen final e inicial [m³]</li>
       </ul>
     </div>
   </section>
@@ -180,119 +157,181 @@ a{text-decoration:none;}
   <section class="section" id="procesos">
     <div class="section-title">Procesos Termodinámicos</div>
     <div class="fgroup">
-      <div class="fname">Isobárico (P = cte)</div>
+      <div class="fname">Proceso Isotérmico (T = cte)</div>
       <div class="fblock">
-        <div class="fm">W = P · ΔV = n · R · ΔT</div>
-        <div class="fa">Q = n · Cp · ΔT  ·  ΔU = n · Cv · ΔT</div>
+        <div class="fl">Trabajo e intercambio de calor</div>
+        <div class="fm">Q = W = n·R·T · ln(V_f/V_i)</div>
       </div>
     </div>
     <div class="fgroup">
-      <div class="fname">Isocórico (V = cte)</div>
-      <div class="fblock">
-        <div class="fm">W = 0  →  Q = ΔU = n · Cv · ΔT</div>
-      </div>
+      <div class="fname">Proceso Isocórico (V = cte)</div>
+      <div class="fdesc">No hay trabajo (ΔV=0), todo el calor modifica la energía interna.</div>
+      <div class="fblock"><div class="fm">ΔU = Q = n · Cv · ΔT</div></div>
+      <ul class="vars">
+        <li><code>Cv</code> — Capacidad calorífica a V constante [J/mol·K]</li>
+      </ul>
     </div>
     <div class="fgroup">
-      <div class="fname">Isotérmico (T = cte)</div>
-      <div class="fblock">
-        <div class="fm">W = n · R · T · ln(V₂/V₁)</div>
-        <div class="fa">ΔU = 0  →  Q = W</div>
-      </div>
+      <div class="fname">Proceso Isobárico (P = cte)</div>
+      <div class="fblock"><div class="fm">Q = ΔH = n · Cp · ΔT</div></div>
+      <ul class="vars">
+        <li><code>Cp</code> — Capacidad calorífica a P constante [J/mol·K]</li>
+      </ul>
     </div>
     <div class="fgroup">
-      <div class="fname">Adiabático (Q = 0)</div>
+      <div class="fname">Proceso Adiabático (Q = 0)</div>
+      <div class="fdesc">Sin intercambio de calor con el exterior.</div>
       <div class="fblock">
-        <div class="fm">P · Vᵞ = cte  ·  T · V^(γ−1) = cte</div>
-        <div class="fa">W = −ΔU = −n · Cv · ΔT</div>
-        <div class="fa">γ = Cp/Cv :  monoatómico = 5/3  ·  diatómico = 7/5</div>
+        <div class="fl">Primera ley simplificada</div>
+        <div class="fm">W = −ΔU = −n·Cv·ΔT</div>
       </div>
+      <div class="fblock">
+        <div class="fl">Relación P-V</div>
+        <div class="fm">P · Vγ = cte</div>
+      </div>
+      <ul class="vars">
+        <li><code>γ</code> — Índice adiabático = Cp/Cv</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="equilibrio">
+    <div class="section-title">Equilibrio Térmico</div>
+    <div class="fgroup">
+      <div class="fname">Transferencia de calor — Conducción</div>
+      <div class="fblock"><div class="fm">Q/t = k · A · ΔT / d</div></div>
+      <ul class="vars">
+        <li><code>k</code> — Conductividad térmica [W/m·K]</li>
+        <li><code>A</code> — Área de sección transversal [m²]</li>
+        <li><code>ΔT</code> — Diferencia de temperatura [K]</li>
+        <li><code>d</code> — Grosor del material [m]</li>
+      </ul>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Convección</div>
+      <div class="fblock"><div class="fm">Q/t = h · A · (T_s − T_fluido)</div></div>
+      <ul class="vars">
+        <li><code>h</code> — Coeficiente de convección [W/m²·K]</li>
+        <li><code>T_s</code> — Temperatura de la superficie [K]</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="ecuaciones">
+    <div class="section-title">Ecuaciones de Estado</div>
+    <div class="fgroup">
+      <div class="fname">Gas ideal</div>
+      <div class="fblock"><div class="fm">P · V = n · R · T</div></div>
+      <ul class="vars">
+        <li><code>P</code> — Presión [Pa]</li>
+        <li><code>V</code> — Volumen [m³]</li>
+        <li><code>n</code> — Moles [mol]</li>
+        <li><code>R</code> — 8.314 J/mol·K</li>
+        <li><code>T</code> — Temperatura [K]</li>
+      </ul>
+    </div>
+    <div class="fsub">Ecuación de Van der Waals</div>
+    <div class="fgroup">
+      <div class="fname">Gas real (Van der Waals)</div>
+      <div class="fdesc">Corrige el gas ideal para interacciones moleculares y volumen finito.</div>
+      <div class="fblock"><div class="fm">(P + a/V_m²) · (V_m − b) = R·T</div></div>
+      <ul class="vars">
+        <li><code>a</code> — Constante de interacción molecular (corrige presión)</li>
+        <li><code>b</code> — Volumen molar del gas (corrige volumen)</li>
+        <li><code>V_m</code> — Volumen molar [m³/mol]</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="trabajo">
+    <div class="section-title">Trabajo y Calor</div>
+    <div class="fgroup">
+      <div class="fname">Trabajo general</div>
+      <div class="fdesc">Trabajo realizado por un sistema durante expansión o compresión:</div>
+      <div class="fblock"><div class="fm">W = ∫ P dV</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Calor a volumen constante</div>
+      <div class="fblock"><div class="fm">Q_v = n · Cv · ΔT</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Calor a presión constante</div>
+      <div class="fblock"><div class="fm">Q_p = n · Cp · ΔT</div></div>
+    </div>
+  </section>
+
+  <section class="section" id="capacidades">
+    <div class="section-title">Capacidades Caloríficas</div>
+    <div class="fgroup">
+      <div class="fname">Relación entre Cp y Cv</div>
+      <div class="fblock">
+        <div class="fl">Para gas ideal</div>
+        <div class="fm">Cp − Cv = R</div>
+      </div>
+      <div class="fblock">
+        <div class="fl">Índice adiabático</div>
+        <div class="fm">γ = Cp / Cv</div>
+      </div>
+      <ul class="vars">
+        <li><code>γ ≈ 1.4</code> para gases diatómicos (N₂, O₂, aire)</li>
+        <li><code>γ ≈ 1.67</code> para gases monoatómicos (He, Ar)</li>
+      </ul>
     </div>
   </section>
 
   <section class="section" id="ciclos">
-    <div class="section-title">Ciclos y Eficiencia</div>
+    <div class="section-title">Ciclos Termodinámicos</div>
     <div class="fgroup">
-      <div class="fname">Ciclo de Carnot — límite teórico máximo</div>
-      <div class="fblock">
-        <div class="fm">η_Carnot = 1 − Tc / Th</div>
-        <div class="fa">η = W_neto / Q_absorbido</div>
-      </div>
+      <div class="fname">Primera ley en ciclos</div>
+      <div class="fdesc">En un ciclo cerrado, la variación de energía interna es cero.</div>
+      <div class="fblock"><div class="fm">Q_net − W_net = ΔU = 0</div></div>
+    </div>
+    <div class="fgroup">
+      <div class="fname">Eficiencia de ciclo de Carnot</div>
+      <div class="fblock"><div class="fm">η_Carnot = 1 − T_fría / T_caliente</div></div>
       <ul class="vars">
-        <li><code>Tc</code> — Temp. foco frío [K] · <code>Th</code> — Temp. foco caliente [K]</li>
-        <li>Ej: Th = 600 K, Tc = 300 K → η_max = 50 %</li>
+        <li><code>T_fría</code> — Temperatura del foco frío [K]</li>
+        <li><code>T_caliente</code> — Temperatura del foco caliente [K]</li>
       </ul>
+      <div class="tip">El ciclo de Carnot es el ciclo ideal de mayor eficiencia posible entre dos focos térmicos.</div>
     </div>
     <div class="fgroup">
-      <div class="fname">Refrigerador y Bomba de Calor</div>
+      <div class="fname">COP — Bomba de calor / Refrigeración</div>
       <div class="fblock">
-        <div class="fl">Refrigerador (COP)</div>
-        <div class="fm">COP_ref = Qc / W = Tc / (Th − Tc)</div>
-        <div class="fl" style="margin-top:10px">Bomba de calor (COP)</div>
-        <div class="fm">COP_BC = Qh / W = Th / (Th − Tc)</div>
-        <div class="fa">COP_BC = COP_ref + 1</div>
+        <div class="fl">Refrigerador</div>
+        <div class="fm">COP_R = Q_frío / W</div>
       </div>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Ciclo Otto (motor de nafta)</div>
       <div class="fblock">
-        <div class="fm">η_Otto = 1 − 1/r^(γ−1)</div>
+        <div class="fl">Bomba de calor</div>
+        <div class="fm">COP_BC = Q_caliente / W</div>
       </div>
-      <ul class="vars"><li><code>r</code> = V_max/V_min — relación de compresión (típico 8–12)</li></ul>
     </div>
   </section>
 
-  <section class="section" id="transferencia">
-    <div class="section-title">Transferencia de Calor</div>
-    <div class="fgroup">
-      <div class="fname">Conducción — Ley de Fourier</div>
-      <div class="fblock">
-        <div class="fm">Q/t = k · A · ΔT / L</div>
-        <div class="fa">R_térmica = L / (k · A)  [K/W]</div>
-      </div>
-      <ul class="vars">
-        <li><code>k</code> — Conductividad [W/m·K]: Cu=385 · Al=205 · Fe=50 · aire=0.026</li>
-      </ul>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Convección — Ley de Newton</div>
-      <div class="fblock"><div class="fm">Q/t = h · A · ΔT</div></div>
-      <ul class="vars">
-        <li><code>h</code> — Coef. convección [W/m²·K]: aire natural 5–25 · agua forzada 1000–15000</li>
-      </ul>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Radiación — Stefan-Boltzmann</div>
-      <div class="fblock">
-        <div class="fm">P = ε · σ · A · T⁴</div>
-        <div class="fa">P_neta = ε · σ · A · (T₁⁴ − T₂⁴)</div>
-      </div>
-      <ul class="vars">
-        <li><code>σ</code> = 5.67×10⁻⁸ W/m²·K⁴ · <code>ε</code> = emisividad (cuerpo negro=1)</li>
-      </ul>
-    </div>
-    <div class="fgroup">
-      <div class="fname">Resistencia térmica en electrónica</div>
-      <div class="fblock">
-        <div class="fm">R_th_total = R_jc + R_cs + R_sa</div>
-        <div class="fa">T_j = T_amb + P_disipada · R_th_total</div>
-      </div>
-      <ul class="vars">
-        <li><code>R_jc</code> — Junta→cápsula · <code>R_cs</code> — Cápsula→disipador · <code>R_sa</code> — Disipador→aire</li>
-      </ul>
-    </div>
-  </section>
 </main>
+
 <aside class="right-toc">
   <div class="toc-title">En esta página</div>
-  <a href="#temperatura">Temperatura y Calor</a>
-  <a href="#leyes">Leyes Termodinámica</a>
-  <a href="#gases">Gases Ideales</a>
-  <a href="#procesos">Procesos</a>
-  <a href="#ciclos">Ciclos y Eficiencia</a>
-  <a href="#transferencia">Transferencia de Calor</a>
+  <a href="#leyes">Leyes de la Termodinámica</a>
+  <a href="#propiedades">Propiedades del Estado</a>
+  <a href="#procesos">Procesos Termodinámicos</a>
+  <a href="#equilibrio">Equilibrio térmico</a>
+  <a href="#ecuaciones">Ecuaciones de Estado</a>
+  <a href="#trabajo">Trabajo y Calor</a>
+  <a href="#capacidades">Capacidades caloríficas</a>
+  <a href="#ciclos">Ciclos Termodinámicos</a>
 </aside>
+
 </div>
-<script>function buscar(q){q=q.toLowerCase().trim();document.querySelectorAll('.section').forEach(s=>{s.style.display=!q||(s.textContent.toLowerCase().includes(q))?'':'none';});}</script>
+<script>
+function renderMath(){document.querySelectorAll('.fm,.fa').forEach(el=>{let h=el.innerHTML;h=h.replace(/_([A-Za-záéíóúüñÁÉÍÓÚ][A-Za-z0-9áéíóúüñÁÉÍÓÚ]*)/g,'<sub>$1</sub>');h=h.replace(/\^([0-9n]+)/g,'<sup>$1</sup>');el.innerHTML=h;});}
+document.addEventListener('DOMContentLoaded',renderMath);
+function buscar(q){
+  q=q.toLowerCase().trim();
+  document.querySelectorAll('.section').forEach(s=>{
+    s.style.display=!q||(s.textContent.toLowerCase().includes(q))?'':'none';
+  });
+}
+</script>
 </body>
 </html>
-
